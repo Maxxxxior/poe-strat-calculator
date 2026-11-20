@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10131b">
+  <title>PoE Run Tracker — kalkulator farmy</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #10131b;
+      color: #eef0f6;
+      font-synthesis: none;
+      --panel: #181c27;
+      --panel-raised: #1e2330;
+      --border: #2c3241;
+      --muted: #9ba3b5;
+      --accent: #d6a85b;
+      --green: #67d6a1;
+      --red: #ff8585;
+    }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; min-width: 320px; min-height: 100vh; }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    .shell { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 38px 0 56px; }
+    header { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; margin-bottom: 24px; }
+    .eyebrow { color: var(--accent); font-size: 11px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+    h1 { margin: 8px 0 7px; font-size: clamp(25px, 4vw, 36px); letter-spacing: -.04em; }
+    .subtitle { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.6; }
+    .header-actions { display: flex; gap: 9px; flex-wrap: wrap; justify-content: flex-end; }
+    .button { border: 1px solid var(--border); border-radius: 9px; background: var(--panel-raised); color: #e9ebf2; padding: 10px 13px; font-size: 12px; font-weight: 700; transition: background .15s, border-color .15s; }
+    .button:hover { background: #292f3e; border-color: #454d60; }
+    .button.primary { color: #17130b; background: var(--accent); border-color: var(--accent); }
+    .button.primary:hover { background: #e8bb70; }
+    .button.danger { color: #ffabab; }
+    .card { border: 1px solid var(--border); border-radius: 14px; background: var(--panel); }
+    .settings { display: grid; grid-template-columns: minmax(0, 1fr) minmax(220px, .75fr); gap: 16px; padding: 18px; margin-bottom: 16px; }
+    .field-label { display: block; margin: 0 0 8px; color: var(--muted); font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+    input, select { width: 100%; min-width: 0; border: 1px solid var(--border); border-radius: 8px; outline: none; background: #12151e; color: #f5f6fa; padding: 11px 12px; }
+    input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px #d6a85b20; }
+    input::placeholder { color: #697184; }
+    .strategy-manager { padding: 16px; margin-bottom: 16px; }
+    .strategy-manager-header, .strategy-current { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .strategy-manager-header { margin-bottom: 14px; }
+    .strategy-manager-header h2 { margin: 0 0 4px; font-size: 15px; }
+    .strategy-manager-header p { margin: 0; color: var(--muted); font-size: 11px; }
+    .strategy-tabs { display: flex; gap: 8px; overflow-x: auto; padding: 2px 1px 14px; }
+    .strategy-tab { min-width: 130px; max-width: 220px; padding: 10px 13px; border: 1px solid var(--border); border-radius: 9px; background: #12151e; color: #b5bdcc; text-align: left; }
+    .strategy-tab:hover { border-color: #555d70; color: #f0f1f3; }
+    .strategy-tab[aria-pressed="true"] { border-color: var(--accent); background: #29251d; color: #f5d69f; box-shadow: inset 0 0 0 1px #d6a85b30; }
+    .strategy-tab-name { display: block; overflow: hidden; font-size: 12px; font-weight: 750; text-overflow: ellipsis; white-space: nowrap; }
+    .strategy-tab-meta { display: block; margin-top: 4px; color: var(--muted); font-size: 10px; }
+    .strategy-current { padding-top: 12px; border-top: 1px solid var(--border); }
+    .strategy-current-label { color: var(--muted); font-size: 11px; }
+    .strategy-current-label strong { margin-left: 4px; color: #f0f1f3; font-size: 12px; }
+    .strategy-actions { display: flex; gap: 8px; }
+    dialog { width: min(420px, calc(100% - 28px)); padding: 0; border: 1px solid #3a4150; border-radius: 14px; background: var(--panel); color: #eef0f6; box-shadow: 0 24px 80px #0009; }
+    dialog::backdrop { background: #05070bcc; backdrop-filter: blur(3px); }
+    .strategy-dialog-content { padding: 20px; }
+    .strategy-dialog-content h2 { margin: 0 0 7px; font-size: 18px; }
+    .strategy-dialog-content p { margin: 0 0 18px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .strategy-dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+    .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; overflow: hidden; margin-bottom: 16px; background: var(--border); }
+    .stat { min-height: 112px; padding: 17px; background: var(--panel); }
+    .stat-label { color: var(--muted); font-size: 11px; font-weight: 700; line-height: 1.4; }
+    .stat-value { margin-top: 12px; font-size: clamp(19px, 2.5vw, 26px); font-weight: 750; letter-spacing: -.04em; overflow-wrap: anywhere; }
+    .positive { color: var(--green) !important; }
+    .negative { color: var(--red) !important; }
+    .panel-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 17px 18px; border-bottom: 1px solid var(--border); }
+    .panel-heading h2 { margin: 0; font-size: 15px; }
+    .run-count, .muted { color: var(--muted); font-size: 12px; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th { padding: 12px 14px; color: var(--muted); background: #151923; font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; }
+    td { padding: 10px 14px; border-top: 1px solid #252a37; }
+    tbody tr:hover { background: #1b202b; }
+    .runs-table td:first-child { width: 54px; color: var(--muted); font-size: 12px; }
+    .runs-table td input { padding: 9px 10px; font-size: 13px; }
+    .runs-table td:nth-child(2) { min-width: 140px; }
+    .runs-table td:nth-child(3), .runs-table td:nth-child(4), .runs-table td:nth-child(5) { min-width: 150px; }
+    .runs-table td:nth-child(6) { min-width: 125px; white-space: nowrap; font-size: 13px; font-weight: 700; }
+    .runs-table td:last-child { width: 48px; }
+    .remove-run { width: 30px; height: 30px; border: 0; border-radius: 7px; background: transparent; color: #81899a; font-size: 18px; }
+    .remove-run:hover { background: #42272c; color: #ffabab; }
+    .toggle { display: flex; align-items: center; gap: 10px; margin-top: 12px; font-size: 13px; cursor: pointer; }
+    .toggle input { width: auto; accent-color: var(--accent); }
+    .empty { padding: 35px 18px; color: var(--muted); text-align: center; font-size: 13px; }
+    .panel-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px; border-top: 1px solid var(--border); }
+    .hint { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.6; }
+    .compare { margin-top: 16px; overflow: hidden; }
+    .compare-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-bottom: 20px; }
+    .compare-card { min-height: 126px; padding: 16px; border: 1px solid var(--border); border-radius: 9px; background: #171a20; }
+    .compare-card.best-hour { border-top: 2px solid #a6d96a; }
+    .compare-card.best-roi { border-top: 2px solid #d6a85b; }
+    .compare-label { color: #b7d77f; font-size: 10px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+    .compare-card.best-roi .compare-label { color: var(--accent); }
+    .compare-primary { margin: 8px 0; font-size: 24px; font-weight: 750; letter-spacing: -.03em; }
+    .compare-strategy { margin-bottom: 7px; color: #f0f1f3; font-size: 13px; font-weight: 750; }
+    .compare-detail { color: #aeb4c0; font-size: 11px; line-height: 1.65; }
+    .compare-note { display: flex; justify-content: space-between; gap: 12px; margin: 0 0 10px; color: #aeb4c0; font-size: 11px; }
+    .compare .table-wrap { border: 1px solid var(--border); border-radius: 8px; }
+    .compare table { min-width: 760px; }
+    .compare table th { border-bottom: 1px solid #373b43; background: #202126; font-size: 11px; text-transform: none; }
+    .compare table td { padding: 10px 12px; border-top: 1px solid #33363c; font-size: 12px; white-space: nowrap; }
+    .compare table td:first-child { width: 42px; color: var(--muted); text-align: center; }
+    .compare table td:nth-child(2) { min-width: 150px; font-weight: 700; }
+    .compare table td:not(:nth-child(2)) { text-align: right; }
+    .compare table th:not(:nth-child(2)) { text-align: right; }
+    .compare tbody tr:first-child:not(.no-runs-row) { box-shadow: inset 3px 0 #a6d96a; }
+    .compare tbody tr.selected-strategy { background: #22241f; }
+    .compare .empty { padding: 20px; }
+    .save-status { min-height: 18px; margin-top: 13px; color: #7f899e; font-size: 11px; text-align: right; }
+    .error-message { min-height: 16px; margin: 7px 0 0; color: var(--red); font-size: 11px; }
+    .community { margin-top: 16px; overflow: hidden; }
+    .community-controls { display: grid; grid-template-columns: minmax(180px, 260px) 1fr; gap: 16px; align-items: end; padding: 18px; }
+    .community-controls .toggle { margin-top: 0; padding-bottom: 11px; }
+    .community-body { padding: 0 18px 18px; }
+    .community .compare-note { margin-bottom: 12px; }
+    .community tr.group-row td { background: #1b202b; font-weight: 700; }
+    .community tr.player-row td { color: #c3c9d6; }
+    .community tr.player-row td:nth-child(2) { padding-left: 28px; font-weight: 500; }
+    @media (max-width: 760px) {
+      .community-controls { grid-template-columns: 1fr; }
+      .shell { width: min(100% - 22px, 1120px); padding-top: 24px; }
+      header { flex-direction: column; }
+      .header-actions { justify-content: flex-start; }
+      .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .stat:nth-child(n+5) { grid-column: span 1; }
+      .panel-heading { align-items: flex-start; flex-direction: column; }
+      .compare-cards { grid-template-columns: 1fr; }
+      .compare-note { flex-direction: column; }
+      .strategy-current { align-items: flex-start; flex-direction: column; }
+    }
+    @media (max-width: 420px) {
+      .settings { grid-template-columns: 1fr; }
+      .header-actions { width: 100%; }
+      .header-actions .button { flex: 1; }
+      .panel-footer { align-items: flex-start; flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div>
+        <div class="eyebrow">Path of Exile · farming tracker</div>
+        <h1>Kalkulator farmy</h1>
+        <p class="subtitle">Zapisuj runy, porównuj strategie i sprawdzaj, która zarabia najwięcej na godzinę.</p>
+      </div>
+      <div class="header-actions">
+        <button class="button" id="export-button" type="button">Eksportuj CSV</button>
+        <button class="button danger" id="clear-button" type="button">Wyczyść wszystkie dane</button>
+      </div>
+    </header>
+
+    <section class="card settings" aria-label="Kurs walut">
+      <div>
+        <label class="field-label" for="exchange-rate">Kurs chaos / divine</label>
+        <input id="exchange-rate" type="text" inputmode="decimal" aria-describedby="rate-hint rate-error">
+        <p class="error-message" id="rate-error" role="alert"></p>
+      </div>
+      <div>
+        <span class="field-label">Przelicznik i format</span>
+        <p class="hint" id="rate-hint">Kwoty przeliczane są do wspólnej wartości. Od jednego divine wyświetlamy div, poniżej — c.</p>
+        <label class="toggle"><input type="checkbox" id="include-rare"> Wliczaj losowe dropy do profitu i średnich</label>
+      </div>
+    </section>
+
+    <section class="card strategy-manager" aria-label="Strategie">
+      <div class="strategy-manager-header">
+        <div>
+          <h2>Strategie</h2>
+          <p>Wybierz zakładkę, aby przełączyć runy i statystyki.</p>
+        </div>
+        <button class="button primary" id="add-strategy-button" type="button">＋ Nowa strategia</button>
+      </div>
+      <div class="strategy-tabs" id="strategy-tabs" role="group" aria-label="Wybierz strategię"></div>
+      <div class="strategy-current">
+        <div class="strategy-current-label">Edytujesz runy strategii:<strong id="active-strategy-name"></strong></div>
+        <div class="strategy-actions">
+          <button class="button" id="rename-strategy-button" type="button">Zmień nazwę</button>
+          <button class="button danger" id="delete-strategy-button" type="button">Usuń tę strategię</button>
+        </div>
+      </div>
+    </section>
+
+    <dialog id="strategy-dialog" aria-labelledby="strategy-dialog-title">
+      <form class="strategy-dialog-content" id="strategy-dialog-form">
+        <h2 id="strategy-dialog-title">Nowa strategia</h2>
+        <p id="strategy-dialog-description">Nadaj nazwę, a potem dodawaj do niej runy. Pozostałe strategie nie zostaną zmienione.</p>
+        <label class="field-label" for="strategy-dialog-input">Nazwa strategii</label>
+        <input id="strategy-dialog-input" type="text" maxlength="80" placeholder="np. Legion" required>
+        <p class="error-message" id="strategy-dialog-error" role="alert"></p>
+        <div class="strategy-dialog-actions">
+          <button class="button" id="strategy-dialog-cancel" type="button">Anuluj</button>
+          <button class="button primary" id="strategy-dialog-submit" type="submit">Utwórz strategię</button>
+        </div>
+      </form>
+    </dialog>
+
+    <section class="stats" aria-label="Podsumowanie strategii">
+      <div class="stat">
+        <div class="stat-label">Średni czas runu</div>
+        <div class="stat-value" id="average-time">—</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Średni koszt runu</div>
+        <div class="stat-value" id="average-cost">—</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Średnia wartość dropu</div>
+        <div class="stat-value" id="average-loot">—</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Średni net profit / run</div>
+        <div class="stat-value" id="average-net">—</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Profit na godzinę</div>
+        <div class="stat-value" id="profit-per-hour">—</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Łączny wynik strategii</div>
+        <div class="stat-value" id="total-result">—</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Losowe dropy (łącznie)</div>
+        <div class="stat-value" id="rare-total">—</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Śr. losowy drop / run</div>
+        <div class="stat-value" id="rare-average">—</div>
+      </div>
+    </section>
+
+    <section class="card" aria-label="Runy wybranej strategii">
+      <div class="panel-heading">
+        <h2>Runy strategii</h2>
+        <span class="run-count" id="run-count">0 kompletnych runów</span>
+      </div>
+      <div class="table-wrap">
+        <table class="runs-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Czas runu</th>
+              <th>Koszt</th>
+              <th>Wartość dropu</th>
+              <th>Losowy drop</th>
+              <th>Net profit</th>
+              <th aria-label="Usuń"></th>
+            </tr>
+          </thead>
+          <tbody id="runs-body"></tbody>
+        </table>
+        <div class="empty" id="empty-message">Dodaj pierwszy run i wpisz czas, koszt oraz wartość dropu.</div>
+      </div>
+      <div class="panel-footer">
+        <p class="hint">Czas: <strong>mm:ss</strong> lub sekundy. Koszt i drop wpisz np. <strong>10</strong> (domyślnie c), <strong>10c</strong>, <strong>10 c</strong> albo <strong>10 div</strong>.<br>Net profit = drop − koszt. Liczą się tylko kompletne runy.</p>
+        <button class="button primary" id="add-run-button" type="button">＋ Dodaj run</button>
+      </div>
+    </section>
+
+    <section class="card compare" aria-label="Porównanie strategii">
+      <div class="panel-heading">
+        <h2>Porównanie strategii</h2>
+        <span class="run-count">Zyskowność na podstawie Twoich runów i aktualnego kursu</span>
+      </div>
+      <div class="compare-cards" id="comparison-cards"></div>
+      <div class="compare-note">
+        <span>Strategie posortowane według <strong>profitu na godzinę</strong>, od najwyższego.</span>
+        <span>ROI = średni net profit ÷ średni koszt runu.</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>#</th><th>Strategia</th><th>Runy</th><th>Śr. czas</th><th>Śr. koszt</th><th>Śr. drop</th><th>Net / run</th><th>Łączny wynik</th><th>ROI</th><th>Profit / h</th></tr>
+          </thead>
+          <tbody id="comparison-body"></tbody>
+        </table>
+        <div class="empty" id="comparison-empty">Dodaj kompletne runy, aby porównać strategie.</div>
+      </div>
+    </section>
+    <section class="card compare community" aria-label="Porównanie ze znajomymi">
+      <div class="panel-heading">
+        <h2>Porównanie ze znajomymi</h2>
+        <span class="run-count" id="community-status">Łączenie…</span>
+      </div>
+      <div class="community-controls">
+        <div>
+          <label class="field-label" for="nick-input">Twój nick</label>
+          <input id="nick-input" type="text" maxlength="30" placeholder="np. Kuba" autocomplete="off">
+        </div>
+        <label class="toggle"><input type="checkbox" id="share-toggle"> Udostępniaj moje dane znajomym</label>
+      </div>
+      <div class="community-body">
+        <div class="compare-note">
+          <span>Strategie łączone po nazwie (bez względu na wielkość liter), posortowane według <strong>profitu na godzinę</strong>.</span>
+          <span>Wartości przeliczone na chaosy. Przełącznik losowych dropów działa też tutaj.</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>#</th><th>Strategia / gracz</th><th>Gracze</th><th>Runy</th><th>Śr. czas</th><th>Śr. koszt</th><th>Śr. drop</th><th>Net / run</th><th>Łączny wynik</th><th>ROI</th><th>Profit / h</th></tr>
+            </thead>
+            <tbody id="community-body"></tbody>
+          </table>
+          <div class="empty" id="community-empty">Brak danych. Włącz udostępnianie i dodaj kompletne runy.</div>
+        </div>
+      </div>
+    </section>
+    <div class="save-status" id="save-status" role="status" aria-live="polite">Dane zapisują się automatycznie w tej przeglądarce.</div>
+  </main>
+
+  <script>
+    (() => {
+      const STORAGE_KEY = "poe-farm-calculator-v1";
+      const runsBody = document.getElementById("runs-body");
+      const comparisonBody = document.getElementById("comparison-body");
+      const comparisonCards = document.getElementById("comparison-cards");
+      const emptyMessage = document.getElementById("empty-message");
+      const comparisonEmpty = document.getElementById("comparison-empty");
+      const strategyTabs = document.getElementById("strategy-tabs");
+      const strategyDialog = document.getElementById("strategy-dialog");
+      const strategyDialogInput = document.getElementById("strategy-dialog-input");
+      const exchangeRateInput = document.getElementById("exchange-rate");
+      const includeRareInput = document.getElementById("include-rare");
+      const saveStatus = document.getElementById("save-status");
+      let strategyDialogMode = "add";
+      const initialStrategy = { id: makeId(), name: "Strategia 1", runs: [] };
+      let state = {
+        exchangeRate: "155",
+        includeRare: true,
+        selectedId: initialStrategy.id,
+        strategies: [initialStrategy]
+      };
+
+      function makeId() {
+        return globalThis.crypto?.randomUUID?.() || `strategy-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      }
+
+      function activeStrategy() {
+        return state.strategies.find(strategy => strategy.id === state.selectedId) || state.strategies[0];
+      }
+
+      function parseRate() {
+        const normalized = exchangeRateInput.value.trim().replace(",", ".");
+        if (!/^\d+(?:\.\d+)?$/.test(normalized)) return null;
+        const rate = Number(normalized);
+        return Number.isFinite(rate) && rate > 0 ? rate : null;
+      }
+
+      function parseAmount(value) {
+        const match = value.trim().match(/^((?:\d+(?:[.,]\d*)?)|(?:[.,]\d+))\s*(c|div)?$/i);
+        if (!match) return null;
+        const amount = Number(match[1].replace(",", "."));
+        if (!Number.isFinite(amount) || amount < 0) return null;
+        const rate = parseRate();
+        if (rate === null) return null;
+        return match[2]?.toLowerCase() === "div" ? amount * rate : amount;
+      }
+
+      function parseRare(value) {
+        if (typeof value !== "string" || !value.trim()) return 0;
+        return parseAmount(value) ?? 0;
+      }
+
+      function parseDuration(value) {
+        const normalized = value.trim().replace(",", ".");
+        if (!normalized) return null;
+        const parts = normalized.split(":");
+        if (parts.length > 3 || parts.some(part => part === "" || !Number.isFinite(Number(part)))) return null;
+        const numbers = parts.map(Number);
+        if (numbers.some(number => number < 0)) return null;
+        let seconds;
+        if (numbers.length === 1) seconds = numbers[0];
+        else if (numbers.length === 2) {
+          if (numbers[1] >= 60) return null;
+          seconds = numbers[0] * 60 + numbers[1];
+        } else {
+          if (numbers[1] >= 60 || numbers[2] >= 60) return null;
+          seconds = numbers[0] * 3600 + numbers[1] * 60 + numbers[2];
+        }
+        return seconds > 0 ? seconds : null;
+      }
+
+      function formatNumber(value) {
+        return new Intl.NumberFormat("pl-PL", { maximumFractionDigits: 2 }).format(value);
+      }
+
+      function formatMoney(chaosValue) {
+        const rate = parseRate();
+        if (rate === null) return "—";
+        const sign = chaosValue < 0 ? "−" : "";
+        const absolute = Math.abs(chaosValue);
+        if (absolute >= rate) return `${sign}${formatNumber(absolute / rate)} div`;
+        return `${sign}${formatNumber(absolute)}c`;
+      }
+
+      function formatSignedMoney(chaosValue) {
+        if (chaosValue > 0) return `+${formatMoney(chaosValue)}`;
+        if (chaosValue < 0) return `−${formatMoney(Math.abs(chaosValue))}`;
+        return formatMoney(0);
+      }
+
+      function formatTotalResult(chaosValue) {
+        if (chaosValue !== 0) return formatSignedMoney(chaosValue);
+        return "0c";
+      }
+
+      function formatDuration(seconds) {
+        const rounded = Math.round(seconds);
+        const hours = Math.floor(rounded / 3600);
+        const minutes = Math.floor((rounded % 3600) / 60);
+        const remainder = rounded % 60;
+        if (hours > 0) return `${hours}:${String(minutes).padStart(2, "0")}:${String(remainder).padStart(2, "0")}`;
+        return `${minutes}:${String(remainder).padStart(2, "0")}`;
+      }
+
+      function metricsFor(strategy) {
+        const empty = { count: 0, averageTime: null, averageCost: null, averageLoot: null, averageNet: null, totalNet: null, hourlyProfit: null, totalRare: null, averageRare: null };
+        const rate = parseRate();
+        if (rate === null) return empty;
+        const completeRuns = strategy.runs.map(run => ({
+          time: parseDuration(run.time),
+          cost: parseAmount(run.cost),
+          loot: parseAmount(run.loot),
+          rare: parseRare(run.rare)
+        })).filter(run => run.time !== null && run.cost !== null && run.loot !== null);
+        const count = completeRuns.length;
+        if (!count) return empty;
+        const totals = completeRuns.reduce((sum, run) => ({
+          time: sum.time + run.time,
+          cost: sum.cost + run.cost,
+          loot: sum.loot + run.loot,
+          rare: sum.rare + run.rare
+        }), { time: 0, cost: 0, loot: 0, rare: 0 });
+        const countedRare = state.includeRare ? totals.rare : 0;
+        const averageTime = totals.time / count;
+        const averageCost = totals.cost / count;
+        const averageLoot = (totals.loot + countedRare) / count;
+        const totalNet = totals.loot + countedRare - totals.cost;
+        const averageNet = totalNet / count;
+        return {
+          count, averageTime, averageCost, averageLoot, averageNet, totalNet,
+          hourlyProfit: averageTime > 0 ? averageNet * 3600 / averageTime : null,
+          totalRare: totals.rare,
+          averageRare: totals.rare / count
+        };
+      }
+
+      function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, character => ({
+          "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+        })[character]);
+      }
+
+      function saveData() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify({
+            version: 2,
+            exchangeRate: state.exchangeRate,
+            includeRare: state.includeRare,
+            selectedId: state.selectedId,
+            strategies: state.strategies
+          }));
+          saveStatus.textContent = "Zapisano automatycznie w tej przeglądarce.";
+          document.dispatchEvent(new Event("poe:changed"));
+        } catch (error) {
+          saveStatus.textContent = "Nie udało się zapisać danych w przeglądarce.";
+          console.error("Nie udało się zapisać danych kalkulatora:", error);
+        }
+      }
+
+      function renderStrategyTabs() {
+        const selected = activeStrategy();
+        if (!selected) return;
+        state.selectedId = selected.id;
+        strategyTabs.innerHTML = state.strategies.map(strategy => {
+          const metrics = metricsFor(strategy);
+          const meta = metrics.count
+            ? `${metrics.count} ${metrics.count === 1 ? "run" : "runów"} · ${formatSignedMoney(metrics.totalNet)}`
+            : "Brak kompletnych runów";
+          return `<button class="strategy-tab" id="strategy-tab-${escapeHtml(strategy.id)}" type="button" data-strategy-id="${escapeHtml(strategy.id)}" aria-pressed="${strategy.id === selected.id}">
+            <span class="strategy-tab-name">${escapeHtml(strategy.name || "Bez nazwy")}</span>
+            <span class="strategy-tab-meta">${escapeHtml(meta)}</span>
+          </button>`;
+        }).join("");
+        document.getElementById("active-strategy-name").textContent = selected.name || "Bez nazwy";
+      }
+
+      function updateSummary() {
+        const strategy = activeStrategy();
+        const metrics = strategy ? metricsFor(strategy) : metricsFor({ runs: [] });
+        document.getElementById("average-time").textContent = metrics.averageTime === null ? "—" : formatDuration(metrics.averageTime);
+        document.getElementById("average-cost").textContent = metrics.averageCost === null ? "—" : formatMoney(metrics.averageCost);
+        document.getElementById("average-loot").textContent = metrics.averageLoot === null ? "—" : formatMoney(metrics.averageLoot);
+        const netElement = document.getElementById("average-net");
+        netElement.textContent = metrics.averageNet === null ? "—" : formatMoney(metrics.averageNet);
+        netElement.className = `stat-value${metrics.averageNet === null ? "" : metrics.averageNet >= 0 ? " positive" : " negative"}`;
+        const hourlyElement = document.getElementById("profit-per-hour");
+        hourlyElement.textContent = metrics.hourlyProfit === null ? "—" : `${formatMoney(metrics.hourlyProfit)} / h`;
+        hourlyElement.className = `stat-value${metrics.hourlyProfit === null ? "" : metrics.hourlyProfit >= 0 ? " positive" : " negative"}`;
+        const totalElement = document.getElementById("total-result");
+        totalElement.textContent = metrics.totalNet === null ? "—" : formatTotalResult(metrics.totalNet);
+        totalElement.className = `stat-value${metrics.totalNet === null ? "" : metrics.totalNet >= 0 ? " positive" : " negative"}`;
+        document.getElementById("rare-total").textContent = metrics.totalRare === null ? "—" : formatMoney(metrics.totalRare);
+        document.getElementById("rare-average").textContent = metrics.averageRare === null ? "—" : formatMoney(metrics.averageRare);
+        document.getElementById("run-count").textContent = `${metrics.count} ${metrics.count === 1 ? "kompletny run" : metrics.count >= 2 && metrics.count <= 4 ? "kompletne runy" : "kompletnych runów"}`;
+
+        if (!strategy) return;
+        runsBody.querySelectorAll("tr").forEach((row, index) => {
+          const run = strategy.runs[index];
+          const cost = parseAmount(run.cost);
+          const loot = parseAmount(run.loot);
+          const netCell = row.querySelector(".net-cell");
+          if (cost === null || loot === null) {
+            netCell.textContent = "—";
+            netCell.className = "net-cell";
+          } else {
+            const net = loot - cost + (state.includeRare ? parseRare(run.rare) : 0);
+            netCell.textContent = formatMoney(net);
+            netCell.className = `net-cell ${net >= 0 ? "positive" : "negative"}`;
+          }
+        });
+      }
+
+      function renderRuns() {
+        const strategy = activeStrategy();
+        if (!strategy) return;
+        runsBody.innerHTML = "";
+        strategy.runs.forEach((run, index) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${index + 1}</td>
+            <td><input data-field="time" data-index="${index}" type="text" inputmode="decimal" placeholder="np. 4:30" aria-label="Czas runu ${index + 1}" value="${escapeHtml(run.time)}"></td>
+            <td><input data-field="cost" data-index="${index}" type="text" inputmode="decimal" placeholder="np. 10, 10c lub 1 div" aria-label="Koszt runu ${index + 1}" value="${escapeHtml(run.cost)}"></td>
+            <td><input data-field="loot" data-index="${index}" type="text" inputmode="decimal" placeholder="np. 10, 10c lub 1 div" aria-label="Wartość dropu runu ${index + 1}" value="${escapeHtml(run.loot)}"></td>
+            <td><input data-field="rare" data-index="${index}" type="text" inputmode="decimal" placeholder="opcjonalnie, np. 2 div" aria-label="Losowy drop runu ${index + 1}" value="${escapeHtml(run.rare || "")}"></td>
+            <td class="net-cell">—</td>
+            <td><button class="remove-run" data-remove="${index}" type="button" aria-label="Usuń run ${index + 1}" title="Usuń run">×</button></td>`;
+          runsBody.appendChild(row);
+        });
+        emptyMessage.hidden = strategy.runs.length > 0;
+        updateSummary();
+      }
+
+      function renderComparison() {
+        const ranked = state.strategies.map(strategy => {
+          const metrics = metricsFor(strategy);
+          return {
+            strategy,
+            metrics,
+            roi: metrics.averageNet !== null && metrics.averageCost > 0
+              ? metrics.averageNet / metrics.averageCost * 100
+              : null
+          };
+        })
+          .sort((a, b) => (b.metrics.hourlyProfit ?? -Infinity) - (a.metrics.hourlyProfit ?? -Infinity));
+        const bestHourly = ranked.find(item => item.metrics.hourlyProfit !== null);
+        const bestRoi = [...ranked].filter(item => item.roi !== null).sort((a, b) => b.roi - a.roi)[0];
+        comparisonCards.innerHTML = `
+          <article class="compare-card best-hour">
+            <div class="compare-label">Najlepszy profit na godzinę</div>
+            <div class="compare-primary ${bestHourly ? bestHourly.metrics.hourlyProfit >= 0 ? "positive" : "negative" : ""}">${bestHourly ? `${formatMoney(bestHourly.metrics.hourlyProfit)} / h` : "—"}</div>
+            <div class="compare-strategy">${bestHourly ? escapeHtml(bestHourly.strategy.name || "Bez nazwy") : "Dodaj kompletne runy"}</div>
+            <div class="compare-detail">${bestHourly ? `Net / run: ${formatMoney(bestHourly.metrics.averageNet)} · ROI: ${formatPercent(bestHourly.roi)}` : "Wynik pojawi się po uzupełnieniu czasu, kosztu i dropu."}</div>
+          </article>
+          <article class="compare-card best-roi">
+            <div class="compare-label">Najlepszy ROI</div>
+            <div class="compare-primary ${bestRoi ? bestRoi.roi >= 0 ? "positive" : "negative" : ""}">${bestRoi ? formatPercent(bestRoi.roi) : "—"}</div>
+            <div class="compare-strategy">${bestRoi ? escapeHtml(bestRoi.strategy.name || "Bez nazwy") : "Dodaj runy z kosztem"}</div>
+            <div class="compare-detail">${bestRoi ? `${formatMoney(bestRoi.metrics.hourlyProfit)} / h · Net / run: ${formatMoney(bestRoi.metrics.averageNet)}` : "ROI wymaga kompletnego runu z kosztem większym od zera."}</div>
+          </article>`;
+        comparisonBody.innerHTML = "";
+        ranked.forEach(({ strategy, metrics, roi }, index) => {
+          const row = document.createElement("tr");
+          if (strategy.id === state.selectedId) row.classList.add("selected-strategy");
+          row.innerHTML = `
+            <td>${index + 1}</td>
+            <td>${escapeHtml(strategy.name || "Bez nazwy")}${strategy.id === state.selectedId ? " · wybrana" : ""}</td>
+            <td>${metrics.count}</td>
+            <td>${metrics.averageTime === null ? "—" : formatDuration(metrics.averageTime)}</td>
+            <td>${metrics.averageCost === null ? "—" : formatMoney(metrics.averageCost)}</td>
+            <td>${metrics.averageLoot === null ? "—" : formatMoney(metrics.averageLoot)}</td>
+            <td class="${metrics.averageNet === null ? "" : metrics.averageNet >= 0 ? "positive" : "negative"}">${metrics.averageNet === null ? "—" : formatMoney(metrics.averageNet)}</td>
+            <td class="${metrics.totalNet === null ? "" : metrics.totalNet >= 0 ? "positive" : "negative"}">${metrics.totalNet === null ? "—" : formatTotalResult(metrics.totalNet)}</td>
+            <td class="${roi === null ? "" : roi >= 0 ? "positive" : "negative"}">${formatPercent(roi)}</td>
+            <td class="${metrics.hourlyProfit === null ? "" : metrics.hourlyProfit >= 0 ? "positive" : "negative"}">${metrics.hourlyProfit === null ? "—" : `${formatMoney(metrics.hourlyProfit)} / h`}</td>`;
+          comparisonBody.appendChild(row);
+        });
+        comparisonEmpty.hidden = ranked.some(({ metrics }) => metrics.count > 0);
+      }
+
+      function formatPercent(value) {
+        return value === null ? "—" : `${value >= 0 ? "+" : "−"}${formatNumber(Math.abs(value))}%`;
+      }
+
+      function renderAll() {
+        renderStrategyTabs();
+        renderRuns();
+        renderComparison();
+      }
+
+      function normalizeRuns(rawRuns, legacyCurrency) {
+        return rawRuns.filter(run => run && typeof run === "object").map(run => {
+          const normalizeAmount = value => {
+            if (typeof value !== "string") return "";
+            if (!value.trim() || /(?:c|div)\s*$/i.test(value.trim())) return value;
+            return `${value.trim()} ${legacyCurrency === "c" ? "c" : "div"}`;
+          };
+          return {
+            time: typeof run.time === "string" ? run.time : "",
+            cost: normalizeAmount(run.cost),
+            loot: normalizeAmount(run.loot),
+            rare: normalizeAmount(run.rare)
+          };
+        });
+      }
+
+      function loadData() {
+        try {
+          const stored = localStorage.getItem(STORAGE_KEY);
+          if (!stored) return;
+          const data = JSON.parse(stored);
+          if (data && data.version === 2 && Array.isArray(data.strategies)) {
+            const strategies = data.strategies.filter(strategy => strategy && typeof strategy === "object" && Array.isArray(strategy.runs)).map(strategy => ({
+              id: typeof strategy.id === "string" ? strategy.id : makeId(),
+              name: typeof strategy.name === "string" ? strategy.name : "",
+              runs: normalizeRuns(strategy.runs, "c")
+            }));
+            if (strategies.length) {
+              state.strategies = strategies;
+              state.selectedId = strategies.some(strategy => strategy.id === data.selectedId) ? data.selectedId : strategies[0].id;
+            }
+            if (data.exchangeRate !== undefined) state.exchangeRate = String(data.exchangeRate);
+            if (typeof data.includeRare === "boolean") state.includeRare = data.includeRare;
+          } else if (data && Array.isArray(data.runs)) {
+            state.exchangeRate = "155";
+            state.strategies = [{
+              id: makeId(),
+              name: data.strategy?.trim() || "Strategia 1",
+              runs: normalizeRuns(data.runs, data.currency)
+            }];
+            state.selectedId = state.strategies[0].id;
+          } else {
+            throw new Error("Nieprawidłowy format zapisanych danych.");
+          }
+        } catch (error) {
+          saveStatus.textContent = "Nie udało się odczytać zapisanych danych.";
+          console.error("Nie udało się odczytać danych kalkulatora:", error);
+        }
+      }
+
+      function exportCsv() {
+        const strategy = activeStrategy();
+        if (!strategy || !strategy.runs.length) {
+          saveStatus.textContent = "Dodaj przynajmniej jeden run przed eksportem.";
+          return;
+        }
+        const rows = [
+          ["Strategia", strategy.name, "Kurs chaos/div", exchangeRateInput.value],
+          ["Run", "Czas", "Koszt", "Drop", "Losowy drop", "Net profit"]
+        ];
+        strategy.runs.forEach((run, index) => {
+          const cost = parseAmount(run.cost);
+          const loot = parseAmount(run.loot);
+          rows.push([String(index + 1), run.time, run.cost, run.loot, run.rare || "", cost !== null && loot !== null ? formatMoney(loot - cost + (state.includeRare ? parseRare(run.rare) : 0)) : ""]);
+        });
+        const csv = "\uFEFF" + rows.map(row => row.map(value => `"${String(value).replace(/"/g, '""')}"`).join(";")).join("\r\n");
+        const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `${(strategy.name || "poe-strategia").replace(/[<>:"/\\|?*]+/g, "-")}.csv`;
+        link.click();
+        URL.revokeObjectURL(url);
+      }
+
+      runsBody.addEventListener("input", event => {
+        const input = event.target.closest("input[data-field]");
+        const strategy = activeStrategy();
+        if (!input || !strategy) return;
+        strategy.runs[Number(input.dataset.index)][input.dataset.field] = input.value;
+        updateSummary();
+        renderStrategyTabs();
+        renderComparison();
+        saveData();
+      });
+
+      runsBody.addEventListener("click", event => {
+        const button = event.target.closest("button[data-remove]");
+        const strategy = activeStrategy();
+        if (!button || !strategy) return;
+        strategy.runs.splice(Number(button.dataset.remove), 1);
+        renderRuns();
+        renderStrategyTabs();
+        renderComparison();
+        saveData();
+      });
+
+      document.getElementById("add-run-button").addEventListener("click", () => {
+        const strategy = activeStrategy();
+        if (!strategy) return;
+        strategy.runs.push({ time: "", cost: "", loot: "", rare: "" });
+        renderRuns();
+        renderStrategyTabs();
+        saveData();
+        runsBody.querySelector("tr:last-child input")?.focus();
+      });
+
+      strategyTabs.addEventListener("click", event => {
+        const tab = event.target.closest("button[data-strategy-id]");
+        if (!tab || tab.dataset.strategyId === state.selectedId) return;
+        state.selectedId = tab.dataset.strategyId;
+        renderAll();
+        document.getElementById(`strategy-tab-${state.selectedId}`)?.focus();
+        saveData();
+      });
+
+      document.getElementById("add-strategy-button").addEventListener("click", () => {
+        strategyDialogMode = "add";
+        document.getElementById("strategy-dialog-title").textContent = "Nowa strategia";
+        document.getElementById("strategy-dialog-description").textContent = "Nadaj nazwę, a potem dodawaj do niej runy. Pozostałe strategie nie zostaną zmienione.";
+        document.getElementById("strategy-dialog-submit").textContent = "Utwórz strategię";
+        document.getElementById("strategy-dialog-error").textContent = "";
+        strategyDialogInput.value = "";
+        strategyDialogInput.placeholder = "np. Legion";
+        strategyDialog.showModal();
+        strategyDialogInput.focus();
+      });
+
+      document.getElementById("rename-strategy-button").addEventListener("click", () => {
+        const strategy = activeStrategy();
+        if (!strategy) return;
+        strategyDialogMode = "rename";
+        document.getElementById("strategy-dialog-title").textContent = "Zmień nazwę strategii";
+        document.getElementById("strategy-dialog-description").textContent = "Zmieni się tylko nazwa tej strategii. Jej runy i pozostałe strategie pozostaną bez zmian.";
+        document.getElementById("strategy-dialog-submit").textContent = "Zapisz nazwę";
+        document.getElementById("strategy-dialog-error").textContent = "";
+        strategyDialogInput.value = strategy.name;
+        strategyDialogInput.placeholder = "np. Legion";
+        strategyDialog.showModal();
+        strategyDialogInput.focus();
+        strategyDialogInput.select();
+      });
+
+      document.getElementById("strategy-dialog-cancel").addEventListener("click", () => strategyDialog.close());
+      document.getElementById("strategy-dialog-form").addEventListener("submit", event => {
+        event.preventDefault();
+        const name = strategyDialogInput.value.trim();
+        const errorElement = document.getElementById("strategy-dialog-error");
+        if (!name) {
+          errorElement.textContent = "Wpisz nazwę strategii.";
+          strategyDialogInput.focus();
+          return;
+        }
+        const duplicate = state.strategies.some(strategy =>
+          strategy.name.trim().toLocaleLowerCase() === name.toLocaleLowerCase()
+          && (strategyDialogMode === "add" || strategy.id !== state.selectedId)
+        );
+        if (duplicate) {
+          errorElement.textContent = "Taka nazwa jest już używana. Wybierz inną, żeby łatwiej odróżniać strategie.";
+          strategyDialogInput.focus();
+          return;
+        }
+        if (strategyDialogMode === "add") {
+          const strategy = { id: makeId(), name, runs: [] };
+          state.strategies.push(strategy);
+          state.selectedId = strategy.id;
+        } else {
+          const strategy = activeStrategy();
+          if (!strategy) return;
+          strategy.name = name;
+        }
+        strategyDialog.close();
+        renderAll();
+        saveData();
+      });
+
+      document.getElementById("delete-strategy-button").addEventListener("click", () => {
+        const strategy = activeStrategy();
+        if (!strategy) return;
+        if (!window.confirm(`Usunąć strategię „${strategy.name || "Bez nazwy"}” wraz ze wszystkimi jej runami?`)) return;
+        state.strategies = state.strategies.filter(item => item.id !== strategy.id);
+        if (!state.strategies.length) state.strategies.push({ id: makeId(), name: "Strategia 1", runs: [] });
+        state.selectedId = state.strategies[0].id;
+        renderAll();
+        saveData();
+      });
+
+      exchangeRateInput.addEventListener("input", () => {
+        state.exchangeRate = exchangeRateInput.value;
+        const valid = parseRate() !== null;
+        document.getElementById("rate-error").textContent = valid ? "" : "Podaj kurs większy od zera, np. 155.";
+        updateSummary();
+        renderStrategyTabs();
+        renderComparison();
+        saveData();
+      });
+
+      includeRareInput.addEventListener("change", () => {
+        state.includeRare = includeRareInput.checked;
+        renderAll();
+        saveData();
+      });
+
+      document.getElementById("export-button").addEventListener("click", exportCsv);
+      document.getElementById("clear-button").addEventListener("click", () => {
+        if (!window.confirm("Usunąć wszystkie strategie, runy i ustawienia?")) return;
+        const strategy = { id: makeId(), name: "Strategia 1", runs: [] };
+        state = { exchangeRate: "155", includeRare: true, selectedId: strategy.id, strategies: [strategy] };
+        exchangeRateInput.value = state.exchangeRate;
+        includeRareInput.checked = state.includeRare;
+        document.getElementById("rate-error").textContent = "";
+        renderAll();
+        saveData();
+      });
+
+      window.poeCalc = {
+        shareData() {
+          return state.strategies.map(strategy => ({
+            name: (strategy.name || "").trim(),
+            runs: strategy.runs.map(run => ({
+              t: parseDuration(run.time),
+              c: parseAmount(run.cost),
+              l: parseAmount(run.loot),
+              r: parseRare(run.rare)
+            })).filter(run => run.t !== null && run.c !== null && run.l !== null)
+          })).filter(strategy => strategy.name && strategy.runs.length);
+        },
+        includeRare: () => state.includeRare,
+        formatMoney, formatSignedMoney, formatTotalResult, formatDuration, formatPercent, escapeHtml
+      };
+
+      loadData();
+      exchangeRateInput.value = state.exchangeRate;
+      includeRareInput.checked = state.includeRare;
+      renderAll();
+      if (parseRate() === null) document.getElementById("rate-error").textContent = "Podaj kurs większy od zera, np. 155.";
+      saveData();
+    })();
+  </script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, deleteDoc, collection, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+    // Wklej tu konfigurację z Firebase (Project settings → Your apps → Web app).
+    const firebaseConfig = {
+      apiKey: "AIzaSyASb0iIGVFDkm3gNkaKIMIoNqrSzhA4ZN8",
+      authDomain: "poe-strat-calculator.firebaseapp.com",
+      projectId: "poe-strat-calculator",
+      storageBucket: "poe-strat-calculator.firebasestorage.app",
+      messagingSenderId: "1091845584966",
+      appId: "1:1091845584966:web:8c4f7b7610b5c12118b247"
+    };
+
+    const SHARE_KEY = "poe-share-v1";
+    const calc = window.poeCalc;
+    const statusEl = document.getElementById("community-status");
+    const nickInput = document.getElementById("nick-input");
+    const shareToggle = document.getElementById("share-toggle");
+    const tableBody = document.getElementById("community-body");
+    const emptyEl = document.getElementById("community-empty");
+
+    let settings = { enabled: false, nick: "" };
+    try { settings = { ...settings, ...JSON.parse(localStorage.getItem(SHARE_KEY) || "{}") }; } catch (error) { console.error(error); }
+    nickInput.value = settings.nick || "";
+    shareToggle.checked = Boolean(settings.enabled);
+
+    let db = null;
+    let uid = null;
+    let players = {};
+    let playerCount = 0;
+    let uploadTimer = null;
+
+    function saveSettings() {
+      try { localStorage.setItem(SHARE_KEY, JSON.stringify(settings)); } catch (error) { console.error(error); }
+    }
+
+    function setStatus(text) { statusEl.textContent = text; }
+
+    function blank() { return { n: 0, t: 0, c: 0, l: 0, r: 0 }; }
+
+    function addRun(total, run) {
+      total.n += 1; total.t += run.t; total.c += run.c; total.l += run.l; total.r += run.r;
+    }
+
+    function metrics(total) {
+      const bonus = calc.includeRare() ? total.r : 0;
+      const totalNet = total.l + bonus - total.c;
+      return {
+        n: total.n,
+        avgTime: total.t / total.n,
+        avgCost: total.c / total.n,
+        avgLoot: (total.l + bonus) / total.n,
+        avgNet: totalNet / total.n,
+        totalNet,
+        roi: total.c > 0 ? totalNet / total.c * 100 : null,
+        hourly: total.t > 0 ? totalNet * 3600 / total.t : null
+      };
+    }
+
+    function collect() {
+      const groups = new Map();
+      for (const [id, player] of Object.entries(players)) {
+        if (!player || !Array.isArray(player.strategies)) continue;
+        for (const strategy of player.strategies) {
+          if (!strategy || typeof strategy.name !== "string" || !Array.isArray(strategy.runs)) continue;
+          const key = strategy.name.trim().toLocaleLowerCase();
+          if (!key) continue;
+          let group = groups.get(key);
+          if (!group) { group = { name: strategy.name.trim(), total: blank(), byPlayer: new Map() }; groups.set(key, group); }
+          let entry = group.byPlayer.get(id);
+          if (!entry) { entry = { id, nick: String(player.nick || "Anonim"), total: blank() }; group.byPlayer.set(id, entry); }
+          for (const run of strategy.runs) {
+            if (!run || ![run.t, run.c, run.l, run.r].every(value => Number.isFinite(value)) || run.t <= 0) continue;
+            addRun(group.total, run);
+            addRun(entry.total, run);
+          }
+        }
+      }
+      return [...groups.values()]
+        .map(group => ({
+          name: group.name,
+          m: group.total.n ? metrics(group.total) : null,
+          players: [...group.byPlayer.values()].filter(entry => entry.total.n > 0).map(entry => ({ id: entry.id, nick: entry.nick, m: metrics(entry.total) }))
+        }))
+        .filter(group => group.m);
+    }
+
+    const sign = value => value === null ? "" : value >= 0 ? "positive" : "negative";
+
+    function cells(m, extra) {
+      return `
+        <td>${extra.players}</td>
+        <td>${m.n}</td>
+        <td>${calc.formatDuration(m.avgTime)}</td>
+        <td>${calc.formatMoney(m.avgCost)}</td>
+        <td>${calc.formatMoney(m.avgLoot)}</td>
+        <td class="${sign(m.avgNet)}">${calc.formatMoney(m.avgNet)}</td>
+        <td class="${sign(m.totalNet)}">${calc.formatTotalResult(m.totalNet)}</td>
+        <td class="${sign(m.roi)}">${calc.formatPercent(m.roi)}</td>
+        <td class="${sign(m.hourly)}">${m.hourly === null ? "—" : `${calc.formatMoney(m.hourly)} / h`}</td>`;
+    }
+
+    function render() {
+      const rank = item => item.m.hourly ?? -Infinity;
+      const groups = collect().sort((a, b) => rank(b) - rank(a));
+      groups.forEach(group => group.players.sort((a, b) => rank(b) - rank(a)));
+      const html = [];
+      groups.forEach((group, index) => {
+        html.push(`<tr class="group-row"><td>${index + 1}</td><td>${calc.escapeHtml(group.name)}</td>${cells(group.m, { players: group.players.length })}</tr>`);
+        group.players.forEach(player => {
+          html.push(`<tr class="player-row"><td></td><td>↳ ${calc.escapeHtml(player.nick)}${player.id === uid ? " (Ty)" : ""}</td>${cells(player.m, { players: "" })}</tr>`);
+        });
+      });
+      tableBody.innerHTML = html.join("");
+      emptyEl.hidden = groups.length > 0;
+    }
+
+    function scheduleUpload(delay = 2000) {
+      clearTimeout(uploadTimer);
+      uploadTimer = setTimeout(upload, delay);
+    }
+
+    async function upload() {
+      if (!db || !uid || !settings.enabled) return;
+      const nick = (settings.nick || "").trim();
+      if (!nick) { setStatus("Wpisz nick, aby udostępniać dane"); return; }
+      try {
+        await setDoc(doc(db, "players", uid), { nick, strategies: calc.shareData(), updatedAt: serverTimestamp() });
+      } catch (error) {
+        setStatus("Nie udało się wysłać danych");
+        console.error(error);
+      }
+    }
+
+    document.addEventListener("poe:changed", () => { render(); scheduleUpload(); });
+
+    nickInput.addEventListener("input", () => {
+      settings.nick = nickInput.value;
+      saveSettings();
+      scheduleUpload();
+    });
+
+    shareToggle.addEventListener("change", async () => {
+      settings.enabled = shareToggle.checked;
+      saveSettings();
+      if (settings.enabled) { scheduleUpload(0); return; }
+      clearTimeout(uploadTimer);
+      if (!db || !uid) return;
+      try { await deleteDoc(doc(db, "players", uid)); } catch (error) { setStatus("Nie udało się usunąć danych"); console.error(error); }
+    });
+
+    async function start() {
+      render();
+      if (!firebaseConfig.apiKey || firebaseConfig.apiKey.startsWith("WKLEJ")) {
+        setStatus("Firebase nieskonfigurowany");
+        return;
+      }
+      try {
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        db = getFirestore(app);
+        await signInAnonymously(auth);
+        uid = auth.currentUser.uid;
+        onSnapshot(collection(db, "players"), snapshot => {
+          players = {};
+          snapshot.forEach(item => { players[item.id] = item.data(); });
+          playerCount = snapshot.size;
+          setStatus(`Połączono · graczy: ${playerCount}`);
+          render();
+        }, error => {
+          setStatus("Brak dostępu do bazy (sprawdź reguły)");
+          console.error(error);
+        });
+        if (settings.enabled) scheduleUpload(0);
+      } catch (error) {
+        setStatus("Błąd połączenia z Firebase");
+        console.error(error);
+      }
+    }
+
+    start();
+  </script>
+</body>
+</html>
