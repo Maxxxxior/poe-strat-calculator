@@ -137,6 +137,11 @@
     .poe-tip-body { padding: 14px 18px 16px; font-size: 14px; line-height: 1.55; }
     .poe-tip-body p { margin: 0 0 12px; }
     .poe-tip-body p:last-child { margin-bottom: 0; }
+    .poe-tip-tldr { margin: 0 18px; padding: 12px 0 14px; border-top: 1px solid #3a2f20; }
+    .poe-tip-tldr-title { margin-bottom: 6px; color: #f2e8cc; font-size: 13px; font-variant: small-caps; letter-spacing: .08em; }
+    .poe-tip-tldr-line { font-size: 14px; line-height: 1.7; }
+    .poe-tip-tldr-line .tone-pos { color: var(--green); }
+    .poe-tip-tldr-line .tone-neg { color: var(--red); }
     .picker { width: min(480px, calc(100% - 28px)); }
     .picker-list { display: flex; flex-direction: column; gap: 6px; max-height: 300px; margin: 0 0 14px; overflow-y: auto; }
     .picker-item { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; background: #12151e; color: #e9ebf2; text-align: left; font-size: 13px; }
@@ -1039,8 +1044,14 @@
           body: [
             "ROI to ile zarabiasz w stosunku do tego, ile wydajesz. Im więcej, tym lepiej.",
             "Przykład: wydajesz 10c na run, a z dropu masz średnio 15c. Zostaje Ci 5c zysku, czyli ROI = +50%.",
-            "ROI +100% — z każdej wydanej monety robisz dwie. ROI 0% — wychodzisz na zero. ROI poniżej 0% — tracisz.",
+            "ROI +100% — wydajesz 10c, a zarabiasz kolejne 10c ponad to (z dropu masz 20c). ROI 0% — dropisz tyle, ile wydałeś. ROI poniżej 0% — dropisz mniej, niż wydałeś, czyli tracisz.",
             "Uwaga: ROI nie patrzy na czas. Wolna strategia też może mieć świetne ROI. Jak szybko zarabiasz, pokazuje Profit / h."
+          ],
+          // Opcjonalne podsumowanie na dole okienka. tone: "pos" = zielony, "neg" = czerwony, brak = kolor zwykłego tekstu.
+          tldr: [
+            { label: "Wynik", value: "+10%", tone: "pos", text: "zarabiasz" },
+            { label: "Wynik", value: "−10%", tone: "neg", text: "tracisz" },
+            { label: "Wynik", value: "0%", text: "wychodzisz na zero" }
           ]
         }
       };
@@ -1070,6 +1081,24 @@
           body.appendChild(paragraph);
         });
         el.append(title, close, body);
+        if (term.tldr) {
+          const box = document.createElement("div");
+          box.className = "poe-tip-tldr";
+          const heading = document.createElement("div");
+          heading.className = "poe-tip-tldr-title";
+          heading.textContent = "TL;DR";
+          box.appendChild(heading);
+          term.tldr.forEach(item => {
+            const line = document.createElement("div");
+            line.className = "poe-tip-tldr-line";
+            const value = document.createElement("span");
+            value.textContent = item.value;
+            if (item.tone) value.className = "tone-" + item.tone;
+            line.append(document.createTextNode(`${item.label} (`), value, document.createTextNode(`) — ${item.text}`));
+            box.appendChild(line);
+          });
+          el.appendChild(box);
+        }
         return { el, title, close };
       }
 
