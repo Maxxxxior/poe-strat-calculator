@@ -122,6 +122,7 @@
     .community tr.group-row td { background: #1b202b; font-weight: 700; }
     .community tr.player-row td { color: #c3c9d6; }
     .community tr.player-row td:nth-child(2) { padding-left: 28px; font-weight: 500; }
+    .low-data { opacity: .55; cursor: help; }
     .term { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; cursor: help; }
     .poe-tip { position: fixed; z-index: 1000; left: 0; top: 0; width: min(340px, calc(100vw - 16px)); color: #c9bd9f; text-align: center;
       font-family: "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif; background: #0c0a08; border: 1px solid #6b5a3d;
@@ -228,6 +229,11 @@
         <span class="field-label">Przelicznik i format</span>
         <p class="hint" id="rate-hint">Kwoty przeliczane są do wspólnej wartości. Od jednego divine wyświetlamy div, poniżej — c.</p>
         <label class="toggle"><input type="checkbox" id="include-rare"> Wliczaj losowe dropy do profitu i średnich</label>
+      </div>
+      <div>
+        <label class="field-label" for="series-size">Długość serii (liczba runów)</label>
+        <input id="series-size" type="text" inputmode="numeric" aria-describedby="series-hint">
+        <p class="hint" id="series-hint">Do kolumny „Szansa serii” w tabelach: szansa, że tyle runów pod rząd się zwróci.</p>
       </div>
     </section>
 
@@ -367,7 +373,7 @@
       <div class="table-wrap">
         <table>
           <thead>
-            <tr><th>#</th><th>Strategia</th><th>Runy</th><th>Śr. czas</th><th>Śr. koszt</th><th>Śr. drop</th><th>Net / run</th><th>Łączny wynik</th><th><span class="term" data-term="roi">ROI</span></th><th>Profit / h</th></tr>
+            <tr><th>#</th><th>Strategia</th><th>Runy</th><th>Śr. czas</th><th>Śr. koszt</th><th>Śr. drop</th><th>Net / run</th><th>Łączny wynik</th><th><span class="term" data-term="roi">ROI</span></th><th>Profit / h</th><th><span class="term" data-term="chance1">Szansa 1 run</span></th><th><span class="term" data-term="chanceN">Szansa serii: <span class="series-n">10</span></span></th><th><span class="term" data-term="minRuns">Min. runów</span></th></tr>
           </thead>
           <tbody id="comparison-body"></tbody>
         </table>
@@ -394,7 +400,7 @@
         <div class="table-wrap">
           <table>
             <thead>
-              <tr><th>#</th><th>Strategia / gracz</th><th>Gracze</th><th>Runy</th><th>Śr. czas</th><th>Śr. koszt</th><th>Śr. drop</th><th>Net / run</th><th>Łączny wynik</th><th><span class="term" data-term="roi">ROI</span></th><th>Profit / h</th></tr>
+              <tr><th>#</th><th>Strategia / gracz</th><th>Gracze</th><th>Runy</th><th>Śr. czas</th><th>Śr. koszt</th><th>Śr. drop</th><th>Net / run</th><th>Łączny wynik</th><th><span class="term" data-term="roi">ROI</span></th><th>Profit / h</th><th><span class="term" data-term="chance1">Szansa 1 run</span></th><th><span class="term" data-term="chanceN">Szansa serii: <span class="series-n">10</span></span></th><th><span class="term" data-term="minRuns">Min. runów</span></th></tr>
             </thead>
             <tbody id="community-body"></tbody>
           </table>
@@ -435,12 +441,14 @@
       const strategyDialogInput = document.getElementById("strategy-dialog-input");
       const exchangeRateInput = document.getElementById("exchange-rate");
       const includeRareInput = document.getElementById("include-rare");
+      const seriesInput = document.getElementById("series-size");
       const saveStatus = document.getElementById("save-status");
       let strategyDialogMode = "add";
       const initialStrategy = { id: makeId(), name: "Strategia 1", runs: [] };
       let state = {
         exchangeRate: "155",
         includeRare: true,
+        seriesSize: 10,
         selectedId: initialStrategy.id,
         strategies: [initialStrategy]
       };
@@ -527,8 +535,69 @@
         return `${minutes}:${String(remainder).padStart(2, "0")}`;
       }
 
+      // ===== Szanse na zwrot (szacunek z zapisanych runów) =====
+      const CONFIDENCE_Z = 2.326; // 99% pewności
+
+      function normalCdf(z) {
+        const t = 1 / (1 + 0.2316419 * Math.abs(z));
+        const d = 0.3989423 * Math.exp(-z * z / 2);
+        const tail = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))));
+        return z > 0 ? 1 - tail : tail;
+      }
+
+      // nets: wynik netto (drop − koszt) każdego kompletnego runu
+      function successStats(nets, seriesSize) {
+        const n = nets.length;
+        if (!n) return null;
+        const mean = nets.reduce((sum, value) => sum + value, 0) / n;
+        const single = nets.filter(value => value >= -1e-9).length / n;
+        let series = null;
+        let minRuns = null;
+        if (n >= 2) {
+          const sd = Math.sqrt(nets.reduce((sum, value) => sum + (value - mean) ** 2, 0) / (n - 1));
+          if (sd < 1e-9) {
+            series = mean >= -1e-9 ? 1 : 0;
+            minRuns = mean >= -1e-9 ? 1 : Infinity;
+          } else {
+            series = normalCdf(mean * Math.sqrt(seriesSize) / sd);
+            minRuns = mean > 0 ? Math.max(1, Math.ceil((CONFIDENCE_Z * sd / mean) ** 2)) : Infinity;
+          }
+        }
+        return { n, single, series, minRuns };
+      }
+
+      function formatChance(value, approximate) {
+        if (value === null) return "—";
+        if (approximate) {
+          if (value >= 0.995) return ">99%";
+          if (value > 0 && value < 0.005) return "<1%";
+        }
+        return `${Math.round(value * 100)}%`;
+      }
+
+      function formatMinRuns(value) {
+        if (value === null) return "—";
+        if (value === Infinity) return "nigdy";
+        if (value > 99999) return "> 99 999";
+        return new Intl.NumberFormat("pl-PL").format(value);
+      }
+
+      function chanceCells(stats) {
+        if (!stats) return "<td>—</td><td>—</td><td>—</td>";
+        const low = stats.n < 10;
+        const title = low ? ` title="Mało danych (${stats.n} ${stats.n === 1 ? "run" : "runów"}) — wynik orientacyjny"` : "";
+        const tone = value => value === null ? "" : value >= 0.75 ? "positive" : value <= 0.25 ? "negative" : "";
+        const cell = (text, toneClass) => {
+          const classes = [toneClass, low ? "low-data" : ""].filter(Boolean).join(" ");
+          return `<td${classes ? ` class="${classes}"` : ""}${title}>${text}</td>`;
+        };
+        return cell(formatChance(stats.single, false), tone(stats.single))
+          + cell(formatChance(stats.series, true), tone(stats.series))
+          + cell(formatMinRuns(stats.minRuns), stats.minRuns === Infinity ? "negative" : "");
+      }
+
       function metricsFor(strategy) {
-        const empty = { count: 0, averageTime: null, averageCost: null, averageLoot: null, averageNet: null, totalNet: null, hourlyProfit: null, totalRare: null, averageRare: null };
+        const empty = { count: 0, averageTime: null, averageCost: null, averageLoot: null, averageNet: null, totalNet: null, hourlyProfit: null, totalRare: null, averageRare: null, stats: null };
         const rate = parseRate();
         if (rate === null) return empty;
         const completeRuns = strategy.runs.map(run => ({
@@ -555,7 +624,11 @@
           count, averageTime, averageCost, averageLoot, averageNet, totalNet,
           hourlyProfit: averageTime > 0 ? averageNet * 3600 / averageTime : null,
           totalRare: totals.rare,
-          averageRare: totals.rare / count
+          averageRare: totals.rare / count,
+          stats: successStats(
+            completeRuns.map(run => run.loot + (state.includeRare ? run.rare : 0) - run.cost),
+            state.seriesSize
+          )
         };
       }
 
@@ -571,6 +644,7 @@
             version: 2,
             exchangeRate: state.exchangeRate,
             includeRare: state.includeRare,
+            seriesSize: state.seriesSize,
             selectedId: state.selectedId,
             strategies: state.strategies
           }));
@@ -696,9 +770,10 @@
             <td class="${metrics.averageNet === null ? "" : metrics.averageNet >= 0 ? "positive" : "negative"}">${metrics.averageNet === null ? "—" : formatMoney(metrics.averageNet)}</td>
             <td class="${metrics.totalNet === null ? "" : metrics.totalNet >= 0 ? "positive" : "negative"}">${metrics.totalNet === null ? "—" : formatTotalResult(metrics.totalNet)}</td>
             <td class="${roi === null ? "" : roi >= 0 ? "positive" : "negative"}">${formatPercent(roi)}</td>
-            <td class="${metrics.hourlyProfit === null ? "" : metrics.hourlyProfit >= 0 ? "positive" : "negative"}">${metrics.hourlyProfit === null ? "—" : `${formatMoney(metrics.hourlyProfit)} / h`}</td>`;
+            <td class="${metrics.hourlyProfit === null ? "" : metrics.hourlyProfit >= 0 ? "positive" : "negative"}">${metrics.hourlyProfit === null ? "—" : `${formatMoney(metrics.hourlyProfit)} / h`}</td>${chanceCells(metrics.stats)}`;
           comparisonBody.appendChild(row);
         });
+        document.querySelectorAll(".series-n").forEach(element => { element.textContent = String(state.seriesSize); });
         comparisonEmpty.hidden = ranked.some(({ metrics }) => metrics.count > 0);
       }
 
@@ -745,6 +820,7 @@
             }
             if (data.exchangeRate !== undefined) state.exchangeRate = String(data.exchangeRate);
             if (typeof data.includeRare === "boolean") state.includeRare = data.includeRare;
+            if (Number.isInteger(data.seriesSize) && data.seriesSize >= 1) state.seriesSize = data.seriesSize;
           } else if (data && Array.isArray(data.runs)) {
             state.exchangeRate = "155";
             state.strategies = [{
@@ -995,6 +1071,16 @@
         saveData();
       });
 
+      seriesInput.addEventListener("input", () => {
+        const value = Number(seriesInput.value.trim());
+        if (Number.isInteger(value) && value >= 1 && value <= 100000) {
+          state.seriesSize = value;
+          renderAll();
+          saveData();
+        }
+      });
+      seriesInput.addEventListener("blur", () => { seriesInput.value = String(state.seriesSize); });
+
       includeRareInput.addEventListener("change", () => {
         state.includeRare = includeRareInput.checked;
         renderAll();
@@ -1005,9 +1091,10 @@
       document.getElementById("clear-button").addEventListener("click", () => {
         if (!window.confirm("Usunąć wszystkie strategie, runy i ustawienia?")) return;
         const strategy = { id: makeId(), name: "Strategia 1", runs: [] };
-        state = { exchangeRate: "155", includeRare: true, selectedId: strategy.id, strategies: [strategy] };
+        state = { exchangeRate: "155", includeRare: true, seriesSize: 10, selectedId: strategy.id, strategies: [strategy] };
         exchangeRateInput.value = state.exchangeRate;
         includeRareInput.checked = state.includeRare;
+        seriesInput.value = String(state.seriesSize);
         document.getElementById("rate-error").textContent = "";
         renderAll();
         saveData();
@@ -1026,12 +1113,15 @@
           })).filter(strategy => strategy.name && strategy.runs.length);
         },
         includeRare: () => state.includeRare,
+        seriesSize: () => state.seriesSize,
+        successStats, chanceCells,
         formatMoney, formatSignedMoney, formatTotalResult, formatDuration, formatPercent, escapeHtml
       };
 
       loadData();
       exchangeRateInput.value = state.exchangeRate;
       includeRareInput.checked = state.includeRare;
+        seriesInput.value = String(state.seriesSize);
       renderAll();
       if (parseRate() === null) document.getElementById("rate-error").textContent = "Podaj kurs większy od zera, np. 155.";
       saveData();
@@ -1045,6 +1135,30 @@
     //     (w kodzie JS możesz użyć:  window.poeTerm("klucz", "słowo") ).
     (() => {
       const TERMS = {
+        chance1: {
+          title: "Szansa 1 run",
+          body: [
+            "Jaka część Twoich runów wyszła na plus, czyli drop był wart tyle co koszt albo więcej.",
+            "Przykład: 7 runów z 10 się zwróciło → 70%.",
+            "Liczone z zapisanych runów. Mało runów = wynik orientacyjny (tabela go przygasza)."
+          ]
+        },
+        chanceN: {
+          title: "Szansa serii",
+          body: [
+            "Szansa, że po poleceniu całej serii runów pod rząd wyjdziesz na plus. Długość serii (domyślnie 10) ustawiasz u góry strony.",
+            "Im bardziej wyniki skaczą (raz wielki drop, raz nic), tym mniejsza pewność.",
+            "To szacunek ze średniej i rozrzutu Twoich runów, nie gwarancja."
+          ]
+        },
+        minRuns: {
+          title: "Min. runów",
+          body: [
+            "Tyle runów trzeba polecieć, żeby mieć 99% pewności, że wyjdziesz na plus. 100% pewności nie ma nigdy, 99% to praktycznie „na pewno”.",
+            "„nigdy” = przy obecnych wynikach strategia jest na minusie, więc samo latanie jej nie uratuje.",
+            "Szacunek z Twoich runów. Im więcej runów zapiszesz, tym dokładniejszy."
+          ]
+        },
         roi: {
           title: "ROI",
           body: [
@@ -1246,10 +1360,10 @@
 
     function setStatus(text) { statusEl.textContent = text; }
 
-    function blank() { return { n: 0, t: 0, c: 0, l: 0, r: 0 }; }
+    function blank() { return { n: 0, t: 0, c: 0, l: 0, r: 0, runs: [] }; }
 
     function addRun(total, run) {
-      total.n += 1; total.t += run.t; total.c += run.c; total.l += run.l; total.r += run.r;
+      total.n += 1; total.t += run.t; total.c += run.c; total.l += run.l; total.r += run.r; total.runs.push(run);
     }
 
     function metrics(total) {
@@ -1263,7 +1377,8 @@
         avgNet: totalNet / total.n,
         totalNet,
         roi: total.c > 0 ? totalNet / total.c * 100 : null,
-        hourly: total.t > 0 ? totalNet * 3600 / total.t : null
+        hourly: total.t > 0 ? totalNet * 3600 / total.t : null,
+        stats: calc.successStats(total.runs.map(run => run.l + (calc.includeRare() ? run.r : 0) - run.c), calc.seriesSize())
       };
     }
 
@@ -1312,7 +1427,7 @@
         <td class="${sign(m.avgNet)}">${calc.formatMoney(m.avgNet)}</td>
         <td class="${sign(m.totalNet)}">${calc.formatTotalResult(m.totalNet)}</td>
         <td class="${sign(m.roi)}">${calc.formatPercent(m.roi)}</td>
-        <td class="${sign(m.hourly)}">${m.hourly === null ? "—" : `${calc.formatMoney(m.hourly)} / h`}</td>`;
+        <td class="${sign(m.hourly)}">${m.hourly === null ? "—" : `${calc.formatMoney(m.hourly)} / h`}</td>${calc.chanceCells(m.stats)}`;
     }
 
     function renderTable(groups) {
