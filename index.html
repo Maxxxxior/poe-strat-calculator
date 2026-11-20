@@ -122,6 +122,60 @@
     .community tr.group-row td { background: #1b202b; font-weight: 700; }
     .community tr.player-row td { color: #c3c9d6; }
     .community tr.player-row td:nth-child(2) { padding-left: 28px; font-weight: 500; }
+    .term { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; cursor: help; }
+    .poe-tip { position: fixed; z-index: 1000; left: 0; top: 0; width: min(340px, calc(100vw - 16px)); color: #c9bd9f; text-align: center;
+      font-family: "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif; background: #0c0a08; border: 1px solid #6b5a3d;
+      box-shadow: 0 0 0 1px #000, inset 0 0 0 1px #2a2218, 0 12px 40px #000b; }
+    .poe-tip:not(.pinned) { pointer-events: none; }
+    .poe-tip-title { position: relative; padding: 10px 36px; color: #f2e8cc; font-size: 15px; font-variant: small-caps; letter-spacing: .06em; user-select: none;
+      background: linear-gradient(#2b2318, #17120c); border-bottom: 1px solid #4a3d28; }
+    .poe-tip.pinned .poe-tip-title { cursor: grab; touch-action: none; }
+    .poe-tip.dragging .poe-tip-title { cursor: grabbing; }
+    .poe-tip-close { position: absolute; top: 7px; right: 8px; width: 24px; height: 24px; padding: 0; border: 0; background: transparent; color: #c9bd9f; font-size: 14px; line-height: 1; }
+    .poe-tip-close:hover { color: #fff; }
+    .poe-tip:not(.pinned) .poe-tip-close { display: none; }
+    .poe-tip-body { padding: 14px 18px 16px; font-size: 14px; line-height: 1.55; }
+    .poe-tip-body p { margin: 0 0 12px; }
+    .poe-tip-body p:last-child { margin-bottom: 0; }
+    .picker { width: min(480px, calc(100% - 28px)); }
+    .picker-list { display: flex; flex-direction: column; gap: 6px; max-height: 300px; margin: 0 0 14px; overflow-y: auto; }
+    .picker-item { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; background: #12151e; color: #e9ebf2; text-align: left; font-size: 13px; }
+    .picker-item:hover { border-color: var(--accent); background: #29251d; }
+    .picker-item small { color: var(--muted); font-size: 11px; white-space: nowrap; }
+    .picker-item mark { background: transparent; color: var(--accent); font-weight: 800; }
+    .picker-hint { margin: 0 0 14px !important; color: var(--muted); font-size: 12px; }
+    .picker-label { margin: 14px 0 8px; color: var(--muted); font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+    .community tr.group-row { cursor: pointer; }
+    .community tr.group-row:hover td { background: #212736; }
+    .group-toggle { display: inline-flex; align-items: center; gap: 8px; padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; }
+    .group-toggle .chev { display: inline-block; color: var(--muted); font-size: 11px; transition: transform .15s; }
+    .group-toggle[aria-expanded="true"] .chev { transform: rotate(90deg); }
+    .share-chart { margin-top: 16px; overflow: hidden; }
+    .chart-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+    .chart-controls select { width: auto; max-width: 240px; padding: 8px 10px; font-size: 12px; }
+    .segmented { display: inline-flex; overflow: hidden; border: 1px solid var(--border); border-radius: 9px; }
+    .seg { padding: 8px 12px; border: 0; background: #12151e; color: var(--muted); font-size: 12px; font-weight: 700; }
+    .seg + .seg { border-left: 1px solid var(--border); }
+    .seg.active { background: #29251d; color: #f5d69f; }
+    .chart-body { display: grid; grid-template-columns: minmax(220px, 300px) 1fr; align-items: center; gap: 28px; padding: 22px 24px 24px; }
+    .chart-body[hidden] { display: none; }
+    .chart-donut svg { display: block; width: 100%; height: auto; }
+    .chart-legend { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+    .legend-row { display: flex; align-items: center; gap: 12px; padding: 11px 13px; border: 1px solid var(--border); border-radius: 9px; background: #151923; }
+    .legend-row.leader { border-color: #5b4a2a; background: #1d1a14; }
+    .legend-row .dot { flex: none; width: 12px; height: 12px; border-radius: 50%; }
+    .legend-row.loss .dot { background: #3a2a30; border: 1px solid #6b4048; }
+    .legend-main { display: flex; flex: 1; flex-direction: column; gap: 3px; min-width: 0; }
+    .legend-main strong { overflow: hidden; font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
+    .legend-sub { color: var(--muted); font-size: 11px; }
+    .legend-values { display: flex; flex-direction: column; gap: 3px; text-align: right; white-space: nowrap; }
+    .legend-values strong { font-size: 15px; }
+    .legend-values span { color: var(--muted); font-size: 11px; }
+    .legend-divider { margin-top: 6px; color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+    @media (max-width: 760px) {
+      .chart-body { grid-template-columns: 1fr; padding: 18px; }
+      .chart-donut { width: 100%; max-width: 300px; margin: 0 auto; }
+    }
     @media (max-width: 760px) {
       .community-controls { grid-template-columns: 1fr; }
       .shell { width: min(100% - 22px, 1120px); padding-top: 24px; }
@@ -201,6 +255,31 @@
       </form>
     </dialog>
 
+    <dialog id="picker-dialog" class="picker" aria-labelledby="picker-title">
+      <div class="strategy-dialog-content">
+        <h2 id="picker-title">Nowa strategia</h2>
+        <div id="picker-view-list">
+          <p>Wybierz strategię, którą już farmią znajomi, albo stwórz własną.</p>
+          <div class="picker-list" id="picker-list"></div>
+          <div class="strategy-dialog-actions">
+            <button class="button" id="picker-cancel" type="button">Anuluj</button>
+            <button class="button primary" id="picker-create-new" type="button">＋ Stwórz nową</button>
+          </div>
+        </div>
+        <form id="picker-view-new" hidden>
+          <label class="field-label" for="picker-input">Nazwa nowej strategii</label>
+          <input id="picker-input" type="text" maxlength="80" placeholder="np. Legion" autocomplete="off">
+          <div class="picker-label">Podobne, które już istnieją</div>
+          <div class="picker-list" id="picker-suggestions"></div>
+          <p class="error-message" id="picker-error" role="alert"></p>
+          <div class="strategy-dialog-actions">
+            <button class="button" id="picker-back" type="button">Wróć do listy</button>
+            <button class="button primary" type="submit">Utwórz strategię</button>
+          </div>
+        </form>
+      </div>
+    </dialog>
+
     <section class="stats" aria-label="Podsumowanie strategii">
       <div class="stat">
         <div class="stat-label">Średni czas runu</div>
@@ -272,12 +351,12 @@
       <div class="compare-cards" id="comparison-cards"></div>
       <div class="compare-note">
         <span>Strategie posortowane według <strong>profitu na godzinę</strong>, od najwyższego.</span>
-        <span>ROI = średni net profit ÷ średni koszt runu.</span>
+        <span><span class="term" data-term="roi">ROI</span> = średni net profit ÷ średni koszt runu.</span>
       </div>
       <div class="table-wrap">
         <table>
           <thead>
-            <tr><th>#</th><th>Strategia</th><th>Runy</th><th>Śr. czas</th><th>Śr. koszt</th><th>Śr. drop</th><th>Net / run</th><th>Łączny wynik</th><th>ROI</th><th>Profit / h</th></tr>
+            <tr><th>#</th><th>Strategia</th><th>Runy</th><th>Śr. czas</th><th>Śr. koszt</th><th>Śr. drop</th><th>Net / run</th><th>Łączny wynik</th><th><span class="term" data-term="roi">ROI</span></th><th>Profit / h</th></tr>
           </thead>
           <tbody id="comparison-body"></tbody>
         </table>
@@ -292,25 +371,42 @@
       <div class="community-controls">
         <div>
           <label class="field-label" for="nick-input">Twój nick</label>
-          <input id="nick-input" type="text" maxlength="30" placeholder="np. Kuba" autocomplete="off">
+          <input id="nick-input" type="text" maxlength="30" placeholder="np. xXx_Chris_Kisser_xXx" autocomplete="off">
         </div>
         <label class="toggle"><input type="checkbox" id="share-toggle"> Udostępniaj moje dane znajomym</label>
       </div>
       <div class="community-body">
         <div class="compare-note">
-          <span>Strategie łączone po nazwie (bez względu na wielkość liter), posortowane według <strong>profitu na godzinę</strong>.</span>
+          <span>Strategie łączone po nazwie (bez względu na wielkość liter), posortowane według <strong>profitu na godzinę</strong>. Kliknij nazwę strategii, aby zobaczyć graczy.</span>
           <span>Wartości przeliczone na chaosy. Przełącznik losowych dropów działa też tutaj.</span>
         </div>
         <div class="table-wrap">
           <table>
             <thead>
-              <tr><th>#</th><th>Strategia / gracz</th><th>Gracze</th><th>Runy</th><th>Śr. czas</th><th>Śr. koszt</th><th>Śr. drop</th><th>Net / run</th><th>Łączny wynik</th><th>ROI</th><th>Profit / h</th></tr>
+              <tr><th>#</th><th>Strategia / gracz</th><th>Gracze</th><th>Runy</th><th>Śr. czas</th><th>Śr. koszt</th><th>Śr. drop</th><th>Net / run</th><th>Łączny wynik</th><th><span class="term" data-term="roi">ROI</span></th><th>Profit / h</th></tr>
             </thead>
             <tbody id="community-body"></tbody>
           </table>
           <div class="empty" id="community-empty">Brak danych. Włącz udostępnianie i dodaj kompletne runy.</div>
         </div>
       </div>
+    </section>
+    <section class="card share-chart" aria-label="Udział graczy w wyniku">
+      <div class="panel-heading">
+        <h2>Udział graczy w wyniku</h2>
+        <div class="chart-controls">
+          <select id="chart-strategy" aria-label="Strategia"></select>
+          <div class="segmented" role="group" aria-label="Sposób wyświetlania">
+            <button type="button" class="seg active" data-mode="percent" aria-pressed="true">Procenty</button>
+            <button type="button" class="seg" data-mode="amount" aria-pressed="false">Divy / chaosy</button>
+          </div>
+        </div>
+      </div>
+      <div class="chart-body" id="chart-body" hidden>
+        <div class="chart-donut" id="chart-donut"></div>
+        <div class="chart-legend" id="chart-legend"></div>
+      </div>
+      <div class="empty" id="chart-empty">Brak danych do wykresu. Włącz udostępnianie i dodaj kompletne runy.</div>
     </section>
     <div class="save-status" id="save-status" role="status" aria-live="polite">Dane zapisują się automatycznie w tej przeglądarce.</div>
   </main>
@@ -570,7 +666,7 @@
             <div class="compare-detail">${bestHourly ? `Net / run: ${formatMoney(bestHourly.metrics.averageNet)} · ROI: ${formatPercent(bestHourly.roi)}` : "Wynik pojawi się po uzupełnieniu czasu, kosztu i dropu."}</div>
           </article>
           <article class="compare-card best-roi">
-            <div class="compare-label">Najlepszy ROI</div>
+            <div class="compare-label">Najlepszy <span class="term" data-term="roi">ROI</span></div>
             <div class="compare-primary ${bestRoi ? bestRoi.roi >= 0 ? "positive" : "negative" : ""}">${bestRoi ? formatPercent(bestRoi.roi) : "—"}</div>
             <div class="compare-strategy">${bestRoi ? escapeHtml(bestRoi.strategy.name || "Bez nazwy") : "Dodaj runy z kosztem"}</div>
             <div class="compare-detail">${bestRoi ? `${formatMoney(bestRoi.metrics.hourlyProfit)} / h · Net / run: ${formatMoney(bestRoi.metrics.averageNet)}` : "ROI wymaga kompletnego runu z kosztem większym od zera."}</div>
@@ -720,16 +816,103 @@
         saveData();
       });
 
+      const pickerDialog = document.getElementById("picker-dialog");
+      const pickerListView = document.getElementById("picker-view-list");
+      const pickerNewView = document.getElementById("picker-view-new");
+      const pickerList = document.getElementById("picker-list");
+      const pickerInput = document.getElementById("picker-input");
+      const pickerSuggestions = document.getElementById("picker-suggestions");
+      const pickerError = document.getElementById("picker-error");
+
+      const normalizeName = value => String(value).trim().toLocaleLowerCase();
+      const plural = (n, one, few, many) => n === 1 ? one : (n % 10 >= 2 && n % 10 <= 4 && !(n % 100 >= 12 && n % 100 <= 14)) ? few : many;
+
+      function communityNames() {
+        return window.poeCommunity?.strategyNames?.() ?? [];
+      }
+
+      function availableStrategies() {
+        const owned = new Set(state.strategies.map(strategy => normalizeName(strategy.name || "")));
+        return communityNames().filter(item => !owned.has(normalizeName(item.name)));
+      }
+
+      function highlightMatch(name, query) {
+        const q = query.trim();
+        const index = q ? name.toLocaleLowerCase().indexOf(q.toLocaleLowerCase()) : -1;
+        if (index < 0) return escapeHtml(name);
+        return `${escapeHtml(name.slice(0, index))}<mark>${escapeHtml(name.slice(index, index + q.length))}</mark>${escapeHtml(name.slice(index + q.length))}`;
+      }
+
+      function pickerItems(items, query) {
+        return items.map(item => `<button type="button" class="picker-item" data-pick="${escapeHtml(item.name)}"><span>${highlightMatch(item.name, query)}</span><small>${item.players} ${plural(item.players, "gracz", "graczy", "graczy")} · ${item.runs} ${plural(item.runs, "run", "runy", "runów")}</small></button>`).join("");
+      }
+
+      function addStrategyByName(name) {
+        const strategy = { id: makeId(), name, runs: [] };
+        state.strategies.push(strategy);
+        state.selectedId = strategy.id;
+        pickerDialog.close();
+        renderAll();
+        saveData();
+      }
+
+      function renderPickerList() {
+        const items = availableStrategies().sort((a, b) => a.name.localeCompare(b.name, "pl"));
+        pickerList.innerHTML = items.length
+          ? pickerItems(items, "")
+          : '<p class="picker-hint">Nie ma jeszcze strategii od znajomych (albo masz już wszystkie). Stwórz własną.</p>';
+      }
+
+      function updateSuggestions() {
+        pickerError.textContent = "";
+        const query = pickerInput.value.trim();
+        if (!query) {
+          pickerSuggestions.innerHTML = '<p class="picker-hint">Zacznij pisać — pokażemy podobne strategie, które już istnieją.</p>';
+          return;
+        }
+        const q = query.toLocaleLowerCase();
+        const matches = availableStrategies()
+          .filter(item => item.name.toLocaleLowerCase().includes(q))
+          .sort((a, b) => (b.name.toLocaleLowerCase().startsWith(q) - a.name.toLocaleLowerCase().startsWith(q)) || a.name.localeCompare(b.name, "pl"));
+        pickerSuggestions.innerHTML = matches.length
+          ? pickerItems(matches, query)
+          : '<p class="picker-hint">Nie ma takiej strategii — możesz utworzyć nową.</p>';
+      }
+
+      function showPickerView(view) {
+        pickerListView.hidden = view !== "list";
+        pickerNewView.hidden = view !== "new";
+        if (view === "new") {
+          pickerInput.value = "";
+          updateSuggestions();
+          pickerInput.focus();
+        }
+      }
+
       document.getElementById("add-strategy-button").addEventListener("click", () => {
-        strategyDialogMode = "add";
-        document.getElementById("strategy-dialog-title").textContent = "Nowa strategia";
-        document.getElementById("strategy-dialog-description").textContent = "Nadaj nazwę, a potem dodawaj do niej runy. Pozostałe strategie nie zostaną zmienione.";
-        document.getElementById("strategy-dialog-submit").textContent = "Utwórz strategię";
-        document.getElementById("strategy-dialog-error").textContent = "";
-        strategyDialogInput.value = "";
-        strategyDialogInput.placeholder = "np. Legion";
-        strategyDialog.showModal();
-        strategyDialogInput.focus();
+        renderPickerList();
+        showPickerView("list");
+        pickerDialog.showModal();
+      });
+      document.getElementById("picker-cancel").addEventListener("click", () => pickerDialog.close());
+      document.getElementById("picker-create-new").addEventListener("click", () => showPickerView("new"));
+      document.getElementById("picker-back").addEventListener("click", () => { renderPickerList(); showPickerView("list"); });
+      pickerInput.addEventListener("input", updateSuggestions);
+      pickerDialog.addEventListener("click", event => {
+        const item = event.target.closest("button[data-pick]");
+        if (item) addStrategyByName(item.dataset.pick);
+      });
+      pickerNewView.addEventListener("submit", event => {
+        event.preventDefault();
+        const name = pickerInput.value.trim();
+        if (!name) { pickerError.textContent = "Wpisz nazwę strategii."; pickerInput.focus(); return; }
+        if (state.strategies.some(strategy => normalizeName(strategy.name || "") === normalizeName(name))) {
+          pickerError.textContent = "Taką strategię już masz.";
+          pickerInput.focus();
+          return;
+        }
+        const existing = communityNames().find(item => normalizeName(item.name) === normalizeName(name));
+        addStrategyByName(existing ? existing.name : name);
       });
 
       document.getElementById("rename-strategy-button").addEventListener("click", () => {
@@ -843,12 +1026,142 @@
       saveData();
     })();
   </script>
+  <script>
+    // ===== Okienka z objaśnieniami (styl PoE) =====
+    // Jak dodać nowe hasło:
+    //  1) dopisz wpis do TERMS poniżej (klucz, tytuł, akapity),
+    //  2) w HTML owiń słowo:  <span class="term" data-term="klucz">słowo</span>
+    //     (w kodzie JS możesz użyć:  window.poeTerm("klucz", "słowo") ).
+    (() => {
+      const TERMS = {
+        roi: {
+          title: "ROI",
+          body: [
+            "ROI to ile zarabiasz w stosunku do tego, ile wydajesz. Im więcej, tym lepiej.",
+            "Przykład: wydajesz 10c na run, a z dropu masz średnio 15c. Zostaje Ci 5c zysku, czyli ROI = +50%.",
+            "ROI +100% — z każdej wydanej monety robisz dwie. ROI 0% — wychodzisz na zero. ROI poniżej 0% — tracisz.",
+            "Uwaga: ROI nie patrzy na czas. Wolna strategia też może mieć świetne ROI. Jak szybko zarabiasz, pokazuje Profit / h."
+          ]
+        }
+      };
+
+      let hoverEl = null;
+      const pinned = new Map();
+      let topZ = 1000;
+
+      function build(key, isPinned) {
+        const term = TERMS[key];
+        const el = document.createElement("div");
+        el.className = "poe-tip" + (isPinned ? " pinned" : "");
+        el.setAttribute("role", isPinned ? "dialog" : "tooltip");
+        const title = document.createElement("div");
+        title.className = "poe-tip-title";
+        title.textContent = term.title;
+        const close = document.createElement("button");
+        close.type = "button";
+        close.className = "poe-tip-close";
+        close.setAttribute("aria-label", "Zamknij");
+        close.textContent = "✕";
+        const body = document.createElement("div");
+        body.className = "poe-tip-body";
+        term.body.forEach(text => {
+          const paragraph = document.createElement("p");
+          paragraph.textContent = text;
+          body.appendChild(paragraph);
+        });
+        el.append(title, close, body);
+        return { el, title, close };
+      }
+
+      function clampTo(el, left, top) {
+        const maxLeft = Math.max(0, document.documentElement.clientWidth - el.offsetWidth);
+        const maxTop = Math.max(0, document.documentElement.clientHeight - el.offsetHeight);
+        el.style.left = Math.min(Math.max(0, left), maxLeft) + "px";
+        el.style.top = Math.min(Math.max(0, top), maxTop) + "px";
+      }
+
+      function placeNear(el, anchor) {
+        const rect = anchor.getBoundingClientRect();
+        let top = rect.bottom + 8;
+        if (top + el.offsetHeight > document.documentElement.clientHeight) top = rect.top - el.offsetHeight - 8;
+        clampTo(el, rect.left, top);
+      }
+
+      function hideHover() {
+        if (hoverEl) { hoverEl.remove(); hoverEl = null; }
+      }
+
+      function showHover(anchor) {
+        const key = anchor.dataset.term;
+        if (!TERMS[key] || pinned.has(key)) return;
+        hideHover();
+        hoverEl = build(key, false).el;
+        document.body.appendChild(hoverEl);
+        placeNear(hoverEl, anchor);
+      }
+
+      function pin(anchor) {
+        const key = anchor.dataset.term;
+        if (!TERMS[key]) return;
+        if (pinned.has(key)) { pinned.get(key).style.zIndex = ++topZ; return; }
+        const { el, title, close } = build(key, true);
+        document.body.appendChild(el);
+        if (hoverEl) clampTo(el, parseFloat(hoverEl.style.left) || 0, parseFloat(hoverEl.style.top) || 0);
+        else placeNear(el, anchor);
+        hideHover();
+        el.style.zIndex = ++topZ;
+        pinned.set(key, el);
+
+        el.addEventListener("pointerdown", () => { el.style.zIndex = ++topZ; });
+        close.addEventListener("click", () => { el.remove(); pinned.delete(key); });
+        title.addEventListener("pointerdown", event => {
+          if (event.pointerType === "mouse" && event.button !== 0) return;
+          event.preventDefault();
+          const rect = el.getBoundingClientRect();
+          const startX = event.clientX;
+          const startY = event.clientY;
+          try { title.setPointerCapture(event.pointerId); } catch (error) { /* ignoruj */ }
+          el.classList.add("dragging");
+          const move = moveEvent => clampTo(el, rect.left + moveEvent.clientX - startX, rect.top + moveEvent.clientY - startY);
+          const stop = () => {
+            title.removeEventListener("pointermove", move);
+            title.removeEventListener("pointerup", stop);
+            title.removeEventListener("pointercancel", stop);
+            el.classList.remove("dragging");
+          };
+          title.addEventListener("pointermove", move);
+          title.addEventListener("pointerup", stop);
+          title.addEventListener("pointercancel", stop);
+        });
+      }
+
+      const termOf = target => target && target.closest ? target.closest(".term") : null;
+
+      document.addEventListener("mouseover", event => { const anchor = termOf(event.target); if (anchor) showHover(anchor); });
+      document.addEventListener("mouseout", event => { const anchor = termOf(event.target); if (anchor && !anchor.contains(event.relatedTarget)) hideHover(); });
+      document.addEventListener("focusin", event => { const anchor = termOf(event.target); if (anchor) showHover(anchor); });
+      document.addEventListener("focusout", event => { if (termOf(event.target)) hideHover(); });
+      document.addEventListener("click", event => { const anchor = termOf(event.target); if (anchor) { event.preventDefault(); pin(anchor); } });
+      document.addEventListener("keydown", event => {
+        if ((event.key === "Enter" || event.key === " ") && event.target.classList?.contains("term")) { event.preventDefault(); pin(event.target); }
+        if (event.key === "Escape") hideHover();
+      });
+      document.addEventListener("poe:changed", hideHover);
+      window.addEventListener("scroll", hideHover, true);
+      window.addEventListener("resize", () => pinned.forEach(el => {
+        const rect = el.getBoundingClientRect();
+        clampTo(el, rect.left, rect.top);
+      }));
+
+      window.poeTerm = (key, label) => `<span class="term" data-term="${key}" tabindex="0" role="button">${label}</span>`;
+      document.querySelectorAll(".term").forEach(element => { element.tabIndex = 0; element.setAttribute("role", "button"); });
+    })();
+  </script>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
     import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
     import { getFirestore, doc, setDoc, deleteDoc, collection, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
-    // Wklej tu konfigurację z Firebase (Project settings → Your apps → Web app).
     const firebaseConfig = {
       apiKey: "AIzaSyASb0iIGVFDkm3gNkaKIMIoNqrSzhA4ZN8",
       authDomain: "poe-strat-calculator.firebaseapp.com",
@@ -859,12 +1172,24 @@
     };
 
     const SHARE_KEY = "poe-share-v1";
+    const PALETTE = ["#d6a85b", "#67d6a1", "#6fa8ff", "#c58bff", "#ff8585", "#5fd0d6", "#f2c14e", "#9bd45a", "#ff9f6b", "#8fa0ff"];
     const calc = window.poeCalc;
     const statusEl = document.getElementById("community-status");
     const nickInput = document.getElementById("nick-input");
     const shareToggle = document.getElementById("share-toggle");
     const tableBody = document.getElementById("community-body");
     const emptyEl = document.getElementById("community-empty");
+    const scopeSelect = document.getElementById("chart-strategy");
+    const chartBody = document.getElementById("chart-body");
+    const chartEmpty = document.getElementById("chart-empty");
+    const donutEl = document.getElementById("chart-donut");
+    const legendEl = document.getElementById("chart-legend");
+
+    const esc = value => calc.escapeHtml(value);
+    const nf1 = new Intl.NumberFormat("pl-PL", { maximumFractionDigits: 1 });
+    const pct = share => `${nf1.format(share * 100)}%`;
+    const pp = share => `${nf1.format(share * 100)} p.p.`;
+    const plural = (n, one, few, many) => n === 1 ? one : (n % 10 >= 2 && n % 10 <= 4 && !(n % 100 >= 12 && n % 100 <= 14)) ? few : many;
 
     let settings = { enabled: false, nick: "" };
     try { settings = { ...settings, ...JSON.parse(localStorage.getItem(SHARE_KEY) || "{}") }; } catch (error) { console.error(error); }
@@ -874,8 +1199,11 @@
     let db = null;
     let uid = null;
     let players = {};
-    let playerCount = 0;
     let uploadTimer = null;
+    let lastGroups = [];
+    let chartScope = "__all__";
+    let chartMode = "percent";
+    const expanded = new Set();
 
     function saveSettings() {
       try { localStorage.setItem(SHARE_KEY, JSON.stringify(settings)); } catch (error) { console.error(error); }
@@ -913,7 +1241,7 @@
           const key = strategy.name.trim().toLocaleLowerCase();
           if (!key) continue;
           let group = groups.get(key);
-          if (!group) { group = { name: strategy.name.trim(), total: blank(), byPlayer: new Map() }; groups.set(key, group); }
+          if (!group) { group = { key, name: strategy.name.trim(), total: blank(), byPlayer: new Map() }; groups.set(key, group); }
           let entry = group.byPlayer.get(id);
           if (!entry) { entry = { id, nick: String(player.nick || "Anonim"), total: blank() }; group.byPlayer.set(id, entry); }
           for (const run of strategy.runs) {
@@ -925,6 +1253,7 @@
       }
       return [...groups.values()]
         .map(group => ({
+          key: group.key,
           name: group.name,
           m: group.total.n ? metrics(group.total) : null,
           players: [...group.byPlayer.values()].filter(entry => entry.total.n > 0).map(entry => ({ id: entry.id, nick: entry.nick, m: metrics(entry.total) }))
@@ -932,11 +1261,15 @@
         .filter(group => group.m);
     }
 
+    window.poeCommunity = {
+      strategyNames: () => collect().map(group => ({ name: group.name, players: group.players.length, runs: group.m.n }))
+    };
+
     const sign = value => value === null ? "" : value >= 0 ? "positive" : "negative";
 
-    function cells(m, extra) {
+    function cells(m, playersCell) {
       return `
-        <td>${extra.players}</td>
+        <td>${playersCell}</td>
         <td>${m.n}</td>
         <td>${calc.formatDuration(m.avgTime)}</td>
         <td>${calc.formatMoney(m.avgCost)}</td>
@@ -947,20 +1280,145 @@
         <td class="${sign(m.hourly)}">${m.hourly === null ? "—" : `${calc.formatMoney(m.hourly)} / h`}</td>`;
     }
 
-    function render() {
-      const rank = item => item.m.hourly ?? -Infinity;
-      const groups = collect().sort((a, b) => rank(b) - rank(a));
-      groups.forEach(group => group.players.sort((a, b) => rank(b) - rank(a)));
+    function renderTable(groups) {
       const html = [];
       groups.forEach((group, index) => {
-        html.push(`<tr class="group-row"><td>${index + 1}</td><td>${calc.escapeHtml(group.name)}</td>${cells(group.m, { players: group.players.length })}</tr>`);
-        group.players.forEach(player => {
-          html.push(`<tr class="player-row"><td></td><td>↳ ${calc.escapeHtml(player.nick)}${player.id === uid ? " (Ty)" : ""}</td>${cells(player.m, { players: "" })}</tr>`);
-        });
+        const open = expanded.has(group.key);
+        html.push(`<tr class="group-row" data-key="${esc(group.key)}"><td>${index + 1}</td><td><button type="button" class="group-toggle" aria-expanded="${open}"><span class="chev">▸</span>${esc(group.name)}</button></td>${cells(group.m, group.players.length)}</tr>`);
+        if (open) {
+          group.players.forEach(player => {
+            html.push(`<tr class="player-row"><td></td><td>↳ ${esc(player.nick)}${player.id === uid ? " (Ty)" : ""}</td>${cells(player.m, "")}</tr>`);
+          });
+        }
       });
       tableBody.innerHTML = html.join("");
       emptyEl.hidden = groups.length > 0;
     }
+
+    const colorFor = id => {
+      const ids = Object.keys(players).sort();
+      const index = ids.indexOf(id);
+      return PALETTE[(index < 0 ? 0 : index) % PALETTE.length];
+    };
+
+    function donutSvg(slices, centerValue, centerColor) {
+      const c = 130, r = 92, strokeWidth = 54, circumference = 2 * Math.PI * r;
+      const gap = slices.length > 1 ? 2 : 0;
+      const threshold = chartMode === "percent" ? 0.07 : 0.12;
+      const arcs = [];
+      const labels = [];
+      let acc = 0;
+      if (!slices.length) arcs.push(`<circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="#2c3241" stroke-width="${strokeWidth}"/>`);
+      slices.forEach(slice => {
+        const length = slice.share * circumference;
+        const dash = Math.max(length - gap, 0.5);
+        arcs.push(`<circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="${slice.color}" stroke-width="${strokeWidth}" stroke-dasharray="${dash.toFixed(3)} ${(circumference - dash).toFixed(3)}" stroke-dashoffset="${(-(acc + gap / 2)).toFixed(3)}" transform="rotate(-90 ${c} ${c})"><title>${esc(slice.nick)}: ${pct(slice.share)} · ${calc.formatSignedMoney(slice.net)}</title></circle>`);
+        if (slice.share >= threshold) {
+          const angle = (acc + length / 2) / circumference * 2 * Math.PI - Math.PI / 2;
+          const text = chartMode === "percent" ? pct(slice.share) : calc.formatMoney(slice.net);
+          labels.push(`<text x="${(c + r * Math.cos(angle)).toFixed(1)}" y="${(c + r * Math.sin(angle)).toFixed(1)}" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="700" fill="#10131b">${esc(text)}</text>`);
+        }
+        acc += length;
+      });
+      return `<svg viewBox="0 0 260 260" role="img" aria-label="Wykres udziału graczy w zysku">${arcs.join("")}${labels.join("")}
+        <text x="${c}" y="${c - 9}" text-anchor="middle" font-size="11" fill="#9ba3b5">Razem</text>
+        <text x="${c}" y="${c + 14}" text-anchor="middle" font-size="17" font-weight="700" fill="${centerColor}">${esc(centerValue)}</text></svg>`;
+    }
+
+    function syncScope(groups) {
+      if (chartScope !== "__all__" && !groups.some(group => group.key === chartScope)) chartScope = "__all__";
+      const optionsHtml = [`<option value="__all__">Wszystkie strategie (razem)</option>`]
+        .concat(groups.map(group => `<option value="${esc(group.key)}">${esc(group.name)}</option>`)).join("");
+      if (scopeSelect.dataset.sig !== optionsHtml) {
+        scopeSelect.innerHTML = optionsHtml;
+        scopeSelect.dataset.sig = optionsHtml;
+      }
+      scopeSelect.value = chartScope;
+    }
+
+    function renderChart(groups) {
+      lastGroups = groups;
+      syncScope(groups);
+      const totals = new Map();
+      groups.filter(group => chartScope === "__all__" || group.key === chartScope).forEach(group => {
+        group.players.forEach(player => {
+          const entry = totals.get(player.id) || { id: player.id, nick: player.nick, net: 0, runs: 0 };
+          entry.net += player.m.totalNet;
+          entry.runs += player.m.n;
+          totals.set(player.id, entry);
+        });
+      });
+      const results = [...totals.values()].map(entry => ({ ...entry, net: Math.round(entry.net * 100) / 100 })).sort((a, b) => b.net - a.net);
+      chartBody.hidden = results.length === 0;
+      chartEmpty.hidden = results.length > 0;
+      if (!results.length) return;
+
+      const winners = results.filter(entry => entry.net > 0);
+      const others = results.filter(entry => entry.net <= 0);
+      const sumPositive = winners.reduce((sum, entry) => sum + entry.net, 0);
+      const total = results.reduce((sum, entry) => sum + entry.net, 0);
+      winners.forEach(entry => { entry.share = entry.net / sumPositive; entry.color = colorFor(entry.id); });
+
+      donutEl.innerHTML = donutSvg(winners, calc.formatTotalResult(total), total >= 0 ? "#67d6a1" : "#ff8585");
+
+      const who = entry => `${esc(entry.nick)}${entry.id === uid ? " (Ty)" : ""}`;
+      const rows = [];
+      winners.forEach((entry, index) => {
+        const leader = winners[0];
+        let sub;
+        if (index === 0) {
+          const next = winners[1];
+          if (!next) sub = "Lider · jedyny na plusie";
+          else if (chartMode === "percent") sub = `Lider · przewaga ${pp(entry.share - next.share)} nad ${who(next)}`;
+          else sub = `Lider · przewaga ${calc.formatSignedMoney(entry.net - next.net)} nad ${who(next)}`;
+        } else if (chartMode === "percent") {
+          sub = `−${pp(leader.share - entry.share)} do lidera`;
+        } else {
+          sub = `${calc.formatSignedMoney(-(leader.net - entry.net))} do lidera`;
+        }
+        const primary = chartMode === "percent" ? pct(entry.share) : calc.formatSignedMoney(entry.net);
+        const secondary = chartMode === "percent" ? calc.formatSignedMoney(entry.net) : pct(entry.share);
+        rows.push(`<div class="legend-row${index === 0 ? " leader" : ""}"><span class="dot" style="background:${entry.color}"></span><div class="legend-main"><strong>${who(entry)}</strong><span class="legend-sub">${sub}</span></div><div class="legend-values"><strong class="positive">${esc(primary)}</strong><span>${esc(secondary)}</span></div></div>`);
+      });
+      if (others.length) {
+        rows.push(`<div class="legend-divider">Poza wykresem · bez zysku</div>`);
+        others.forEach(entry => {
+          const loss = entry.net < 0;
+          rows.push(`<div class="legend-row loss"><span class="dot"></span><div class="legend-main"><strong>${who(entry)}</strong><span class="legend-sub">${loss ? "Strata" : "Wynik na zero"} · ${entry.runs} ${plural(entry.runs, "run", "runy", "runów")}</span></div><div class="legend-values"><strong class="${loss ? "negative" : ""}">${esc(calc.formatTotalResult(entry.net))}</strong></div></div>`);
+        });
+      }
+      legendEl.innerHTML = rows.join("");
+    }
+
+    function render() {
+      const rank = item => item.m.hourly ?? -Infinity;
+      const groups = collect().sort((a, b) => rank(b) - rank(a));
+      groups.forEach(group => group.players.sort((a, b) => rank(b) - rank(a)));
+      renderTable(groups);
+      renderChart(groups);
+    }
+
+    tableBody.addEventListener("click", event => {
+      const row = event.target.closest("tr[data-key]");
+      if (!row) return;
+      const key = row.dataset.key;
+      if (expanded.has(key)) expanded.delete(key); else expanded.add(key);
+      const hadFocus = Boolean(event.target.closest(".group-toggle")) && document.activeElement === event.target.closest(".group-toggle");
+      render();
+      if (hadFocus) {
+        [...tableBody.querySelectorAll("tr[data-key]")].find(element => element.dataset.key === key)?.querySelector(".group-toggle")?.focus();
+      }
+    });
+
+    scopeSelect.addEventListener("change", () => { chartScope = scopeSelect.value; renderChart(lastGroups); });
+    document.querySelectorAll(".seg").forEach(button => button.addEventListener("click", () => {
+      chartMode = button.dataset.mode;
+      document.querySelectorAll(".seg").forEach(other => {
+        other.classList.toggle("active", other === button);
+        other.setAttribute("aria-pressed", String(other === button));
+      });
+      renderChart(lastGroups);
+    }));
 
     function scheduleUpload(delay = 2000) {
       clearTimeout(uploadTimer);
@@ -1011,8 +1469,7 @@
         onSnapshot(collection(db, "players"), snapshot => {
           players = {};
           snapshot.forEach(item => { players[item.id] = item.data(); });
-          playerCount = snapshot.size;
-          setStatus(`Połączono · graczy: ${playerCount}`);
+          setStatus(`Połączono · graczy: ${snapshot.size}`);
           render();
         }, error => {
           setStatus("Brak dostępu do bazy (sprawdź reguły)");
