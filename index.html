@@ -63,10 +63,10 @@
     .strategy-dialog-content h2 { margin: 0 0 7px; font-size: 18px; }
     .strategy-dialog-content p { margin: 0 0 18px; color: var(--muted); font-size: 12px; line-height: 1.5; }
     .strategy-dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
-    .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; overflow: hidden; margin-bottom: 16px; background: var(--border); }
-    .stat { min-height: 112px; padding: 17px; background: var(--panel); }
+    .stats { position: sticky; top: 0; z-index: 30; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; overflow: hidden; margin-bottom: 16px; background: var(--border); box-shadow: 0 12px 28px rgba(0, 0, 0, .5); }
+    .stat { min-height: 84px; padding: 13px 16px; background: var(--panel); }
     .stat-label { color: var(--muted); font-size: 11px; font-weight: 700; line-height: 1.4; }
-    .stat-value { margin-top: 12px; font-size: clamp(19px, 2.5vw, 26px); font-weight: 750; letter-spacing: -.04em; overflow-wrap: anywhere; }
+    .stat-value { margin-top: 8px; font-size: clamp(18px, 2.2vw, 24px); font-weight: 750; letter-spacing: -.04em; overflow-wrap: anywhere; }
     .positive { color: var(--green) !important; }
     .negative { color: var(--red) !important; }
     .panel-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 17px 18px; border-bottom: 1px solid var(--border); }
@@ -178,6 +178,9 @@
     .legend-values span { color: var(--muted); font-size: 11px; }
     .legend-divider { margin-top: 6px; color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
     @media (max-width: 760px) {
+      .stats { position: static; box-shadow: none; }
+    }
+    @media (max-width: 760px) {
       .chart-body { grid-template-columns: 1fr; padding: 18px; }
       .chart-donut { width: 100%; max-width: 300px; margin: 0 auto; }
     }
@@ -285,6 +288,7 @@
       </div>
     </dialog>
 
+    <div class="stats-zone">
     <section class="stats" aria-label="Podsumowanie strategii">
       <div class="stat">
         <div class="stat-label">Średni czas runu</div>
@@ -347,6 +351,8 @@
         <button class="button primary" id="add-run-button" type="button">＋ Dodaj run</button>
       </div>
     </section>
+
+    </div>
 
     <section class="card compare" aria-label="Porównanie strategii">
       <div class="panel-heading">
