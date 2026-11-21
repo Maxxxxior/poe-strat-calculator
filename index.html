@@ -135,6 +135,43 @@
       .stats.stats-invest { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .item-search-fields { grid-template-columns: 1fr; }
     }
+    .view-tabs { display: flex; gap: 8px; margin: 0 0 16px; }
+    .view-tab { padding: 11px 18px; border: 1px solid var(--border); border-radius: 10px; background: var(--panel); color: var(--muted); font-size: 13px; font-weight: 750; }
+    .view-tab:hover { border-color: #454d60; color: #e9ebf2; }
+    .view-tab.active { border-color: var(--accent); background: #29251d; color: #f5d69f; }
+    main[data-view="stash"] .header-actions { display: none; }
+    #view-farm[hidden], #view-stash[hidden] { display: none; }
+    .stash-settings { display: grid; grid-template-columns: minmax(200px, .6fr) minmax(0, 1.4fr) auto; align-items: start; gap: 16px; padding: 18px; margin-bottom: 16px; }
+    .stash-settings-actions { align-self: end; }
+    .stash-summary { position: sticky; top: 0; z-index: 30; display: grid; grid-template-columns: minmax(220px, 1.1fr) repeat(4, minmax(0, 1fr)); gap: 1px; overflow: hidden; margin-bottom: 16px; border: 1px solid var(--border); border-radius: 14px; background: var(--border); box-shadow: 0 12px 28px rgba(0, 0, 0, .5); }
+    .stash-total, .stash-part { padding: 14px 16px; background: var(--panel); }
+    .stash-total-label, .stash-part-label { color: var(--muted); font-size: 11px; font-weight: 700; }
+    .stash-total-value { margin-top: 6px; font-size: clamp(22px, 3vw, 30px); font-weight: 800; letter-spacing: -.02em; color: #f5d69f; }
+    .stash-total-sub { margin-top: 3px; color: var(--muted); font-size: 12px; }
+    .stash-part-value { margin-top: 8px; font-size: 16px; font-weight: 750; }
+    .stash-part-sub { margin-top: 3px; color: var(--muted); font-size: 11px; }
+    .stash-basic { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; padding: 18px; }
+    .stash-basic .hint { margin: 8px 0 0; }
+    .stash-table { min-width: 680px; }
+    .stash-table td { padding: 8px 12px; }
+    .stash-table td:first-child { width: 44px; color: var(--muted); font-size: 12px; }
+    .stash-table td input { padding: 8px 10px; font-size: 13px; }
+    .stash-table td:nth-child(2) { min-width: 220px; }
+    .stash-table td:nth-child(3) { width: 120px; }
+    .stash-table td:nth-child(4) { min-width: 160px; }
+    .stash-table td:nth-child(5) { min-width: 130px; font-weight: 700; white-space: nowrap; text-align: right; }
+    .stash-table th:nth-child(5) { text-align: right; }
+    .stash-table td:last-child { width: 48px; }
+    .stash-paste { padding: 14px 18px 0; }
+    .stash-paste textarea { width: 100%; margin-top: 6px; padding: 9px 11px; resize: vertical; border: 1px solid var(--border); border-radius: 8px; background: #0f1219; color: #f5f6fa; font: inherit; font-size: 12px; }
+    .stash-paste .hint { margin: 8px 0 12px; }
+    .stash-table tr.flash td { animation: flash 1.6s ease-out; }
+    @media (max-width: 900px) {
+      .stash-summary { position: static; box-shadow: none; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .stash-total { grid-column: 1 / -1; }
+      .stash-settings { grid-template-columns: 1fr; }
+      .stash-basic { grid-template-columns: 1fr; }
+    }
     .remove-run:disabled { opacity: .3; cursor: not-allowed; }
     .remove-run:disabled:hover { background: transparent; color: #81899a; }
     .session-rate { width: 210px; }
@@ -335,6 +372,12 @@
       </div>
     </header>
 
+    <nav class="view-tabs" role="tablist" aria-label="Widok">
+      <button class="view-tab active" id="tab-farm" type="button" role="tab" aria-selected="true" data-view="farm">Farmienie i strategie</button>
+      <button class="view-tab" id="tab-stash" type="button" role="tab" aria-selected="false" data-view="stash">Stash · ile mam hajsu</button>
+    </nav>
+
+    <div id="view-farm">
     <section class="card settings" aria-label="Kurs walut">
       <div>
         <label class="field-label" for="exchange-rate">Kurs chaos / divine</label>
@@ -619,6 +662,95 @@
       <div class="empty" id="chart-empty">Brak danych do wykresu. Włącz udostępnianie i dodaj kompletne runy.</div>
     </section>
     <button class="button primary back-to-search" id="back-to-search" type="button" hidden>↑ Wróć do wyszukiwarki</button>
+
+    </div>
+
+    <div id="view-stash" hidden>
+      <section class="card stash-settings" aria-label="Kurs w stashu">
+        <div>
+          <label class="field-label" for="stash-rate">Kurs chaos / divine (tylko dla stasha)</label>
+          <input id="stash-rate" type="text" inputmode="decimal" autocomplete="off">
+          <p class="error-message" id="stash-rate-error" role="alert"></p>
+        </div>
+        <div>
+          <span class="field-label">Jak to działa</span>
+          <p class="hint">Wpisz chaosy, diviny, inne waluty (ile jedna sztuka jest warta) i przedmioty (ile chodzą na rynku). Wartości możesz podawać jako działania, np. <strong>12c + 3 div</strong>. Kurs jest osobny od kursu w zakładce farmienia.</p>
+        </div>
+        <div class="stash-settings-actions">
+          <button class="button danger" id="stash-clear" type="button">Wyczyść stash</button>
+        </div>
+      </section>
+
+      <section class="stash-summary" id="stash-summary" aria-label="Podsumowanie stasha"></section>
+
+      <section class="card" aria-label="Chaos i divine">
+        <div class="panel-heading"><h2>Chaos i divine</h2><span class="run-count" id="stash-basic-sum"></span></div>
+        <div class="stash-basic">
+          <div>
+            <label class="field-label" for="stash-chaos">Chaos Orb (ilość)</label>
+            <input id="stash-chaos" type="text" inputmode="decimal" autocomplete="off" placeholder="np. 1250">
+            <p class="hint" id="stash-chaos-value"></p>
+          </div>
+          <div>
+            <label class="field-label" for="stash-divine">Divine Orb (ilość)</label>
+            <input id="stash-divine" type="text" inputmode="decimal" autocomplete="off" placeholder="np. 14">
+            <p class="hint" id="stash-divine-value"></p>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" aria-label="Inne waluty">
+        <div class="panel-heading"><h2>Inne waluty</h2><span class="run-count" id="stash-currencies-sum"></span></div>
+        <div class="table-wrap">
+          <table class="stash-table">
+            <thead><tr><th>#</th><th>Waluta</th><th>Ilość</th><th>Wartość 1 szt.</th><th>Razem</th><th aria-label="Usuń"></th></tr></thead>
+            <tbody id="stash-currencies-body"></tbody>
+          </table>
+          <div class="empty" id="stash-currencies-empty">Dodaj walutę (np. Exalted Orb) i wpisz, ile jedna sztuka jest warta w chaosach lub divinach.</div>
+        </div>
+        <div class="panel-footer">
+          <p class="hint">Wartość 1 szt. to np. <strong>12c</strong> albo <strong>0,1 div</strong>. Podpowiedzi nazw pojawiają się po wpisaniu pierwszych liter.</p>
+          <div class="add-group">
+            <button class="button primary" type="button" data-add="currencies" data-n="1">＋ Dodaj walutę</button>
+            <button class="button" type="button" data-add="currencies" data-n="5">＋ 5 walut</button>
+            <span class="add-custom"><input type="text" inputmode="numeric" maxlength="3" value="10" data-count="currencies" aria-label="Ile walut dodać"><button class="button" type="button" data-add-custom="currencies">＋ Dodaj wpisaną liczbę</button></span>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" aria-label="Przedmioty">
+        <div class="panel-heading"><h2>Przedmioty</h2><span class="run-count" id="stash-items-sum"></span></div>
+        <div class="stash-paste">
+          <label class="field-label" for="stash-paste">Dodaj przedmiot z gry</label>
+          <textarea id="stash-paste" rows="2" placeholder="Ctrl+C na przedmiocie w grze, potem Ctrl+V tutaj. Doda się nowy wiersz z nazwą i ceną (z notatki ~b/o), a taki sam przedmiot zwiększy ilość."></textarea>
+          <p class="hint" id="stash-paste-note"></p>
+        </div>
+        <div class="table-wrap">
+          <table class="stash-table">
+            <thead><tr><th>#</th><th>Przedmiot</th><th>Ilość</th><th>Cena 1 szt.</th><th>Razem</th><th aria-label="Usuń"></th></tr></thead>
+            <tbody id="stash-items-body"></tbody>
+          </table>
+          <div class="empty" id="stash-items-empty">Dodaj przedmiot ręcznie albo wklej opis z gry powyżej.</div>
+        </div>
+        <div class="panel-footer">
+          <p class="hint">Cenę wpisz taką, za jaką przedmiot chodzi na rynku albo ile jest warty (np. <strong>45c</strong>, <strong>2 div</strong>). Ctrl+V opisu przedmiotu w polu nazwy lub ceny też wypełni wiersz.</p>
+          <div class="add-group">
+            <button class="button primary" type="button" data-add="items" data-n="1">＋ Dodaj przedmiot</button>
+            <button class="button" type="button" data-add="items" data-n="5">＋ 5 przedmiotów</button>
+            <span class="add-custom"><input type="text" inputmode="numeric" maxlength="3" value="10" data-count="items" aria-label="Ile przedmiotów dodać"><button class="button" type="button" data-add-custom="items">＋ Dodaj wpisaną liczbę</button></span>
+            <button class="button" type="button" id="stash-sort">Sortuj od najcenniejszych</button>
+          </div>
+        </div>
+      </section>
+      <datalist id="currency-names">
+        <option value="Exalted Orb"></option><option value="Mirror of Kalandra"></option><option value="Orb of Alchemy"></option><option value="Orb of Fusing"></option>
+        <option value="Orb of Alteration"></option><option value="Orb of Augmentation"></option><option value="Orb of Regret"></option><option value="Orb of Scouring"></option>
+        <option value="Orb of Annulment"></option><option value="Orb of Chance"></option><option value="Blessed Orb"></option><option value="Jeweller's Orb"></option>
+        <option value="Chromatic Orb"></option><option value="Vaal Orb"></option><option value="Ancient Orb"></option><option value="Awakener's Orb"></option>
+        <option value="Gemcutter's Prism"></option><option value="Cartographer's Chisel"></option><option value="Orb of Horizons"></option><option value="Orb of Binding"></option>
+        <option value="Orb of Dominance"></option><option value="Orb of Alchemy"></option><option value="Hunter's Exalted Orb"></option><option value="Divine Orb"></option>
+      </datalist>
+    </div>
 
     <div class="save-status" id="save-status" role="status" aria-live="polite">Dane zapisują się automatycznie w tej przeglądarce.</div>
   </main>
@@ -2587,7 +2719,7 @@
         successStats, chanceCells,
         formatMoney, formatSignedMoney, formatTotalResult, formatDuration, formatLong, formatPercent, escapeHtml,
         // do testów i rozszerzeń
-        parseMoneyExpr, displayMoney, parseAmount
+        parseMoneyExpr, displayMoney, parseAmount, parseRateText, parseItemText, parseFreeQuery, moneyInput
       };
 
       loadData();
@@ -2599,6 +2731,326 @@
       saveData();
     })();
   </script>
+  </script>
+  <script>
+    // ===== Stash: ile mam hajsu =====
+    (() => {
+      const calc = window.poeCalc;
+      const $ = id => document.getElementById(id);
+      const KEY = "poe-stash-v1";
+      const VIEW_KEY = "poe-view-v1";
+      const esc = calc.escapeHtml;
+      const makeId = () => globalThis.crypto?.randomUUID?.() || `s-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      const nf = new Intl.NumberFormat("pl-PL", { maximumFractionDigits: 2 });
+      const plural = (n, one, few, many) => n === 1 ? one : (n % 10 >= 2 && n % 10 <= 4 && !(n % 100 >= 12 && n % 100 <= 14)) ? few : many;
+      const KINDS = { currencies: $("stash-currencies-body"), items: $("stash-items-body") };
+      const PLACEHOLDERS = { currencies: "np. Exalted Orb", items: "np. Constant Quicksilver Flask of the Cheetah" };
+      const UNIT_HINTS = { currencies: "np. 12c lub 0,1 div", items: "np. 45c lub 2 div" };
+
+      let state = { rate: "155", chaos: "", divine: "", currencies: [], items: [] };
+
+      function normalize(raw) {
+        const text = value => typeof value === "string" ? value : "";
+        const rows = list => (Array.isArray(list) ? list : []).filter(row => row && typeof row === "object").map(row => ({
+          id: typeof row.id === "string" ? row.id : makeId(), name: text(row.name), qty: text(row.qty) || "1", unit: text(row.unit)
+        }));
+        return { rate: text(raw.rate) || "155", chaos: text(raw.chaos), divine: text(raw.divine), currencies: rows(raw.currencies), items: rows(raw.items) };
+      }
+
+      function load() {
+        try {
+          const stored = localStorage.getItem(KEY);
+          if (stored) state = normalize(JSON.parse(stored));
+        } catch (error) { console.error("Nie udało się odczytać stasha:", error); }
+      }
+
+      function save() {
+        try {
+          localStorage.setItem(KEY, JSON.stringify({ version: 1, ...state }));
+          $("save-status").textContent = "Stash zapisany automatycznie w tej przeglądarce.";
+        } catch (error) {
+          $("save-status").textContent = "Nie udało się zapisać stasha w przeglądarce.";
+          console.error(error);
+        }
+      }
+
+      // ----- liczenie -----
+      const rate = () => calc.parseRateText(state.rate);
+
+      function parseQty(text) {
+        const normalized = String(text ?? "").replace(/\s+/g, "").replace(",", ".");
+        if (!normalized) return 0;
+        return /^\d+(?:\.\d+)?$/.test(normalized) ? Number(normalized) : null;
+      }
+
+      const unitChaos = row => calc.parseAmount(row.unit, rate());
+
+      function rowTotal(row) {
+        const qty = parseQty(row.qty);
+        const unit = unitChaos(row);
+        return qty === null || unit === null ? null : qty * unit;
+      }
+
+      function fmt(chaos) {
+        const r = rate();
+        if (r === null) return "—";
+        const sign = chaos < 0 ? "−" : "";
+        const abs = Math.abs(chaos);
+        return abs >= r ? `${sign}${nf.format(abs / r)} div` : `${sign}${nf.format(abs)}c`;
+      }
+
+      const fmtChaos = chaos => `${nf.format(chaos)}c`;
+      const fmtDiv = chaos => rate() === null ? "—" : `${nf.format(chaos / rate())} div`;
+
+      function sumOf(list) {
+        return list.reduce((sum, row) => sum + (rowTotal(row) ?? 0), 0);
+      }
+
+      function totals() {
+        const r = rate();
+        const chaosQty = parseQty(state.chaos) ?? 0;
+        const divineQty = parseQty(state.divine) ?? 0;
+        const basicChaos = chaosQty;
+        const basicDivine = r === null ? 0 : divineQty * r;
+        const currencies = sumOf(state.currencies);
+        const items = sumOf(state.items);
+        return { chaosQty, divineQty, basicChaos, basicDivine, currencies, items, total: basicChaos + basicDivine + currencies + items };
+      }
+
+      // ----- renderowanie -----
+      function rowHtml(kind, row, index) {
+        return `<tr data-row="${esc(row.id)}" data-kind="${kind}">
+          <td class="idx">${index + 1}</td>
+          <td><input data-f="name" type="text" maxlength="120" ${kind === "currencies" ? 'list="currency-names" ' : ""}placeholder="${esc(PLACEHOLDERS[kind])}" aria-label="Nazwa ${index + 1}" value="${esc(row.name)}" autocomplete="off"></td>
+          <td><input data-f="qty" type="text" inputmode="decimal" aria-label="Ilość ${index + 1}" value="${esc(row.qty)}" autocomplete="off"></td>
+          <td>${calc.moneyInput('data-f="unit"', row.unit, UNIT_HINTS[kind], `Wartość 1 szt. ${index + 1}`)}</td>
+          <td data-sum>—</td>
+          <td><button class="remove-run" type="button" data-remove aria-label="Usuń wiersz ${index + 1}" title="Usuń">×</button></td>
+        </tr>`;
+      }
+
+      function renderKind(kind) {
+        KINDS[kind].innerHTML = state[kind].map((row, index) => rowHtml(kind, row, index)).join("");
+        $(`stash-${kind}-empty`).hidden = state[kind].length > 0;
+      }
+
+      function stashPart(label, value, sub) {
+        return `<div class="stash-part"><div class="stash-part-label">${label}</div><div class="stash-part-value">${value}</div><div class="stash-part-sub">${sub}</div></div>`;
+      }
+
+      function updateTotals() {
+        const t = totals();
+        const r = rate();
+        $("stash-rate-error").textContent = r === null ? "Podaj kurs większy od zera, np. 155." : "";
+        $("stash-rate").classList.toggle("invalid", r === null);
+        Object.entries(KINDS).forEach(([kind, body]) => body.querySelectorAll("tr[data-row]").forEach(tr => {
+          const row = state[kind].find(entry => entry.id === tr.dataset.row);
+          const total = row ? rowTotal(row) : null;
+          const cell = tr.querySelector("[data-sum]");
+          cell.textContent = total === null || (!row.unit.trim()) ? "—" : fmt(total);
+          cell.title = total === null ? "" : `${fmtChaos(total)} · ${fmtDiv(total)}`;
+        }));
+        const share = value => t.total > 0 ? `${nf.format(value / t.total * 100)}% całości` : "—";
+        const itemCount = state.items.reduce((sum, row) => sum + (parseQty(row.qty) ?? 0), 0);
+        $("stash-summary").innerHTML = `
+          <div class="stash-total">
+            <div class="stash-total-label">Razem w stashu</div>
+            <div class="stash-total-value">${r === null ? "—" : fmtDiv(t.total)}</div>
+            <div class="stash-total-sub">${fmtChaos(t.total)}</div>
+          </div>
+          ${stashPart("Chaos Orb", fmt(t.basicChaos), `${nf.format(t.chaosQty)} szt. · ${share(t.basicChaos)}`)}
+          ${stashPart("Divine Orb", fmt(t.basicDivine), `${nf.format(t.divineQty)} szt. · ${share(t.basicDivine)}`)}
+          ${stashPart("Inne waluty", fmt(t.currencies), `${state.currencies.length} ${plural(state.currencies.length, "pozycja", "pozycje", "pozycji")} · ${share(t.currencies)}`)}
+          ${stashPart("Przedmioty", fmt(t.items), `${nf.format(itemCount)} szt. · ${share(t.items)}`)}`;
+        $("stash-chaos-value").textContent = `Wartość: ${fmtChaos(t.basicChaos)}`;
+        $("stash-divine-value").textContent = r === null ? "" : `Wartość: ${fmtChaos(t.basicDivine)} · ${fmt(t.basicDivine)}`;
+        $("stash-basic-sum").textContent = fmt(t.basicChaos + t.basicDivine);
+        $("stash-currencies-sum").textContent = fmt(t.currencies);
+        $("stash-items-sum").textContent = fmt(t.items);
+      }
+
+      function renderAll() {
+        $("stash-rate").value = state.rate;
+        $("stash-chaos").value = state.chaos;
+        $("stash-divine").value = state.divine;
+        renderKind("currencies");
+        renderKind("items");
+        updateTotals();
+      }
+
+      // ----- obsługa -----
+      function newRow() { return { id: makeId(), name: "", qty: "1", unit: "" }; }
+
+      function addRows(kind, count) {
+        const amount = Math.min(Math.max(Math.floor(Number(count)) || 1, 1), 200);
+        for (let index = 0; index < amount; index += 1) state[kind].push(newRow());
+        renderKind(kind);
+        updateTotals();
+        save();
+        const rows = KINDS[kind].querySelectorAll("tr");
+        rows[rows.length - amount]?.querySelector("input")?.focus();
+      }
+
+      $("view-stash").querySelectorAll("[data-add]").forEach(button => button.addEventListener("click", () => addRows(button.dataset.add, Number(button.dataset.n))));
+      $("view-stash").querySelectorAll("[data-add-custom]").forEach(button => button.addEventListener("click", () => {
+        const kind = button.dataset.addCustom;
+        addRows(kind, $("view-stash").querySelector(`[data-count="${kind}"]`).value);
+      }));
+      $("view-stash").querySelectorAll("[data-count]").forEach(input => input.addEventListener("keydown", event => {
+        if (event.key === "Enter") { event.preventDefault(); addRows(input.dataset.count, input.value); }
+      }));
+
+      function findRow(element) {
+        const tr = element.closest("tr[data-row]");
+        if (!tr) return null;
+        const kind = tr.dataset.kind;
+        return { kind, tr, row: state[kind].find(entry => entry.id === tr.dataset.row) };
+      }
+
+      Object.keys(KINDS).forEach(kind => {
+        const body = KINDS[kind];
+        body.addEventListener("input", event => {
+          const input = event.target;
+          const found = findRow(input);
+          if (!found || !found.row || !input.dataset.f) return;
+          found.row[input.dataset.f] = input.value;
+          updateTotals();
+          save();
+        });
+        body.addEventListener("click", event => {
+          const button = event.target.closest("button[data-remove]");
+          const found = button && findRow(button);
+          if (!found) return;
+          state[kind] = state[kind].filter(entry => entry.id !== found.row.id);
+          renderKind(kind);
+          updateTotals();
+          save();
+        });
+        body.addEventListener("keydown", event => {
+          const input = event.target;
+          if (event.key !== "Enter" || !input.dataset.f) return;
+          event.preventDefault();
+          const found = findRow(input);
+          if (!found) return;
+          let next = found.tr.nextElementSibling;
+          if (!next) { addRows(kind, 1); next = body.lastElementChild; }
+          next?.querySelector(`[data-f="${input.dataset.f}"]`)?.focus();
+        });
+        // Ctrl+V opisu przedmiotu z gry w polu nazwy lub ceny wypełnia wiersz
+        body.addEventListener("paste", event => {
+          const input = event.target;
+          if (!input.matches?.('input[data-f="name"], input[data-f="unit"]')) return;
+          const parsed = calc.parseItemText(event.clipboardData?.getData("text") || "");
+          if (!parsed.isItem || !parsed.name) return;
+          const found = findRow(input);
+          if (!found || !found.row) return;
+          event.preventDefault();
+          found.row.name = parsed.name.slice(0, 120);
+          found.tr.querySelector('[data-f="name"]').value = found.row.name;
+          if (parsed.priceText) {
+            found.row.unit = parsed.priceText;
+            const unitInput = found.tr.querySelector('[data-f="unit"]');
+            unitInput.dataset.raw = parsed.priceText;
+            unitInput.value = document.activeElement === unitInput ? parsed.priceText : calc.displayMoney(parsed.priceText);
+            unitInput.classList.remove("invalid");
+          }
+          updateTotals();
+          save();
+          $("save-status").textContent = parsed.priceText
+            ? `Wklejono: „${found.row.name}” za ${calc.displayMoney(parsed.priceText)}.`
+            : `Wklejono nazwę „${found.row.name}”. W opisie nie było ceny (brak notatki ~b/o), więc wpisz ją ręcznie.`;
+        });
+      });
+
+      // Pole „Dodaj przedmiot z gry”: nowy wiersz albo +1 do ilości identycznego przedmiotu
+      $("stash-paste").addEventListener("input", () => {
+        const area = $("stash-paste");
+        const text = area.value;
+        if (!text.trim()) return;
+        const parsed = calc.parseItemText(text);
+        let name;
+        let priceText;
+        if (parsed.isItem) { name = parsed.name; priceText = parsed.priceText; }
+        else { const free = calc.parseFreeQuery(text); name = free.name; priceText = free.priceText; }
+        area.value = "";
+        if (!name) { $("stash-paste-note").textContent = "Nie rozpoznałem nazwy przedmiotu."; return; }
+        const same = state.items.find(row => row.name.trim().toLocaleLowerCase() === name.toLocaleLowerCase()
+          && (priceText ? (unitChaos(row) !== null && Math.abs(unitChaos(row) - calc.parseAmount(priceText, rate())) < 0.5) : !row.unit.trim()));
+        let target;
+        if (same) {
+          same.qty = String((parseQty(same.qty) ?? 0) + 1);
+          target = same;
+          $("stash-paste-note").textContent = `„${name}” już był na liście, więc zwiększyłem ilość do ${same.qty}.`;
+        } else {
+          target = { id: makeId(), name: name.slice(0, 120), qty: "1", unit: priceText || "" };
+          state.items.push(target);
+          const missing = parsed.isItem && !priceText ? " W opisie nie było ceny (brak notatki ~b/o), wpisz ją w wierszu." : "";
+          $("stash-paste-note").textContent = `Dodano: „${target.name}”${priceText ? ` za ${calc.displayMoney(priceText)}` : ""}.${missing}`;
+        }
+        renderKind("items");
+        updateTotals();
+        save();
+        const tr = KINDS.items.querySelector(`tr[data-row="${CSS.escape(target.id)}"]`);
+        if (tr) {
+          tr.classList.add("flash");
+          tr.scrollIntoView?.({ block: "nearest", behavior: "smooth" });
+          if (!target.unit.trim()) tr.querySelector('[data-f="unit"]')?.focus({ preventScroll: true });
+        }
+      });
+
+      $("stash-sort").addEventListener("click", () => {
+        state.items.sort((a, b) => (rowTotal(b) ?? -1) - (rowTotal(a) ?? -1));
+        renderKind("items");
+        updateTotals();
+        save();
+      });
+
+      [["stash-chaos", "chaos"], ["stash-divine", "divine"]].forEach(([id, key]) => $(id).addEventListener("input", () => {
+        state[key] = $(id).value;
+        $(id).classList.toggle("invalid", parseQty($(id).value) === null);
+        updateTotals();
+        save();
+      }));
+
+      $("stash-rate").addEventListener("input", () => {
+        state.rate = $("stash-rate").value;
+        updateTotals();
+        save();
+      });
+
+      $("stash-clear").addEventListener("click", () => {
+        if (!window.confirm("Wyczyścić cały stash (waluty, przedmioty i kurs)?")) return;
+        state = { rate: "155", chaos: "", divine: "", currencies: [], items: [] };
+        renderAll();
+        save();
+      });
+
+      // ----- zakładki widoków -----
+      const SUBTITLES = {
+        farm: "Zapisuj runy, porównuj strategie i sprawdzaj, która zarabia najwięcej na godzinę.",
+        stash: "Policz, ile hajsu leży w stashu: chaosy, diviny, inne waluty i przedmioty z ich cenami."
+      };
+      function setView(view) {
+        const target = view === "stash" ? "stash" : "farm";
+        $("view-farm").hidden = target !== "farm";
+        $("view-stash").hidden = target !== "stash";
+        document.querySelectorAll(".view-tab").forEach(tab => {
+          const active = tab.dataset.view === target;
+          tab.classList.toggle("active", active);
+          tab.setAttribute("aria-selected", String(active));
+        });
+        document.querySelector("main.shell").dataset.view = target;
+        document.querySelector(".subtitle").textContent = SUBTITLES[target];
+        try { localStorage.setItem(VIEW_KEY, target); } catch (error) { /* ignoruj */ }
+      }
+      document.querySelectorAll(".view-tab").forEach(tab => tab.addEventListener("click", () => setView(tab.dataset.view)));
+
+      load();
+      renderAll();
+      let view = "farm";
+      try { view = localStorage.getItem(VIEW_KEY) || "farm"; } catch (error) { /* ignoruj */ }
+      setView(view);
+    })();
   </script>
   <script>
     // ===== Okienka z objaśnieniami (styl PoE) =====
