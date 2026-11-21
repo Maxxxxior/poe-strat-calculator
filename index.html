@@ -106,7 +106,9 @@
     .orders-table td:last-child { width: 170px; }
     .invest-overview { margin: 16px 18px 0; }
     .invest-overview .mini-table tfoot td { background: #1b202b; font-weight: 800; border-top: 1px solid var(--border); }
-    .item-search { margin: 16px 18px 0; padding: 14px; border: 1px solid var(--border); border-radius: 10px; background: #151923; }
+    .back-to-search { position: fixed; right: 20px; bottom: 20px; z-index: 40; box-shadow: 0 8px 24px rgba(0, 0, 0, .55); }
+    .back-to-search[hidden] { display: none; }
+    .item-search { scroll-margin-top: 210px; margin: 16px 18px 0; padding: 14px; border: 1px solid var(--border); border-radius: 10px; background: #151923; }
     .item-search-head { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
     .item-search-fields { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) auto; gap: 8px; }
     .item-search input, .item-search textarea { padding: 9px 11px; font-size: 13px; }
@@ -608,6 +610,8 @@
       </div>
       <div class="empty" id="chart-empty">Brak danych do wykresu. Włącz udostępnianie i dodaj kompletne runy.</div>
     </section>
+    <button class="button primary back-to-search" id="back-to-search" type="button" hidden>↑ Wróć do wyszukiwarki</button>
+
     <div class="save-status" id="save-status" role="status" aria-live="polite">Dane zapisują się automatycznie w tej przeglądarce.</div>
   </main>
 
@@ -1684,6 +1688,7 @@
       const searchPaste = $("search-paste");
       const searchNote = $("search-note");
       const searchResults = $("search-results");
+      const backButton = $("back-to-search");
 
       const normText = value => String(value).toLocaleLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
 
@@ -1761,11 +1766,11 @@
         }));
         hits.forEach(hit => investList.querySelector(`[data-item="${CSS.escape(hit.item.id)}"]`)?.classList.add("search-hit"));
         if (!hits.length) {
-          searchResults.innerHTML = `<p class="hint">Nie ma przedmiotu o takiej nazwie i cenie.${nameOnly ? ` Z samą nazwą ${plural(nameOnly, "pasuje", "pasują", "pasuje")} ${nameOnly} ${plural(nameOnly, "przedmiot", "przedmioty", "przedmiotów")}, ale w innej cenie.` : ""}</p>`;
+          searchResults.innerHTML = `<p class="hint">Nie ma przedmiotu o takiej nazwie i cenie.${nameOnly ? ` Z samą nazwą pasuje ${nameOnly} ${plural(nameOnly, "przedmiot", "przedmioty", "przedmiotów")}, ale w innej cenie.` : ""}</p>`;
           return hits;
         }
         const shown = hits.slice(0, 15);
-        searchResults.innerHTML = `<p class="hint">${plural(hits.length, "Pasuje", "Pasują", "Pasuje")} ${hits.length} ${plural(hits.length, "przedmiot", "przedmioty", "przedmiotów")}:</p>` + shown.map(hit => {
+        searchResults.innerHTML = `<p class="hint">Pasuje ${hits.length} ${plural(hits.length, "przedmiot", "przedmioty", "przedmiotów")}:</p>` + shown.map(hit => {
           const where = hit.investment.label || `Inwestycja ${hit.investmentIndex + 1}`;
           return `<button type="button" class="result-btn strong" data-jump="${escapeHtml(hit.item.id)}"><span>${escapeHtml(where)} · #${hit.itemIndex + 1} · ${escapeHtml(hit.item.name || "bez nazwy")}</span><small>${formatMoney(hit.values.price)} · ${hit.values.isSold ? "sprzedany" : "wystawiony"}</small></button>`;
         }).join("") + (hits.length > shown.length ? `<p class="hint">…i ${hits.length - shown.length} kolejnych (są podświetlone na liście).</p>` : "");
@@ -1779,6 +1784,19 @@
         row.classList.remove("flash");
         void row.offsetWidth;
         row.classList.add("flash");
+        backButton.hidden = false;
+      }
+
+      // Przycisk pływający: po przeskoku do przedmiotu wraca do wyszukiwarki
+      backButton.addEventListener("click", () => {
+        backButton.hidden = true;
+        $("item-search").scrollIntoView?.({ block: "start", behavior: "smooth" });
+        searchPaste.focus({ preventScroll: true });
+      });
+      if ("IntersectionObserver" in window) {
+        new IntersectionObserver(entries => {
+          if (entries.some(entry => entry.isIntersecting)) backButton.hidden = true;
+        }, { threshold: 0.6 }).observe($("item-search"));
       }
 
       searchName.addEventListener("input", applySearch);
@@ -1907,6 +1925,7 @@
         renderRuns();
         renderInvest();
         renderComparison();
+        if (activeStrategy()?.type !== "invest") backButton.hidden = true;
       }
 
       // ===== CSV =====
