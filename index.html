@@ -501,7 +501,7 @@
       </div>
       <div class="sessions-block invest-overview" id="invest-overview" hidden></div>
       <div class="item-search" id="item-search">
-        <div class="item-search-head"><strong>Znajdź przedmiot na liście</strong><span class="hint">Wpisz nazwę i/lub cenę albo wklej opis przedmiotu z gry (Ctrl+C na przedmiocie w grze, potem Ctrl+V poniżej).</span></div>
+        <div class="item-search-head"><strong>Znajdź przedmiot na liście</strong><span class="hint">Wpisz nazwę i/lub cenę albo wklej opis przedmiotu z gry (Ctrl+C na przedmiocie w grze, potem Ctrl+V poniżej). Gdy podasz nazwę i cenę, pokażą się tylko przedmioty pasujące do obu naraz.</span></div>
         <div class="item-search-fields">
           <input id="search-name" type="text" placeholder="Nazwa, np. Quicksilver Flask" autocomplete="off">
           <input id="search-price" type="text" placeholder="Cena, np. 18c lub 2 div" autocomplete="off">
@@ -1481,7 +1481,7 @@
         const sold = item.status === "sold";
         return `<tr data-item="${escapeHtml(item.id)}"${sold ? ' class="is-sold"' : ""}>
           <td class="idx" data-n="${index + 1}">${index + 1}${sold ? " ✓" : ""}</td>
-          <td><input data-item-field="name" type="text" maxlength="80" placeholder="np. Quicksilver Flask (MS)" aria-label="Nazwa przedmiotu ${index + 1}" value="${escapeHtml(item.name)}"></td>
+          <td><input data-item-field="name" type="text" maxlength="120" placeholder="np. Quicksilver Flask (MS) · albo wklej opis z gry (Ctrl+V)" aria-label="Nazwa przedmiotu ${index + 1}" value="${escapeHtml(item.name)}"></td>
           <td>${moneyInput('data-item-field="price"', item.price, "np. 45c lub 2 div", `Cena wystawienia przedmiotu ${index + 1}`)}</td>
           <td><select data-item-field="status" aria-label="Status przedmiotu ${index + 1}"><option value="listed"${sold ? "" : " selected"}>Wystawiony</option><option value="sold"${sold ? " selected" : ""}>Sprzedany</option></select></td>
           <td>${moneyInput(`data-item-field="sold"${sold ? "" : " disabled"}`, item.sold, "puste = cena wystawienia", `Cena sprzedaży przedmiotu ${index + 1}`)}</td>
@@ -1694,10 +1694,7 @@
         if (a === b || a.includes(b) || b.includes(a)) return true;
         const ta = a.split(" ");
         const tb = b.split(" ");
-        if (ta.every(token => tb.includes(token)) || tb.every(token => ta.includes(token))) return true;
-        const long = ta.filter(token => token.length >= 3);
-        const overlap = long.filter(token => tb.includes(token)).length;
-        return overlap > 0 && overlap >= Math.min(2, long.length);
+        return tb.every(token => ta.includes(token)) || ta.every(token => tb.includes(token));
       }
 
       function currencyOf(word) {
@@ -1751,31 +1748,27 @@
           searchResults.innerHTML = "";
           return [];
         }
+        // Gdy podano nazwę i cenę, przedmiot musi pasować do obu naraz (AND)
         const hits = [];
+        let nameOnly = 0;
         strategy.investments.forEach((investment, investmentIndex) => investment.items.forEach((item, itemIndex) => {
           const values = itemValues(item);
           const nameOk = hasName && nameMatches(item.name, nameQuery);
           const priceOk = hasPrice && (Math.abs(values.price - priceValue) < 0.5 || (values.isSold && Math.abs(values.sold - priceValue) < 0.5));
-          let level = 0;
-          if (hasName && hasPrice) level = nameOk && priceOk ? 2 : (nameOk || priceOk ? 1 : 0);
-          else level = (hasName ? nameOk : priceOk) ? 2 : 0;
-          if (level) hits.push({ investment, investmentIndex, item, itemIndex, level, values });
+          const matches = hasName && hasPrice ? nameOk && priceOk : hasName ? nameOk : priceOk;
+          if (matches) hits.push({ investment, investmentIndex, item, itemIndex, values });
+          else if (hasName && hasPrice && nameOk) nameOnly += 1;
         }));
-        hits.sort((a, b) => b.level - a.level);
-        hits.forEach(hit => investList.querySelector(`[data-item="${CSS.escape(hit.item.id)}"]`)?.classList.add(hit.level === 2 ? "search-hit" : "search-maybe"));
-        const strong = hits.filter(hit => hit.level === 2);
-        const shown = (strong.length ? hits : hits).slice(0, 10);
+        hits.forEach(hit => investList.querySelector(`[data-item="${CSS.escape(hit.item.id)}"]`)?.classList.add("search-hit"));
         if (!hits.length) {
-          searchResults.innerHTML = '<p class="hint">Nie ma takiego przedmiotu na liście.</p>';
+          searchResults.innerHTML = `<p class="hint">Nie ma przedmiotu o takiej nazwie i cenie.${nameOnly ? ` Z samą nazwą ${plural(nameOnly, "pasuje", "pasują", "pasuje")} ${nameOnly} ${plural(nameOnly, "przedmiot", "przedmioty", "przedmiotów")}, ale w innej cenie.` : ""}</p>`;
           return hits;
         }
-        const heading = strong.length
-          ? `Pasuje ${strong.length} ${plural(strong.length, "przedmiot", "przedmioty", "przedmiotów")}${hits.length > strong.length ? ` (i ${hits.length - strong.length} częściowo)` : ""}:`
-          : `Brak pewnego dopasowania, ale ${hits.length} ${plural(hits.length, "przedmiot pasuje", "przedmioty pasują", "przedmiotów pasuje")} częściowo (tylko nazwa albo tylko cena):`;
-        searchResults.innerHTML = `<p class="hint">${heading}</p>` + shown.map(hit => {
+        const shown = hits.slice(0, 15);
+        searchResults.innerHTML = `<p class="hint">${plural(hits.length, "Pasuje", "Pasują", "Pasuje")} ${hits.length} ${plural(hits.length, "przedmiot", "przedmioty", "przedmiotów")}:</p>` + shown.map(hit => {
           const where = hit.investment.label || `Inwestycja ${hit.investmentIndex + 1}`;
-          return `<button type="button" class="result-btn${hit.level === 2 ? " strong" : ""}" data-jump="${escapeHtml(hit.item.id)}"><span>${escapeHtml(where)} · #${hit.itemIndex + 1} · ${escapeHtml(hit.item.name || "bez nazwy")}</span><small>${formatMoney(hit.values.price)} · ${hit.values.isSold ? "sprzedany" : "wystawiony"}</small></button>`;
-        }).join("");
+          return `<button type="button" class="result-btn strong" data-jump="${escapeHtml(hit.item.id)}"><span>${escapeHtml(where)} · #${hit.itemIndex + 1} · ${escapeHtml(hit.item.name || "bez nazwy")}</span><small>${formatMoney(hit.values.price)} · ${hit.values.isSold ? "sprzedany" : "wystawiony"}</small></button>`;
+        }).join("") + (hits.length > shown.length ? `<p class="hint">…i ${hits.length - shown.length} kolejnych (są podświetlone na liście).</p>` : "");
         return hits;
       }
 
@@ -1823,7 +1816,7 @@
         searchPaste.value = "";
         searchNote.textContent = `Rozpoznano: ${name ? `„${name}”` : "brak nazwy"}${priceText ? ` · cena ${displayMoney(priceText)}` : ""}${notes.length ? ` (${notes.join("; ")})` : ""}`;
         const hits = applySearch();
-        const first = hits.find(hit => hit.level === 2) || hits[0];
+        const first = hits[0];
         if (first) jumpToItem(first.item.id);
       });
 
@@ -2203,6 +2196,35 @@
         const soldInput = row.querySelector('[data-item-field="sold"]');
         soldInput.disabled = item.status !== "sold";
         if (item.status === "sold") soldInput.focus();
+        refreshLive();
+        saveData();
+      });
+
+      // Ctrl+V opisu przedmiotu z gry w polu nazwy lub ceny: wpisuje nazwę i cenę do tego wiersza
+      investList.addEventListener("paste", event => {
+        const input = event.target;
+        if (!input.matches?.('input[data-item-field="name"], input[data-item-field="price"]')) return;
+        const parsed = parseItemText(event.clipboardData?.getData("text") || "");
+        if (!parsed.isItem || !parsed.name) return;
+        const investment = findInvestment(input);
+        const row = input.closest("[data-item]");
+        const item = investment?.items.find(entry => entry.id === row?.dataset.item);
+        if (!item) return;
+        event.preventDefault();
+        item.name = parsed.name.slice(0, 120);
+        row.querySelector('[data-item-field="name"]').value = item.name;
+        if (parsed.priceText) {
+          item.price = parsed.priceText;
+          const priceInput = row.querySelector('[data-item-field="price"]');
+          priceInput.dataset.raw = parsed.priceText;
+          priceInput.value = document.activeElement === priceInput ? parsed.priceText : displayMoney(parsed.priceText);
+          priceInput.classList.remove("invalid");
+          saveStatus.textContent = `Wklejono: „${item.name}” za ${displayMoney(parsed.priceText)}.`;
+        } else {
+          saveStatus.textContent = parsed.unknownCurrency
+            ? `Wklejono nazwę „${item.name}”. Cena w walucie „${parsed.unknownCurrency}” (obsługuję chaos i divine), więc wpisz ją ręcznie.`
+            : `Wklejono nazwę „${item.name}”. W opisie nie było ceny (brak notatki ~b/o), więc wpisz ją ręcznie.`;
+        }
         refreshLive();
         saveData();
       });
