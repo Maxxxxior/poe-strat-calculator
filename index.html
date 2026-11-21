@@ -120,6 +120,14 @@
     .result-btn small { color: var(--muted); white-space: nowrap; }
     .invest-table tr.search-hit td { background: #26311f; opacity: 1; }
     .invest-table tr.search-hit td:first-child { box-shadow: inset 3px 0 #a6d96a; }
+    .result-row { display: flex; align-items: stretch; gap: 6px; }
+    .result-row .result-btn { flex: 1; min-width: 0; }
+    .result-row.is-listed .result-btn.strong { border-color: #5f7a34; background: #1d2616; }
+    .result-row.is-sold .result-btn.strong { border-color: #3f6082; background: #172230; }
+    .result-action { padding: 0 11px; border: 1px solid var(--border); border-radius: 8px; background: #12151e; color: var(--muted); font-size: 11px; font-weight: 700; white-space: nowrap; }
+    .result-action:hover { border-color: var(--accent); color: #f5d69f; }
+    .invest-table tr.search-hit.is-sold td { background: #172230; }
+    .invest-table tr.search-hit.is-sold td:first-child { box-shadow: inset 3px 0 #6fa8ff; }
     .invest-table tr.search-maybe td { background: #2a2618; opacity: 1; }
     .invest-table tr.flash td { animation: flash 1.6s ease-out; }
     @keyframes flash { 0% { background: #5f7a34; } 100% { background: transparent; } }
@@ -1766,13 +1774,14 @@
         }));
         hits.forEach(hit => investList.querySelector(`[data-item="${CSS.escape(hit.item.id)}"]`)?.classList.add("search-hit"));
         if (!hits.length) {
-          searchResults.innerHTML = `<p class="hint">Nie ma przedmiotu o takiej nazwie i cenie.${nameOnly ? ` Z samą nazwą pasuje ${nameOnly} ${plural(nameOnly, "przedmiot", "przedmioty", "przedmiotów")}, ale w innej cenie.` : ""}</p>`;
+          searchResults.innerHTML = `<p class="hint">Nie ma przedmiotu o takiej nazwie i cenie.${nameOnly ? ` Z samą nazwą ${plural(nameOnly, "pasuje", "pasują", "pasuje")} ${nameOnly} ${plural(nameOnly, "przedmiot", "przedmioty", "przedmiotów")}, ale w innej cenie.` : ""}</p>`;
           return hits;
         }
         const shown = hits.slice(0, 15);
-        searchResults.innerHTML = `<p class="hint">Pasuje ${hits.length} ${plural(hits.length, "przedmiot", "przedmioty", "przedmiotów")}:</p>` + shown.map(hit => {
+        searchResults.innerHTML = `<p class="hint">${plural(hits.length, "Pasuje", "Pasują", "Pasuje")} ${hits.length} ${plural(hits.length, "przedmiot", "przedmioty", "przedmiotów")} (zielone: wystawione, niebieskie: sprzedane):</p>` + shown.map(hit => {
           const where = hit.investment.label || `Inwestycja ${hit.investmentIndex + 1}`;
-          return `<button type="button" class="result-btn strong" data-jump="${escapeHtml(hit.item.id)}"><span>${escapeHtml(where)} · #${hit.itemIndex + 1} · ${escapeHtml(hit.item.name || "bez nazwy")}</span><small>${formatMoney(hit.values.price)} · ${hit.values.isSold ? "sprzedany" : "wystawiony"}</small></button>`;
+          const sold = hit.values.isSold;
+          return `<div class="result-row ${sold ? "is-sold" : "is-listed"}"><button type="button" class="result-btn strong" data-jump="${escapeHtml(hit.item.id)}"><span>${escapeHtml(where)} · #${hit.itemIndex + 1} · ${escapeHtml(hit.item.name || "bez nazwy")}</span><small>${formatMoney(hit.values.price)} · ${sold ? "sprzedany" : "wystawiony"}</small></button><button type="button" class="result-action" data-sell="${escapeHtml(hit.item.id)}" data-to="${sold ? "listed" : "sold"}" title="${sold ? "Cofnij: oznacz jako wystawiony" : "Oznacz jako sprzedany (bez przenoszenia)"}">${sold ? "↩ Wystawiony" : "✓ Sprzedany"}</button></div>`;
         }).join("") + (hits.length > shown.length ? `<p class="hint">…i ${hits.length - shown.length} kolejnych (są podświetlone na liście).</p>` : "");
         return hits;
       }
@@ -1808,7 +1817,30 @@
         searchNote.textContent = "";
         applySearch();
       });
+      // Zmiana statusu przedmiotu prosto z wyników wyszukiwania (bez przewijania do niego)
+      function setItemStatus(itemId, status) {
+        const strategy = activeStrategy();
+        if (!strategy || strategy.type !== "invest") return;
+        let found = null;
+        strategy.investments.forEach(investment => investment.items.forEach(item => { if (item.id === itemId) found = item; }));
+        if (!found) return;
+        found.status = status === "sold" ? "sold" : "listed";
+        const row = investList.querySelector(`[data-item="${CSS.escape(itemId)}"]`);
+        if (row) {
+          row.classList.toggle("is-sold", found.status === "sold");
+          const indexCell = row.querySelector(".idx");
+          indexCell.textContent = `${indexCell.dataset.n}${found.status === "sold" ? " ✓" : ""}`;
+          row.querySelector('[data-item-field="status"]').value = found.status;
+          row.querySelector('[data-item-field="sold"]').disabled = found.status !== "sold";
+        }
+        refreshLive();
+        saveData();
+        saveStatus.textContent = `„${found.name || "Przedmiot"}” oznaczono jako ${found.status === "sold" ? "sprzedany" : "wystawiony"}.`;
+      }
+
       searchResults.addEventListener("click", event => {
+        const action = event.target.closest("button[data-sell]");
+        if (action) { setItemStatus(action.dataset.sell, action.dataset.to); return; }
         const button = event.target.closest("button[data-jump]");
         if (button) jumpToItem(button.dataset.jump);
       });
