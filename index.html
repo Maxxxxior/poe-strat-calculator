@@ -86,6 +86,45 @@
     .runs-table td select { padding: 9px 10px; font-size: 12px; }
     .runs-table td:last-child { width: 92px; }
     .row-actions { display: flex; gap: 2px; }
+    .stats.stats-invest { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+    .stats.stats-invest .stat { padding: 12px 13px; }
+    .stats.stats-invest .stat-label { font-size: 11px; }
+    .stats.stats-invest .stat-value { font-size: clamp(15px, 1.6vw, 20px); }
+    .add-group { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+    .add-custom { display: inline-flex; align-items: center; gap: 6px; }
+    .add-custom input { width: 58px; padding: 9px 8px; text-align: center; font-size: 13px; }
+    .invest-table tr.is-sold td, .orders-table tr.is-done td { opacity: .5; transition: opacity .15s; }
+    .invest-table tr.is-sold td.idx, .orders-table tr.is-done td.idx { color: var(--green); font-weight: 700; opacity: 1; }
+    .invest-table tr.is-sold:hover td, .invest-table tr.is-sold:focus-within td, .orders-table tr.is-done:hover td, .orders-table tr.is-done:focus-within td { opacity: 1; }
+    .orders-block { margin: 16px 18px 0; border: 1px solid var(--border); border-radius: 10px; background: #151923; overflow: hidden; }
+    .orders-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px; padding: 14px 14px 6px; }
+    .orders-head h3 { margin: 0; font-size: 13px; }
+    .orders-table { min-width: 760px; }
+    .orders-table td:nth-child(2) { min-width: 240px; }
+    .orders-table td:nth-child(3) { min-width: 150px; }
+    .orders-table td:nth-child(4) { min-width: 160px; }
+    .orders-table td:last-child { width: 170px; }
+    .invest-overview { margin: 16px 18px 0; }
+    .invest-overview .mini-table tfoot td { background: #1b202b; font-weight: 800; border-top: 1px solid var(--border); }
+    .item-search { margin: 16px 18px 0; padding: 14px; border: 1px solid var(--border); border-radius: 10px; background: #151923; }
+    .item-search-head { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
+    .item-search-fields { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) auto; gap: 8px; }
+    .item-search input, .item-search textarea { padding: 9px 11px; font-size: 13px; }
+    .item-search textarea { width: 100%; margin-top: 8px; resize: vertical; border: 1px solid var(--border); border-radius: 8px; background: #0f1219; color: var(--text); font: inherit; font-size: 12px; }
+    .item-search .hint { margin: 8px 0 0; }
+    .item-search-results { display: flex; flex-direction: column; gap: 6px; }
+    .result-btn { display: flex; justify-content: space-between; gap: 12px; width: 100%; padding: 8px 11px; border: 1px solid var(--border); border-radius: 8px; background: #12151e; color: #e9ebf2; text-align: left; font-size: 12px; }
+    .result-btn.strong { border-color: #5f7a34; background: #1d2616; }
+    .result-btn small { color: var(--muted); white-space: nowrap; }
+    .invest-table tr.search-hit td { background: #26311f; opacity: 1; }
+    .invest-table tr.search-hit td:first-child { box-shadow: inset 3px 0 #a6d96a; }
+    .invest-table tr.search-maybe td { background: #2a2618; opacity: 1; }
+    .invest-table tr.flash td { animation: flash 1.6s ease-out; }
+    @keyframes flash { 0% { background: #5f7a34; } 100% { background: transparent; } }
+    @media (max-width: 760px) {
+      .stats.stats-invest { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .item-search-fields { grid-template-columns: 1fr; }
+    }
     .remove-run:disabled { opacity: .3; cursor: not-allowed; }
     .remove-run:disabled:hover { background: transparent; color: #81899a; }
     .session-rate { width: 210px; }
@@ -427,7 +466,14 @@
       </div>
       <div class="panel-footer">
         <p class="hint">Czas: <strong>mm:ss</strong> lub sekundy. Kwoty możesz wpisać jako działanie, np. <strong>12c + 3 div</strong>, <strong>2+4c+5</strong> albo <strong>4+2+6div</strong>. Liczby bez jednostki to chaosy (a jeśli w działaniu jest tylko div, to divy). Po wyjściu z pola zapis się uporządkuje, a po kliknięciu w pole zobaczysz i poprawisz oryginał.<br>Net profit = drop − koszt. Liczą się tylko kompletne runy. Enter przechodzi do pola niżej.<br>Listą „Sesja” przeniesiesz pojedynczy run, a <strong>✂</strong> przy runie zaczyna od niego nową sesję (ten i kolejne runy przechodzą do niej). Czas farmienia sumuje się ze wszystkich runów z wpisanym czasem.</p>
-        <button class="button primary" id="add-run-button" type="button">＋ Dodaj run</button>
+        <div class="add-group">
+          <button class="button primary" id="add-run-button" type="button">＋ Dodaj run</button>
+          <button class="button" id="add-runs-5-button" type="button">＋ 5 runów</button>
+          <span class="add-custom">
+            <input id="add-runs-count" type="text" inputmode="numeric" maxlength="3" value="10" aria-label="Ile runów dodać">
+            <button class="button" id="add-runs-custom-button" type="button">＋ Dodaj wpisaną liczbę</button>
+          </span>
+        </div>
       </div>
     </section>
 
@@ -435,6 +481,35 @@
       <div class="panel-heading">
         <h2>Inwestycje</h2>
         <span class="run-count" id="invest-count">0 inwestycji</span>
+      </div>
+      <div class="orders-block">
+        <div class="orders-head">
+          <h3>Zlecenia skupu · <span class="term" data-term="frozen">zamrożone środki</span></h3>
+          <span class="hint" id="orders-summary"></span>
+        </div>
+        <div class="table-wrap">
+          <table class="invest-table orders-table">
+            <thead><tr><th>#</th><th>Co skupujesz</th><th>Zamrożone</th><th>Status</th><th aria-label="Akcje"></th></tr></thead>
+            <tbody id="orders-body"></tbody>
+          </table>
+          <div class="empty" id="orders-empty">Brak zleceń skupu. Dodaj zlecenie, jeśli masz pieniądze zamrożone w skupowaniu na rynku.</div>
+        </div>
+        <div class="invest-foot">
+          <button class="button" id="add-order-button" type="button">＋ Dodaj zlecenie skupu</button>
+          <span class="hint">Zamrożone środki nie liczą się jeszcze jako wydatek. Gdy karty się skupią, kliknij „→ Inwestycja”.</span>
+        </div>
+      </div>
+      <div class="sessions-block invest-overview" id="invest-overview" hidden></div>
+      <div class="item-search" id="item-search">
+        <div class="item-search-head"><strong>Znajdź przedmiot na liście</strong><span class="hint">Wpisz nazwę i/lub cenę albo wklej opis przedmiotu z gry (Ctrl+C na przedmiocie w grze, potem Ctrl+V poniżej).</span></div>
+        <div class="item-search-fields">
+          <input id="search-name" type="text" placeholder="Nazwa, np. Quicksilver Flask" autocomplete="off">
+          <input id="search-price" type="text" placeholder="Cena, np. 18c lub 2 div" autocomplete="off">
+          <button class="button" id="search-clear" type="button">Wyczyść</button>
+        </div>
+        <textarea id="search-paste" rows="2" placeholder="Wklej tutaj cały opis przedmiotu skopiowany w grze…"></textarea>
+        <p class="hint" id="search-note"></p>
+        <div class="item-search-results" id="search-results"></div>
       </div>
       <div class="invest-list" id="invest-list"></div>
       <div class="empty" id="invest-empty">Dodaj pierwszą inwestycję: wpisz, ile włożyłeś, i dopisz przedmioty, które wystawiasz.</div>
@@ -594,15 +669,19 @@
 
       function newMapStrategy(name) {
         const session = newSession(1);
-        return { id: makeId(), name, type: "map", runs: [], sessions: [session], currentSessionId: session.id, viewSessionId: session.id, investments: [] };
+        return { id: makeId(), name, type: "map", runs: [], sessions: [session], currentSessionId: session.id, viewSessionId: session.id, investments: [], orders: [] };
       }
 
       function newInvestStrategy(name) {
-        return { id: makeId(), name, type: "invest", runs: [], sessions: [], currentSessionId: null, viewSessionId: null, investments: [] };
+        return { id: makeId(), name, type: "invest", runs: [], sessions: [], currentSessionId: null, viewSessionId: null, investments: [], orders: [] };
       }
 
       function newInvestment() {
         return { id: makeId(), label: "", cost: "", items: [] };
+      }
+
+      function newOrder() {
+        return { id: makeId(), label: "", amount: "", status: "waiting", investmentId: null };
       }
 
       function newItem() {
@@ -941,17 +1020,23 @@
       }
 
       function blankInvest() {
-        return { investments: 0, items: 0, soldCount: 0, invested: 0, listed: 0, sold: 0, pending: 0 };
+        return { investments: 0, items: 0, soldCount: 0, invested: 0, listed: 0, sold: 0, pending: 0, soldProfit: 0 };
       }
 
       function addInvestment(total, investment) {
+        const invested = parseAmount(investment.cost) ?? 0;
+        const costPerItem = investment.items.length ? invested / investment.items.length : 0;
         total.investments += 1;
-        total.invested += parseAmount(investment.cost) ?? 0;
+        total.invested += invested;
         investment.items.forEach(item => {
           const value = itemValues(item);
           total.items += 1;
           total.listed += value.price;
-          if (value.isSold) { total.soldCount += 1; total.sold += value.sold; } else total.pending += value.price;
+          if (value.isSold) {
+            total.soldCount += 1;
+            total.sold += value.sold;
+            total.soldProfit += value.sold - costPerItem;
+          } else total.pending += value.price;
         });
         return total;
       }
@@ -961,6 +1046,10 @@
         const potential = total.sold + total.pending - total.invested;
         return {
           ...total, realized, potential,
+          pendingCount: total.items - total.soldCount,
+          avgPerSold: total.soldCount ? total.soldProfit / total.soldCount : null,
+          avgRealized: total.investments ? realized / total.investments : null,
+          avgPotential: total.investments ? potential / total.investments : null,
           roiPotential: total.invested > 0 ? potential / total.invested * 100 : null,
           returnPct: total.invested > 0 ? total.sold / total.invested * 100 : null
         };
@@ -1022,15 +1111,27 @@
         }));
       }
 
+      function normalizeOrders(raw) {
+        if (!Array.isArray(raw)) return [];
+        return raw.filter(order => order && typeof order === "object").map(order => ({
+          id: typeof order.id === "string" ? order.id : makeId(),
+          label: typeof order.label === "string" ? order.label : "",
+          amount: typeof order.amount === "string" ? order.amount : "",
+          status: ["waiting", "filled", "withdrawn"].includes(order.status) ? order.status : "waiting",
+          investmentId: typeof order.investmentId === "string" ? order.investmentId : null
+        }));
+      }
+
       function normalizeStrategy(raw, legacyCurrency) {
         const type = raw.type === "invest" ? "invest" : "map";
         const strategy = {
           id: typeof raw.id === "string" ? raw.id : makeId(),
           name: typeof raw.name === "string" ? raw.name : "",
-          type, runs: [], sessions: [], currentSessionId: null, viewSessionId: null, investments: []
+          type, runs: [], sessions: [], currentSessionId: null, viewSessionId: null, investments: [], orders: []
         };
         if (type === "invest") {
           strategy.investments = normalizeInvestments(raw.investments);
+          strategy.orders = normalizeOrders(raw.orders);
           return strategy;
         }
         let sessions = (Array.isArray(raw.sessions) ? raw.sessions : [])
@@ -1120,18 +1221,27 @@
           const m = investMetrics(strategy);
           const has = m.investments > 0;
           const dash = "—";
+          const waiting = strategy.orders.filter(order => order.status === "waiting");
+          const frozen = waiting.reduce((sum, order) => sum + (parseAmount(order.amount) ?? 0), 0);
+          const withCount = (value, count) => `${formatMoney(value)} (${count} szt.)`;
+          statsEl.className = "stats stats-invest";
           statsEl.innerHTML = [
             statCard("Zainwestowano", has ? formatMoney(m.invested) : dash),
-            statCard("Wartość wystawiona (wszystko)", has ? formatMoney(m.listed) : dash),
-            statCard("Sprzedane za", has ? formatMoney(m.sold) : dash),
-            statCard("Czeka na sprzedaż", has ? formatMoney(m.pending) : dash),
+            statCard(term("frozen", "Zamrożone środki"), strategy.orders.length ? `${formatMoney(frozen)} (${waiting.length} ${plural(waiting.length, "zlec.", "zlec.", "zlec.")})` : dash),
+            statCard("Wartość wystawiona", has ? withCount(m.listed, m.items) : dash),
+            statCard("Sprzedane za", has ? withCount(m.sold, m.soldCount) : dash),
+            statCard("Czeka na sprzedaż", has ? withCount(m.pending, m.pendingCount) : dash),
+            statCard(term("returnPct", "Zwrot kosztów"), has && m.returnPct !== null ? `${formatNumber(m.returnPct)}%` : dash),
             statCard(term("realized", "Zysk zrealizowany"), has ? formatTotalResult(m.realized) : dash, has ? toneOf(m.realized) : ""),
             statCard(term("potential", "Zysk potencjalny"), has ? formatTotalResult(m.potential) : dash, has ? toneOf(m.potential) : ""),
-            statCard(term("returnPct", "Zwrot kosztów"), has && m.returnPct !== null ? `${formatNumber(m.returnPct)}%` : dash),
-            statCard(`${term("roi", "ROI")} potencjalne`, has ? formatPercent(m.roiPotential) : dash, has && m.roiPotential !== null ? toneOf(m.roiPotential) : "")
+            statCard(`${term("roi", "ROI")} potencjalne`, has ? formatPercent(m.roiPotential) : dash, has && m.roiPotential !== null ? toneOf(m.roiPotential) : ""),
+            statCard(term("perSold", "Śr. zarobek / sprzedaną szt."), m.avgPerSold === null ? dash : formatSignedMoney(m.avgPerSold), toneOf(m.avgPerSold)),
+            statCard("Śr. zysk / inwestycję (zreal.)", m.avgRealized === null ? dash : formatTotalResult(m.avgRealized), toneOf(m.avgRealized)),
+            statCard("Śr. zysk / inwestycję (potenc.)", m.avgPotential === null ? dash : formatTotalResult(m.avgPotential), toneOf(m.avgPotential))
           ].join("");
           return;
         }
+        statsEl.className = "stats";
         const m = metricsFor(strategy, state.scope === "sessions" ? "all" : state.scope);
         const dash = "—";
         statsEl.innerHTML = [
@@ -1369,8 +1479,8 @@
       // ===== Renderowanie: inwestycje =====
       function itemRowHtml(item, index) {
         const sold = item.status === "sold";
-        return `<tr data-item="${escapeHtml(item.id)}">
-          <td>${index + 1}</td>
+        return `<tr data-item="${escapeHtml(item.id)}"${sold ? ' class="is-sold"' : ""}>
+          <td class="idx" data-n="${index + 1}">${index + 1}${sold ? " ✓" : ""}</td>
           <td><input data-item-field="name" type="text" maxlength="80" placeholder="np. Quicksilver Flask (MS)" aria-label="Nazwa przedmiotu ${index + 1}" value="${escapeHtml(item.name)}"></td>
           <td>${moneyInput('data-item-field="price"', item.price, "np. 45c lub 2 div", `Cena wystawienia przedmiotu ${index + 1}`)}</td>
           <td><select data-item-field="status" aria-label="Status przedmiotu ${index + 1}"><option value="listed"${sold ? "" : " selected"}>Wystawiony</option><option value="sold"${sold ? " selected" : ""}>Sprzedany</option></select></td>
@@ -1402,8 +1512,46 @@
           <div class="invest-foot">
             <button class="button" type="button" data-add-item="1">＋ Dodaj przedmiot</button>
             <button class="button" type="button" data-add-item="5">＋ 5 przedmiotów</button>
+            <span class="add-custom">
+              <input type="text" inputmode="numeric" maxlength="3" value="10" data-custom-count aria-label="Ile przedmiotów dodać">
+              <button class="button" type="button" data-add-custom>＋ Dodaj wpisaną liczbę</button>
+            </span>
           </div>
         </article>`;
+      }
+
+      function renderInvestOverview(strategy) {
+        const box = $("invest-overview");
+        box.hidden = strategy.investments.length === 0;
+        if (box.hidden) { box.innerHTML = ""; return; }
+        const n = strategy.investments.length;
+        const total = investMetrics(strategy);
+        const sold = m => `${formatMoney(m.sold)} (${m.soldCount} szt.)`;
+        const pending = m => `${formatMoney(m.pending)} (${m.pendingCount} szt.)`;
+        const rois = strategy.investments.map(investment => investmentMetrics(investment).roiPotential).filter(value => value !== null);
+        const avgRoi = rois.length ? rois.reduce((sum, value) => sum + value, 0) / rois.length : null;
+        const rows = strategy.investments.map((investment, index) => {
+          const m = investmentMetrics(investment);
+          return `<tr>
+            <td>${escapeHtml(investment.label || `Inwestycja ${index + 1}`)}</td>
+            <td>${formatMoney(m.invested)}</td>
+            <td>${sold(m)}</td>
+            <td>${pending(m)}</td>
+            <td class="${toneOf(m.realized)}">${formatTotalResult(m.realized)}</td>
+            <td class="${toneOf(m.potential)}">${formatTotalResult(m.potential)}</td>
+            <td class="${toneOf(m.roiPotential)}">${formatPercent(m.roiPotential)}</td>
+            <td class="${toneOf(m.avgPerSold)}">${m.avgPerSold === null ? "—" : formatSignedMoney(m.avgPerSold)}</td>
+          </tr>`;
+        }).join("");
+        box.innerHTML = `<h3>Podsumowanie inwestycji</h3>
+          <div class="table-wrap"><table class="mini-table">
+            <thead><tr><th>Inwestycja</th><th>Zainwestowano</th><th>Sprzedane</th><th>Czeka</th><th>${term("realized", "Zysk zreal.")}</th><th>${term("potential", "Zysk potenc.")}</th><th>${term("roi", "ROI")} potenc.</th><th>${term("perSold", "Śr. / sprzedaną szt.")}</th></tr></thead>
+            <tbody>${rows}</tbody>
+            <tfoot>
+              <tr><td>Średnio na inwestycję</td><td>${formatMoney(total.invested / n)}</td><td>${formatMoney(total.sold / n)} (${formatNumber(total.soldCount / n)} szt.)</td><td>${formatMoney(total.pending / n)} (${formatNumber(total.pendingCount / n)} szt.)</td><td class="${toneOf(total.avgRealized)}">${formatTotalResult(total.avgRealized)}</td><td class="${toneOf(total.avgPotential)}">${formatTotalResult(total.avgPotential)}</td><td class="${toneOf(avgRoi)}">${formatPercent(avgRoi)}</td><td class="${toneOf(total.avgPerSold)}">${total.avgPerSold === null ? "—" : formatSignedMoney(total.avgPerSold)}</td></tr>
+              <tr><td>Razem (${n} ${plural(n, "inwestycja", "inwestycje", "inwestycji")})</td><td>${formatMoney(total.invested)}</td><td>${sold(total)}</td><td>${pending(total)}</td><td class="${toneOf(total.realized)}">${formatTotalResult(total.realized)}</td><td class="${toneOf(total.potential)}">${formatTotalResult(total.potential)}</td><td class="${toneOf(total.roiPotential)}">${formatPercent(total.roiPotential)}</td><td></td></tr>
+            </tfoot>
+          </table></div>`;
       }
 
       function updateInvestSummaries() {
@@ -1416,21 +1564,275 @@
           const chip = (label, value, tone) => `<span class="chip"><small>${label}</small><strong class="${tone || ""}">${value}</strong></span>`;
           block.querySelector("[data-summary]").innerHTML = [
             chip("Sprzedane", `${m.soldCount} z ${m.items}`),
-            chip("Wystawione", formatMoney(m.listed)),
-            chip("Sprzedane za", formatMoney(m.sold)),
-            chip("Czeka", formatMoney(m.pending)),
+            chip("Wystawione", `${formatMoney(m.listed)} (${m.items} szt.)`),
+            chip("Sprzedane za", `${formatMoney(m.sold)} (${m.soldCount} szt.)`),
+            chip("Czeka", `${formatMoney(m.pending)} (${m.pendingCount} szt.)`),
             chip(term("realized", "Zysk zrealizowany"), formatTotalResult(m.realized), toneOf(m.realized)),
-            chip(term("potential", "Zysk potencjalny"), `${formatTotalResult(m.potential)}${m.roiPotential === null ? "" : ` · ${formatPercent(m.roiPotential)}`}`, toneOf(m.potential))
+            chip(term("potential", "Zysk potencjalny"), `${formatTotalResult(m.potential)}${m.roiPotential === null ? "" : ` · ${formatPercent(m.roiPotential)}`}`, toneOf(m.potential)),
+            chip(term("perSold", "Śr. zarobek / sprzedaną szt."), m.avgPerSold === null ? "—" : formatSignedMoney(m.avgPerSold), toneOf(m.avgPerSold))
           ].join("");
         });
         $("invest-count").textContent = `${strategy.investments.length} ${plural(strategy.investments.length, "inwestycja", "inwestycje", "inwestycji")}`;
+        renderInvestOverview(strategy);
+        applySearch();
       }
+
+      // ----- Zlecenia skupu (zamrożone środki) -----
+      const ordersBody = $("orders-body");
+      const ORDER_LABELS = [["waiting", "Czeka (zamrożone)"], ["filled", "Skupione"], ["withdrawn", "Wycofane"]];
+
+      function orderRowHtml(order, index) {
+        const options = ORDER_LABELS.map(([value, label]) => `<option value="${value}"${order.status === value ? " selected" : ""}>${label}</option>`).join("");
+        return `<tr data-order="${escapeHtml(order.id)}"${order.status === "waiting" ? "" : ' class="is-done"'}>
+          <td class="idx">${index + 1}${order.status === "filled" ? " ✓" : ""}</td>
+          <td><input data-order-field="label" type="text" maxlength="100" placeholder="np. 20× The Shortcut po 22c (zlecenie skupu)" aria-label="Opis zlecenia ${index + 1}" value="${escapeHtml(order.label)}"></td>
+          <td>${moneyInput('data-order-field="amount"', order.amount, "np. 440c lub 20*22c", `Zamrożone środki zlecenia ${index + 1}`)}</td>
+          <td><select data-order-field="status" aria-label="Status zlecenia ${index + 1}">${options}</select></td>
+          <td><div class="row-actions">
+            <button class="button" type="button" data-order-convert${order.investmentId ? " disabled" : ""} title="${order.investmentId ? "To zlecenie już zamieniono w inwestycję" : "Zamień w inwestycję o tym koszcie (gdy karty są już skupione)"}">→ Inwestycja</button>
+            <button class="remove-run" type="button" data-order-remove aria-label="Usuń zlecenie ${index + 1}" title="Usuń zlecenie">×</button>
+          </div></td>
+        </tr>`;
+      }
+
+      function renderOrders() {
+        const strategy = activeStrategy();
+        if (!strategy || strategy.type !== "invest") return;
+        ordersBody.innerHTML = strategy.orders.map(orderRowHtml).join("");
+        $("orders-empty").hidden = strategy.orders.length > 0;
+        const waiting = strategy.orders.filter(order => order.status === "waiting");
+        const frozen = waiting.reduce((sum, order) => sum + (parseAmount(order.amount) ?? 0), 0);
+        $("orders-summary").textContent = waiting.length ? `Zamrożone teraz: ${formatMoney(frozen)} (${waiting.length} ${plural(waiting.length, "zlecenie", "zlecenia", "zleceń")})` : "Nic nie jest teraz zamrożone";
+      }
+
+      function findOrder(element) {
+        const strategy = activeStrategy();
+        const row = element.closest("[data-order]");
+        return strategy && row ? strategy.orders.find(order => order.id === row.dataset.order) : null;
+      }
+
+      ordersBody.addEventListener("input", event => {
+        const input = event.target;
+        if (input.tagName === "SELECT" || !input.dataset.orderField) return;
+        const order = findOrder(input);
+        if (!order) return;
+        order[input.dataset.orderField] = input.value;
+        $("orders-summary").textContent = "";
+        refreshLive();
+        renderOrderSummary();
+        saveData();
+      });
+
+      function renderOrderSummary() {
+        const strategy = activeStrategy();
+        const waiting = strategy.orders.filter(order => order.status === "waiting");
+        const frozen = waiting.reduce((sum, order) => sum + (parseAmount(order.amount) ?? 0), 0);
+        $("orders-summary").textContent = waiting.length ? `Zamrożone teraz: ${formatMoney(frozen)} (${waiting.length} ${plural(waiting.length, "zlecenie", "zlecenia", "zleceń")})` : "Nic nie jest teraz zamrożone";
+      }
+
+      ordersBody.addEventListener("change", event => {
+        const select = event.target.closest("select[data-order-field]");
+        const order = select && findOrder(select);
+        if (!order) return;
+        order.status = ["waiting", "filled", "withdrawn"].includes(select.value) ? select.value : "waiting";
+        renderOrders();
+        refreshLive();
+        saveData();
+      });
+
+      ordersBody.addEventListener("click", event => {
+        const strategy = activeStrategy();
+        const order = findOrder(event.target);
+        if (!strategy || !order) return;
+        if (event.target.closest("button[data-order-remove]")) {
+          strategy.orders = strategy.orders.filter(entry => entry.id !== order.id);
+          renderOrders();
+          refreshLive();
+          saveData();
+          return;
+        }
+        const convert = event.target.closest("button[data-order-convert]");
+        if (convert && !convert.disabled) {
+          const investment = newInvestment();
+          investment.label = order.label;
+          investment.cost = order.amount;
+          strategy.investments.push(investment);
+          order.investmentId = investment.id;
+          order.status = "filled";
+          renderInvest();
+          refreshLive();
+          saveData();
+          const block = investList.querySelector("[data-inv]:last-child");
+          block?.scrollIntoView?.({ block: "center", behavior: "smooth" });
+          block?.querySelector('[data-add-item="5"]')?.focus();
+        }
+      });
+
+      $("add-order-button").addEventListener("click", () => {
+        const strategy = activeStrategy();
+        if (!strategy || strategy.type !== "invest") return;
+        strategy.orders.push(newOrder());
+        renderOrders();
+        refreshLive();
+        saveData();
+        ordersBody.querySelector("tr:last-child input")?.focus();
+      });
+
+      // ----- Szukanie przedmiotu (ręcznie albo wklejonym opisem z gry) -----
+      const searchName = $("search-name");
+      const searchPrice = $("search-price");
+      const searchPaste = $("search-paste");
+      const searchNote = $("search-note");
+      const searchResults = $("search-results");
+
+      const normText = value => String(value).toLocaleLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+
+      function nameMatches(itemName, query) {
+        const a = normText(itemName);
+        const b = normText(query);
+        if (!a || !b) return false;
+        if (a === b || a.includes(b) || b.includes(a)) return true;
+        const ta = a.split(" ");
+        const tb = b.split(" ");
+        if (ta.every(token => tb.includes(token)) || tb.every(token => ta.includes(token))) return true;
+        const long = ta.filter(token => token.length >= 3);
+        const overlap = long.filter(token => tb.includes(token)).length;
+        return overlap > 0 && overlap >= Math.min(2, long.length);
+      }
+
+      function currencyOf(word) {
+        if (/^(c|chaos|chaos-orbs?)$/i.test(word)) return "c";
+        if (/^(div|divs|divine|divines|divine-orbs?)$/i.test(word)) return "div";
+        return null;
+      }
+
+      // Opis przedmiotu skopiowany w grze (Ctrl+C): nazwa po linii "Rarity:" i cena z linii "Note: ~b/o 18 chaos"
+      function parseItemText(text) {
+        const lines = text.replace(/\r/g, "").split("\n").map(line => line.trim());
+        const rarityIndex = lines.findIndex(line => /^(Rarity|Rzadkość)\s*:/i.test(line));
+        let name = "";
+        if (rarityIndex >= 0) {
+          const rarity = lines[rarityIndex].replace(/^[^:]*:\s*/, "").toLowerCase();
+          const first = lines[rarityIndex + 1] || "";
+          const second = lines[rarityIndex + 2] || "";
+          const twoLines = (rarity === "rare" || rarity === "unique" || rarity === "rzadki" || rarity === "unikatowy") && second && !/^-+$/.test(second);
+          name = twoLines ? `${first} ${second}` : first;
+        }
+        const noteLine = lines.find(line => /^(Note|Notatka)\s*:/i.test(line));
+        const noteMatch = noteLine && noteLine.match(/~(?:b\/o|price)\s+(\d+(?:[.,]\d+)?)\s*([A-Za-z-]+)/i);
+        let priceText = null;
+        let unknownCurrency = null;
+        if (noteMatch) {
+          const unit = currencyOf(noteMatch[2]);
+          if (unit) priceText = `${noteMatch[1].replace(",", ".")}${unit === "c" ? "c" : " div"}`;
+          else unknownCurrency = noteMatch[2];
+        }
+        return { isItem: rarityIndex >= 0 || Boolean(noteMatch), name: name.trim(), priceText, unknownCurrency, hasNote: Boolean(noteLine) };
+      }
+
+      function parseFreeQuery(text) {
+        const flat = text.replace(/\s+/g, " ").trim();
+        const match = flat.match(/(\d+(?:[.,]\d+)?)\s*(chaos|divine|divs?|c)\b/i);
+        if (!match) return { name: flat, priceText: null };
+        const unit = currencyOf(match[2]);
+        return { name: flat.replace(match[0], " ").replace(/\s+/g, " ").trim(), priceText: `${match[1].replace(",", ".")}${unit === "c" ? "c" : " div"}` };
+      }
+
+      function applySearch() {
+        const strategy = activeStrategy();
+        investList.querySelectorAll("[data-item]").forEach(row => row.classList.remove("search-hit", "search-maybe"));
+        const nameQuery = searchName.value.trim();
+        const priceText = searchPrice.value.trim();
+        const priceValue = priceText ? parseAmount(priceText) : null;
+        const hasName = nameQuery !== "";
+        const hasPrice = priceValue !== null;
+        searchPrice.classList.toggle("invalid", priceText !== "" && !hasPrice);
+        if (!strategy || strategy.type !== "invest" || (!hasName && !hasPrice)) {
+          searchResults.innerHTML = "";
+          return [];
+        }
+        const hits = [];
+        strategy.investments.forEach((investment, investmentIndex) => investment.items.forEach((item, itemIndex) => {
+          const values = itemValues(item);
+          const nameOk = hasName && nameMatches(item.name, nameQuery);
+          const priceOk = hasPrice && (Math.abs(values.price - priceValue) < 0.5 || (values.isSold && Math.abs(values.sold - priceValue) < 0.5));
+          let level = 0;
+          if (hasName && hasPrice) level = nameOk && priceOk ? 2 : (nameOk || priceOk ? 1 : 0);
+          else level = (hasName ? nameOk : priceOk) ? 2 : 0;
+          if (level) hits.push({ investment, investmentIndex, item, itemIndex, level, values });
+        }));
+        hits.sort((a, b) => b.level - a.level);
+        hits.forEach(hit => investList.querySelector(`[data-item="${CSS.escape(hit.item.id)}"]`)?.classList.add(hit.level === 2 ? "search-hit" : "search-maybe"));
+        const strong = hits.filter(hit => hit.level === 2);
+        const shown = (strong.length ? hits : hits).slice(0, 10);
+        if (!hits.length) {
+          searchResults.innerHTML = '<p class="hint">Nie ma takiego przedmiotu na liście.</p>';
+          return hits;
+        }
+        const heading = strong.length
+          ? `Pasuje ${strong.length} ${plural(strong.length, "przedmiot", "przedmioty", "przedmiotów")}${hits.length > strong.length ? ` (i ${hits.length - strong.length} częściowo)` : ""}:`
+          : `Brak pewnego dopasowania, ale ${hits.length} ${plural(hits.length, "przedmiot pasuje", "przedmioty pasują", "przedmiotów pasuje")} częściowo (tylko nazwa albo tylko cena):`;
+        searchResults.innerHTML = `<p class="hint">${heading}</p>` + shown.map(hit => {
+          const where = hit.investment.label || `Inwestycja ${hit.investmentIndex + 1}`;
+          return `<button type="button" class="result-btn${hit.level === 2 ? " strong" : ""}" data-jump="${escapeHtml(hit.item.id)}"><span>${escapeHtml(where)} · #${hit.itemIndex + 1} · ${escapeHtml(hit.item.name || "bez nazwy")}</span><small>${formatMoney(hit.values.price)} · ${hit.values.isSold ? "sprzedany" : "wystawiony"}</small></button>`;
+        }).join("");
+        return hits;
+      }
+
+      function jumpToItem(itemId) {
+        const row = investList.querySelector(`[data-item="${CSS.escape(itemId)}"]`);
+        if (!row) return;
+        row.scrollIntoView?.({ block: "center", behavior: "smooth" });
+        row.classList.remove("flash");
+        void row.offsetWidth;
+        row.classList.add("flash");
+      }
+
+      searchName.addEventListener("input", applySearch);
+      searchPrice.addEventListener("input", applySearch);
+      $("search-clear").addEventListener("click", () => {
+        searchName.value = "";
+        searchPrice.value = "";
+        searchPaste.value = "";
+        searchNote.textContent = "";
+        applySearch();
+      });
+      searchResults.addEventListener("click", event => {
+        const button = event.target.closest("button[data-jump]");
+        if (button) jumpToItem(button.dataset.jump);
+      });
+      searchPaste.addEventListener("input", () => {
+        const text = searchPaste.value;
+        if (!text.trim()) return;
+        const parsed = parseItemText(text);
+        let name;
+        let priceText;
+        const notes = [];
+        if (parsed.isItem) {
+          name = parsed.name;
+          priceText = parsed.priceText;
+          if (parsed.unknownCurrency) notes.push(`cena w walucie „${parsed.unknownCurrency}” (obsługuję chaos i divine), wpisz ją ręcznie`);
+          else if (!priceText) notes.push("w opisie nie ma ceny (brak notatki ~b/o), szukam tylko po nazwie");
+        } else {
+          const free = parseFreeQuery(text);
+          name = free.name;
+          priceText = free.priceText;
+        }
+        searchName.value = name;
+        searchPrice.value = priceText || "";
+        searchPaste.value = "";
+        searchNote.textContent = `Rozpoznano: ${name ? `„${name}”` : "brak nazwy"}${priceText ? ` · cena ${displayMoney(priceText)}` : ""}${notes.length ? ` (${notes.join("; ")})` : ""}`;
+        const hits = applySearch();
+        const first = hits.find(hit => hit.level === 2) || hits[0];
+        if (first) jumpToItem(first.item.id);
+      });
 
       function renderInvest() {
         const strategy = activeStrategy();
         if (!strategy || strategy.type !== "invest") return;
         investList.innerHTML = strategy.investments.map(investBlockHtml).join("");
         investEmpty.hidden = strategy.investments.length > 0;
+        renderOrders();
         updateInvestSummaries();
       }
 
@@ -1644,18 +2046,28 @@
         saveStatus.textContent = `Podzielono: „${created.name}” zaczyna się od runu ${index + 1} dotychczasowej sesji.`;
       }
 
-      function addRun() {
+      function addRun(count = 1) {
         const strategy = activeStrategy();
         if (!strategy || strategy.type !== "map") return;
-        strategy.runs.push({ id: makeId(), time: "", cost: "", loot: "", rare: "", sessionId: strategy.viewSessionId });
+        for (let index = 0; index < count; index += 1) {
+          strategy.runs.push({ id: makeId(), time: "", cost: "", loot: "", rare: "", sessionId: strategy.viewSessionId });
+        }
         renderRuns();
         refreshLive();
         saveData();
       }
 
-      $("add-run-button").addEventListener("click", () => {
-        addRun();
-        runsBody.querySelector("tr:last-child input")?.focus();
+      function addRunsAndFocus(count) {
+        addRun(count);
+        const rows = runsBody.querySelectorAll("tr");
+        rows[rows.length - count]?.querySelector("input")?.focus();
+      }
+
+      $("add-run-button").addEventListener("click", () => addRunsAndFocus(1));
+      $("add-runs-5-button").addEventListener("click", () => addRunsAndFocus(5));
+      $("add-runs-custom-button").addEventListener("click", () => addRunsAndFocus(clampCount($("add-runs-count").value)));
+      $("add-runs-count").addEventListener("keydown", event => {
+        if (event.key === "Enter") { event.preventDefault(); addRunsAndFocus(clampCount($("add-runs-count").value)); }
       });
 
       // ===== Obsługa: zakres i sesje =====
@@ -1762,6 +2174,21 @@
         saveData();
       });
 
+      function clampCount(value) {
+        const number = Math.floor(Number(String(value).trim()));
+        return Number.isFinite(number) ? Math.min(Math.max(number, 1), 200) : 1;
+      }
+
+      function addItems(investment, amount) {
+        for (let index = 0; index < amount; index += 1) investment.items.push(newItem());
+        renderInvest();
+        refreshLive();
+        saveData();
+        const block = [...investList.querySelectorAll("[data-inv]")].find(element => element.dataset.inv === investment.id);
+        const rows = block?.querySelectorAll("tbody tr");
+        rows?.[rows.length - amount]?.querySelector("input")?.focus();
+      }
+
       investList.addEventListener("change", event => {
         const select = event.target.closest("select[data-item-field]");
         if (!select) return;
@@ -1770,6 +2197,9 @@
         const item = investment?.items.find(entry => entry.id === row?.dataset.item);
         if (!item) return;
         item.status = select.value === "sold" ? "sold" : "listed";
+        row.classList.toggle("is-sold", item.status === "sold");
+        const indexCell = row.querySelector(".idx");
+        indexCell.textContent = `${indexCell.dataset.n}${item.status === "sold" ? " ✓" : ""}`;
         const soldInput = row.querySelector('[data-item-field="sold"]');
         soldInput.disabled = item.status !== "sold";
         if (item.status === "sold") soldInput.focus();
@@ -1779,6 +2209,11 @@
 
       investList.addEventListener("keydown", event => {
         const input = event.target;
+        if (event.key === "Enter" && input.matches("input[data-custom-count]")) {
+          event.preventDefault();
+          input.closest(".invest-foot").querySelector("[data-add-custom]").click();
+          return;
+        }
         if (event.key !== "Enter" || !input.matches("input[data-item-field]")) return;
         event.preventDefault();
         const investment = findInvestment(input);
@@ -1800,15 +2235,12 @@
         const strategy = activeStrategy();
         const investment = findInvestment(event.target);
         if (!strategy || !investment) return;
-        const addButton = event.target.closest("button[data-add-item]");
+        const addButton = event.target.closest("button[data-add-item], button[data-add-custom]");
         if (addButton) {
-          for (let index = 0; index < Number(addButton.dataset.addItem); index += 1) investment.items.push(newItem());
-          renderInvest();
-          refreshLive();
-          saveData();
-          const block = [...investList.querySelectorAll("[data-inv]")].find(element => element.dataset.inv === investment.id);
-          const rows = block?.querySelectorAll("tbody tr");
-          rows?.[rows.length - Number(addButton.dataset.addItem)]?.querySelector("input")?.focus();
+          const amount = addButton.dataset.addCustom !== undefined
+            ? clampCount(addButton.closest(".invest-foot").querySelector("[data-custom-count]").value)
+            : Number(addButton.dataset.addItem);
+          addItems(investment, amount);
           return;
         }
         const removeItem = event.target.closest("button[data-item-remove]");
@@ -2103,6 +2535,21 @@
     //     (w kodzie JS możesz użyć:  window.poeTerm("klucz", "słowo") ).
     (() => {
       const TERMS = {
+        frozen: {
+          title: "Zamrożone środki",
+          body: [
+            "Pieniądze, które leżą w zleceniu skupu na rynku i czekają, aż ktoś sprzeda Ci przedmioty.",
+            "Dopóki nic nie kupiłeś, możesz je w każdej chwili wypłacić, więc to jeszcze nie jest wydatek. Gdy zlecenie się zrealizuje, zamień je w inwestycję."
+          ]
+        },
+        perSold: {
+          title: "Zarobek na sprzedaną sztukę",
+          body: [
+            "Średnio ile zarabiasz na jednym sprzedanym przedmiocie.",
+            "Liczymy: cena sprzedaży minus koszt jednej sztuki. Koszt jednej sztuki to koszt inwestycji podzielony przez liczbę przedmiotów w niej.",
+            "Przykład: inwestycja 440c na 20 przedmiotów → jedna sztuka kosztuje 22c. Sprzedajesz za 40c, więc zarobek na niej to 18c."
+          ]
+        },
         session: {
           title: "Sesja",
           body: [
