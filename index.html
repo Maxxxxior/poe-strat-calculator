@@ -82,7 +82,17 @@
     .runs-table td:nth-child(2) { min-width: 140px; }
     .runs-table td:nth-child(3), .runs-table td:nth-child(4), .runs-table td:nth-child(5) { min-width: 150px; }
     .runs-table td:nth-child(6) { min-width: 125px; white-space: nowrap; font-size: 13px; font-weight: 700; }
-    .runs-table td:last-child { width: 48px; }
+    .runs-table td:nth-child(7) { min-width: 140px; }
+    .runs-table td select { padding: 9px 10px; font-size: 12px; }
+    .runs-table td:last-child { width: 92px; }
+    .row-actions { display: flex; gap: 2px; }
+    .remove-run:disabled { opacity: .3; cursor: not-allowed; }
+    .remove-run:disabled:hover { background: transparent; color: #81899a; }
+    .session-rate { width: 210px; }
+    .session-rate .field-label { margin-bottom: 6px; }
+    .session-rate input { padding: 9px 11px; font-size: 13px; }
+    .session-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-left: auto; }
+    .time-summary { padding: 14px 0 0; }
     .remove-run { width: 30px; height: 30px; border: 0; border-radius: 7px; background: transparent; color: #81899a; font-size: 18px; }
     .remove-run:hover { background: #42272c; color: #ffabab; }
     .toggle { display: flex; align-items: center; gap: 10px; margin-top: 12px; font-size: 13px; cursor: pointer; }
@@ -375,8 +385,17 @@
           <label class="field-label" for="session-select"><span class="term" data-term="session">Sesja</span> pokazana w tabeli runów</label>
           <select id="session-select"></select>
         </div>
-        <button class="button primary" id="new-session-button" type="button">Zakończ sesję · zacznij nową</button>
+        <div class="session-rate">
+          <label class="field-label" for="session-rate">Kurs w tej sesji (chaos / div)</label>
+          <input id="session-rate" type="text" inputmode="decimal" placeholder="puste = kurs z ustawień" autocomplete="off">
+        </div>
+        <div class="session-actions">
+          <button class="button" id="session-rename-button" type="button">Zmień nazwę</button>
+          <button class="button danger" id="session-delete-button" type="button">Usuń sesję</button>
+          <button class="button primary" id="new-session-button" type="button">Zakończ sesję · zacznij nową</button>
+        </div>
       </div>
+      <div class="invest-summary time-summary" id="time-summary"></div>
       <div class="sessions-panel" id="sessions-panel" hidden></div>
     </section>
 
@@ -398,7 +417,8 @@
               <th>Wartość dropu</th>
               <th>Losowy drop</th>
               <th>Net profit</th>
-              <th aria-label="Usuń"></th>
+              <th>Sesja</th>
+              <th aria-label="Akcje"></th>
             </tr>
           </thead>
           <tbody id="runs-body"></tbody>
@@ -406,7 +426,7 @@
         <div class="empty" id="empty-message">Dodaj pierwszy run i wpisz czas, koszt oraz wartość dropu.</div>
       </div>
       <div class="panel-footer">
-        <p class="hint">Czas: <strong>mm:ss</strong> lub sekundy. Kwoty możesz wpisać jako działanie, np. <strong>12c + 3 div</strong>, <strong>2+4c+5</strong> albo <strong>4+2+6div</strong>. Liczby bez jednostki to chaosy (a jeśli w działaniu jest tylko div, to divy). Po wyjściu z pola zapis się uporządkuje, a po kliknięciu w pole zobaczysz i poprawisz oryginał.<br>Net profit = drop − koszt. Liczą się tylko kompletne runy. Enter przechodzi do pola niżej.</p>
+        <p class="hint">Czas: <strong>mm:ss</strong> lub sekundy. Kwoty możesz wpisać jako działanie, np. <strong>12c + 3 div</strong>, <strong>2+4c+5</strong> albo <strong>4+2+6div</strong>. Liczby bez jednostki to chaosy (a jeśli w działaniu jest tylko div, to divy). Po wyjściu z pola zapis się uporządkuje, a po kliknięciu w pole zobaczysz i poprawisz oryginał.<br>Net profit = drop − koszt. Liczą się tylko kompletne runy. Enter przechodzi do pola niżej.<br>Listą „Sesja” przeniesiesz pojedynczy run, a <strong>✂</strong> przy runie zaczyna od niego nową sesję (ten i kolejne runy przechodzą do niej). Czas farmienia sumuje się ze wszystkich runów z wpisanym czasem.</p>
         <button class="button primary" id="add-run-button" type="button">＋ Dodaj run</button>
       </div>
     </section>
@@ -439,7 +459,7 @@
       <div class="table-wrap">
         <table>
           <thead>
-            <tr><th>#</th><th>Strategia</th><th>Runy</th><th>Śr. czas</th><th>Śr. koszt</th><th>Śr. drop</th><th>Net / run</th><th>Łączny wynik</th><th><span class="term" data-term="roi">ROI</span></th><th>Profit / h</th><th><span class="term" data-term="chance1">Szansa 1 run</span></th><th><span class="term" data-term="chanceN">Szansa serii: <span class="series-n">10</span></span></th><th><span class="term" data-term="minRuns">Min. runów</span></th></tr>
+            <tr><th>#</th><th>Strategia</th><th>Runy</th><th>Śr. czas</th><th>Czas łącznie</th><th>Śr. koszt</th><th>Śr. drop</th><th>Net / run</th><th>Łączny wynik</th><th><span class="term" data-term="roi">ROI</span></th><th>Profit / h</th><th><span class="term" data-term="chance1">Szansa 1 run</span></th><th><span class="term" data-term="chanceN">Szansa serii: <span class="series-n">10</span></span></th><th><span class="term" data-term="minRuns">Min. runów</span></th></tr>
           </thead>
           <tbody id="comparison-body"></tbody>
         </table>
@@ -477,7 +497,7 @@
         <div class="table-wrap">
           <table>
             <thead>
-              <tr><th>#</th><th>Strategia / gracz</th><th>Gracze</th><th>Runy</th><th>Śr. czas</th><th>Śr. koszt</th><th>Śr. drop</th><th>Net / run</th><th>Łączny wynik</th><th><span class="term" data-term="roi">ROI</span></th><th>Profit / h</th><th><span class="term" data-term="chance1">Szansa 1 run</span></th><th><span class="term" data-term="chanceN">Szansa serii: <span class="series-n">10</span></span></th><th><span class="term" data-term="minRuns">Min. runów</span></th></tr>
+              <tr><th>#</th><th>Strategia / gracz</th><th>Gracze</th><th>Runy</th><th>Śr. czas</th><th>Czas łącznie</th><th>Śr. koszt</th><th>Śr. drop</th><th>Net / run</th><th>Łączny wynik</th><th><span class="term" data-term="roi">ROI</span></th><th>Profit / h</th><th><span class="term" data-term="chance1">Szansa 1 run</span></th><th><span class="term" data-term="chanceN">Szansa serii: <span class="series-n">10</span></span></th><th><span class="term" data-term="minRuns">Min. runów</span></th></tr>
             </thead>
             <tbody id="community-body"></tbody>
           </table>
@@ -529,6 +549,7 @@
       const scopeCard = $("scope-card");
       const scopeCaption = $("scope-caption");
       const sessionSelect = $("session-select");
+      const sessionRateInput = $("session-rate");
       const sessionsPanel = $("sessions-panel");
       const comparisonBody = $("comparison-body");
       const comparisonCards = $("comparison-cards");
@@ -568,7 +589,7 @@
       const term = (key, label) => `<span class="term" data-term="${key}" tabindex="0" role="button">${label}</span>`;
 
       function newSession(number) {
-        return { id: makeId(), name: `Sesja ${number}`, startedAt: Date.now(), endedAt: null };
+        return { id: makeId(), name: `Sesja ${number}`, startedAt: Date.now(), endedAt: null, rate: "" };
       }
 
       function newMapStrategy(name) {
@@ -592,11 +613,15 @@
         return state.strategies.find(strategy => strategy.id === state.selectedId) || state.strategies[0];
       }
 
-      function parseRate() {
-        const normalized = exchangeRateInput.value.trim().replace(",", ".");
+      function parseRateText(value) {
+        const normalized = String(value ?? "").trim().replace(",", ".");
         if (!/^\d+(?:\.\d+)?$/.test(normalized)) return null;
         const rate = Number(normalized);
         return Number.isFinite(rate) && rate > 0 ? rate : null;
+      }
+
+      function parseRate() {
+        return parseRateText(exchangeRateInput.value);
       }
 
       // ===== Wpisywanie kwot jako działania: "12c + 3 div", "2+4c+5", "4+2+6div", "20*22c" =====
@@ -659,17 +684,17 @@
 
       const isInvalidMoney = raw => typeof raw === "string" && raw.trim() !== "" && parseMoneyExpr(raw) === null;
 
-      function parseAmount(value) {
+      // rate: kurs chaos/div użyty do przeliczenia (domyślnie kurs globalny z ustawień)
+      function parseAmount(value, rate = parseRate()) {
         const parsed = parseMoneyExpr(value);
         if (!parsed) return null;
-        const rate = parseRate();
-        if (rate === null) return null;
+        if (rate === null || rate === undefined) return null;
         return parsed.c + parsed.d * rate;
       }
 
-      function parseRare(value) {
+      function parseRare(value, rate = parseRate()) {
         if (typeof value !== "string" || !value.trim()) return 0;
-        return parseAmount(value) ?? 0;
+        return parseAmount(value, rate) ?? 0;
       }
 
       function moneyInput(attrs, raw, placeholder, label) {
@@ -752,6 +777,16 @@
         return `${minutes}:${String(remainder).padStart(2, "0")}`;
       }
 
+      // Czas w zrozumiałej formie, np. "2 h 14 min 5 s"
+      function formatLong(seconds) {
+        const total = Math.round(seconds);
+        if (!Number.isFinite(total) || total <= 0) return "0 s";
+        const hours = Math.floor(total / 3600);
+        const minutes = Math.floor((total % 3600) / 60);
+        const rest = total % 60;
+        return [hours ? `${hours} h` : "", minutes ? `${minutes} min` : "", rest ? `${rest} s` : ""].filter(Boolean).join(" ");
+      }
+
       // ===== Szanse na zwrot (szacunek z zapisanych runów) =====
       const CONFIDENCE_Z = 2.326; // 99% pewności
 
@@ -818,27 +853,47 @@
         return strategy.runs.filter(run => run.sessionId === sessionId);
       }
 
-      function completeRun(run) {
-        return parseDuration(run.time) !== null && parseAmount(run.cost) !== null && parseAmount(run.loot) !== null;
+      // Kurs danej sesji (jeśli wpisano), a w innym wypadku kurs globalny z ustawień
+      function runReader(strategy) {
+        const globalRate = parseRate();
+        const rates = new Map(strategy.sessions.map(session => [session.id, parseRateText(session.rate || "")]));
+        return run => {
+          const rate = rates.get(run.sessionId) ?? globalRate;
+          return {
+            time: parseDuration(run.time),
+            cost: parseAmount(run.cost, rate),
+            loot: parseAmount(run.loot, rate),
+            rare: parseRare(run.rare, rate)
+          };
+        };
+      }
+
+      const isCompleteValues = values => values.time !== null && values.cost !== null && values.loot !== null;
+
+      // Runy po kolei: według kolejności sesji, a w sesji według dodania
+      function chronoRuns(strategy) {
+        const order = new Map(strategy.sessions.map((session, index) => [session.id, index]));
+        return strategy.runs.map((run, position) => ({ run, position }))
+          .sort((a, b) => ((order.get(a.run.sessionId) ?? 0) - (order.get(b.run.sessionId) ?? 0)) || a.position - b.position)
+          .map(item => item.run);
       }
 
       function scopeRuns(strategy, scope) {
         if (strategy.type !== "map") return [];
-        if (scope === "last10") return strategy.runs.filter(completeRun).slice(-10);
+        if (scope === "last10") {
+          const read = runReader(strategy);
+          return chronoRuns(strategy).filter(run => isCompleteValues(read(run))).slice(-10);
+        }
         if (scope === "session") return runsOfSession(strategy, strategy.currentSessionId);
         return strategy.runs;
       }
 
-      function metricsOfRuns(runs) {
-        const empty = { count: 0, averageTime: null, averageCost: null, averageLoot: null, averageNet: null, totalNet: null, hourlyProfit: null, totalRare: null, averageRare: null, stats: null };
-        const rate = parseRate();
-        if (rate === null) return empty;
-        const completeRuns = runs.map(run => ({
-          time: parseDuration(run.time),
-          cost: parseAmount(run.cost),
-          loot: parseAmount(run.loot),
-          rare: parseRare(run.rare)
-        })).filter(run => run.time !== null && run.cost !== null && run.loot !== null);
+      function metricsOfRuns(runs, strategy) {
+        const read = runReader(strategy);
+        const values = runs.map(read);
+        const totalTime = values.reduce((sum, value) => sum + (value.time ?? 0), 0);
+        const empty = { count: 0, averageTime: null, averageCost: null, averageLoot: null, averageNet: null, totalNet: null, hourlyProfit: null, totalRare: null, averageRare: null, stats: null, totalTime };
+        const completeRuns = values.filter(isCompleteValues);
         const count = completeRuns.length;
         if (!count) return empty;
         const totals = completeRuns.reduce((sum, run) => ({
@@ -854,7 +909,7 @@
         const totalNet = totals.loot + countedRare - totals.cost;
         const averageNet = totalNet / count;
         return {
-          count, averageTime, averageCost, averageLoot, averageNet, totalNet,
+          count, averageTime, averageCost, averageLoot, averageNet, totalNet, totalTime,
           hourlyProfit: averageTime > 0 ? averageNet * 3600 / averageTime : null,
           totalRare: totals.rare,
           averageRare: totals.rare / count,
@@ -866,7 +921,12 @@
       }
 
       function metricsFor(strategy, scope = "all") {
-        return metricsOfRuns(scopeRuns(strategy, scope));
+        return metricsOfRuns(scopeRuns(strategy, scope), strategy);
+      }
+
+      function nextSessionName(strategy) {
+        const numbers = strategy.sessions.map(session => Number((session.name.match(/^Sesja (\d+)$/) || [])[1])).filter(Number.isFinite);
+        return `Sesja ${(numbers.length ? Math.max(...numbers) : strategy.sessions.length) + 1}`;
       }
 
       const effectiveScope = () => state.scope === "sessions" ? "all" : state.scope;
@@ -979,9 +1039,10 @@
             id: session.id,
             name: typeof session.name === "string" && session.name ? session.name : `Sesja ${index + 1}`,
             startedAt: Number.isFinite(session.startedAt) ? session.startedAt : null,
-            endedAt: Number.isFinite(session.endedAt) ? session.endedAt : null
+            endedAt: Number.isFinite(session.endedAt) ? session.endedAt : null,
+            rate: typeof session.rate === "string" ? session.rate : ""
           }));
-        if (!sessions.length) sessions = [{ id: makeId(), name: "Sesja 1", startedAt: null, endedAt: null }];
+        if (!sessions.length) sessions = [{ id: makeId(), name: "Sesja 1", startedAt: null, endedAt: null, rate: "" }];
         const known = new Set(sessions.map(session => session.id));
         const fallback = sessions[sessions.length - 1].id;
         strategy.sessions = sessions;
@@ -1107,6 +1168,7 @@
           { label: "Śr. czas runu", get: m => m.averageTime, kind: "time", better: "low" },
           { label: "Śr. koszt runu", get: m => m.averageCost, kind: "money", better: "none" },
           { label: "Runy w sesji", get: m => m.count, kind: "count", better: "none" },
+          { label: "Czas farmienia", get: m => m.totalTime, kind: "duration", better: "none" },
           { label: "Łączny wynik", get: m => m.totalNet, kind: "total", better: "high" }
         ];
       }
@@ -1114,6 +1176,7 @@
       function formatKind(kind, value, suffix = "") {
         if (value === null || value === undefined) return "—";
         if (kind === "time") return formatDuration(value);
+        if (kind === "duration") return formatLong(value);
         if (kind === "count") return formatNumber(value);
         if (kind === "total") return formatTotalResult(value);
         return `${formatMoney(value)}${suffix}`;
@@ -1125,6 +1188,7 @@
         const percent = base !== 0 ? ` (${diff >= 0 ? "+" : "−"}${formatNumber(Math.abs(diff / base * 100))}%)` : "";
         let text;
         if (row.kind === "time") text = `${diff >= 0 ? "+" : "−"}${formatDuration(Math.abs(diff))}`;
+        else if (row.kind === "duration") text = `${diff >= 0 ? "+" : "−"}${formatLong(Math.abs(diff))}`;
         else if (row.kind === "count") text = `${diff >= 0 ? "+" : "−"}${formatNumber(Math.abs(diff))}`;
         else text = formatSignedMoney(diff);
         let tone = "";
@@ -1133,7 +1197,7 @@
       }
 
       function renderSessionsPanel(strategy) {
-        const data = strategy.sessions.map(session => ({ session, m: metricsOfRuns(runsOfSession(strategy, session.id)) }));
+        const data = strategy.sessions.map(session => ({ session, m: metricsOfRuns(runsOfSession(strategy, session.id), strategy) }));
         const current = data.find(item => item.session.id === strategy.currentSessionId);
         const earlier = data.filter(item => item !== current && item.m.count > 0);
         const previous = [...data].slice(0, data.indexOf(current)).reverse().find(item => item.m.count > 0);
@@ -1175,15 +1239,17 @@
         const listRows = [...data].reverse().map(item => `<tr${item === best ? ' class="best-session"' : ""}>
           <td>${escapeHtml(sessionTitle(strategy, item.session))}</td>
           <td>${item.m.count}</td>
+          <td>${formatLong(item.m.totalTime)}</td>
           <td>${item.m.averageTime === null ? "—" : formatDuration(item.m.averageTime)}</td>
           <td class="${toneOf(item.m.averageNet)}">${item.m.averageNet === null ? "—" : formatMoney(item.m.averageNet)}</td>
           <td class="${toneOf(item.m.totalNet)}">${item.m.totalNet === null ? "—" : formatTotalResult(item.m.totalNet)}</td>
           <td class="${toneOf(item.m.hourlyProfit)}">${item.m.hourlyProfit === null ? "—" : `${formatMoney(item.m.hourlyProfit)} / h`}</td>
+          <td>${item.session.rate && parseRateText(item.session.rate) ? escapeHtml(String(parseRateText(item.session.rate)).replace(".", ",")) : "z ustawień"}</td>
         </tr>`).join("");
         parts.push(`<div class="sessions-block">
           <h3>Wszystkie sesje</h3>
           <div class="table-wrap"><table class="mini-table">
-            <thead><tr><th>Sesja</th><th>Runy</th><th>Śr. czas</th><th>Net / run</th><th>Łączny wynik</th><th>Profit / h</th></tr></thead>
+            <thead><tr><th>Sesja</th><th>Runy</th><th>Czas farmienia</th><th>Śr. czas</th><th>Net / run</th><th>Łączny wynik</th><th>Profit / h</th><th>Kurs c/div</th></tr></thead>
             <tbody>${listRows}</tbody>
           </table></div>
           <p class="hint">Obwódka z lewej oznacza najlepszą sesję pod względem profitu na godzinę.</p>
@@ -1192,8 +1258,10 @@
       }
 
       function scopeCaptionText(strategy) {
-        const complete = scopeRuns(strategy, effectiveScope()).filter(completeRun).length;
-        const total = strategy.runs.filter(completeRun).length;
+        const read = runReader(strategy);
+        const completeCount = list => list.filter(run => isCompleteValues(read(run))).length;
+        const complete = completeCount(scopeRuns(strategy, effectiveScope()));
+        const total = completeCount(strategy.runs);
         if (state.scope === "last10") return `Statystyki z ostatnich ${complete} ${plural(complete, "runu", "runów", "runów")} (z ${total} kompletnych).`;
         if (state.scope === "session") {
           const session = strategy.sessions.find(item => item.id === strategy.currentSessionId);
@@ -1223,6 +1291,23 @@
           sessionSelect.dataset.sig = selectHtml;
         }
         sessionSelect.value = strategy.viewSessionId;
+        const viewed = strategy.sessions.find(session => session.id === strategy.viewSessionId);
+        if (viewed) {
+          if (sessionRateInput.dataset.sid !== viewed.id || document.activeElement !== sessionRateInput) {
+            sessionRateInput.value = viewed.rate || "";
+            sessionRateInput.dataset.sid = viewed.id;
+          }
+          sessionRateInput.classList.toggle("invalid", Boolean((viewed.rate || "").trim()) && parseRateText(viewed.rate) === null);
+          const sessionMetrics = metricsOfRuns(runsOfSession(strategy, viewed.id), strategy);
+          const strategyMetrics = metricsOfRuns(strategy.runs, strategy);
+          const chip = (label, value) => `<span class="chip"><small>${label}</small><strong>${value}</strong></span>`;
+          $("time-summary").innerHTML = [
+            chip(`Czas farmienia · ${escapeHtml(viewed.name)}`, formatLong(sessionMetrics.totalTime)),
+            chip("Czas strategii łącznie", formatLong(strategyMetrics.totalTime)),
+            chip("Liczba sesji", String(strategy.sessions.length))
+          ].join("");
+        }
+        $("session-delete-button").disabled = strategy.sessions.length < 2;
         sessionsPanel.hidden = state.scope !== "sessions";
         if (state.scope === "sessions") renderSessionsPanel(strategy);
       }
@@ -1235,23 +1320,23 @@
       function updateNetCells() {
         const strategy = activeStrategy();
         if (!strategy || strategy.type !== "map") return;
+        const read = runReader(strategy);
         runsBody.querySelectorAll("tr[data-run-id]").forEach(row => {
           const run = strategy.runs.find(item => item.id === row.dataset.runId);
           if (!run) return;
-          const cost = parseAmount(run.cost);
-          const loot = parseAmount(run.loot);
+          const values = read(run);
           const netCell = row.querySelector(".net-cell");
-          if (cost === null || loot === null) {
+          if (values.cost === null || values.loot === null) {
             netCell.textContent = "—";
             netCell.className = "net-cell";
           } else {
-            const net = loot - cost + (state.includeRare ? parseRare(run.rare) : 0);
+            const net = values.loot - values.cost + (state.includeRare ? values.rare : 0);
             netCell.textContent = formatMoney(net);
             netCell.className = `net-cell ${net >= 0 ? "positive" : "negative"}`;
           }
         });
         const runs = viewedRuns(strategy);
-        const complete = runs.filter(completeRun).length;
+        const complete = runs.filter(run => isCompleteValues(read(run))).length;
         $("run-count").textContent = `${complete} z ${runs.length} ${plural(runs.length, "runu", "runów", "runów")} kompletnych`;
       }
 
@@ -1271,7 +1356,11 @@
             <td>${moneyInput(`data-field="loot" data-run-id="${escapeHtml(run.id)}"`, run.loot, "np. 10c + 1 div", `Wartość dropu runu ${index + 1}`)}</td>
             <td>${moneyInput(`data-field="rare" data-run-id="${escapeHtml(run.id)}"`, run.rare || "", "opcjonalnie, np. 2 div", `Losowy drop runu ${index + 1}`)}</td>
             <td class="net-cell">—</td>
-            <td><button class="remove-run" data-remove="${escapeHtml(run.id)}" type="button" aria-label="Usuń run ${index + 1}" title="Usuń run">×</button></td>
+            <td><select data-move="${escapeHtml(run.id)}" aria-label="Sesja runu ${index + 1}" title="Przenieś run do innej sesji">${strategy.sessions.map(item => `<option value="${escapeHtml(item.id)}"${item.id === run.sessionId ? " selected" : ""}>${escapeHtml(item.name)}</option>`).join("")}</select></td>
+            <td><div class="row-actions">
+              <button class="remove-run" data-split="${escapeHtml(run.id)}" type="button" aria-label="Zacznij nową sesję od runu ${index + 1}" title="Zacznij nową sesję od tego runu (ten i kolejne runy trafią do nowej sesji)"${index === 0 ? " disabled" : ""}>✂</button>
+              <button class="remove-run" data-remove="${escapeHtml(run.id)}" type="button" aria-label="Usuń run ${index + 1}" title="Usuń run">×</button>
+            </div></td>
           </tr>`).join("");
         emptyMessage.hidden = runs.length > 0;
         updateNetCells();
@@ -1378,6 +1467,7 @@
             <td>${escapeHtml(strategy.name || "Bez nazwy")}${strategy.id === state.selectedId ? " · wybrana" : ""}</td>
             <td>${metrics.count}</td>
             <td>${metrics.averageTime === null ? "—" : formatDuration(metrics.averageTime)}</td>
+            <td>${metrics.totalTime ? formatLong(metrics.totalTime) : "—"}</td>
             <td>${metrics.averageCost === null ? "—" : formatMoney(metrics.averageCost)}</td>
             <td>${metrics.averageLoot === null ? "—" : formatMoney(metrics.averageLoot)}</td>
             <td class="${toneOf(metrics.averageNet)}">${metrics.averageNet === null ? "—" : formatMoney(metrics.averageNet)}</td>
@@ -1458,13 +1548,14 @@
         }
         const rows = [
           ["Strategia", strategy.name, "Kurs chaos/div", exchangeRateInput.value],
-          ["Sesja", "Run", "Czas", "Koszt", "Drop", "Losowy drop", "Net profit"]
+          ["Sesja", "Kurs sesji", "Run", "Czas", "Koszt", "Drop", "Losowy drop", "Net profit"]
         ];
+        const read = runReader(strategy);
         strategy.sessions.forEach(session => {
           runsOfSession(strategy, session.id).forEach((run, index) => {
-            const cost = parseAmount(run.cost);
-            const loot = parseAmount(run.loot);
-            rows.push([session.name, String(index + 1), run.time, run.cost, run.loot, run.rare || "", cost !== null && loot !== null ? formatMoney(loot - cost + (state.includeRare ? parseRare(run.rare) : 0)) : ""]);
+            const values = read(run);
+            const net = values.cost !== null && values.loot !== null ? formatMoney(values.loot - values.cost + (state.includeRare ? values.rare : 0)) : "";
+            rows.push([session.name, session.rate || exchangeRateInput.value, String(index + 1), run.time, run.cost, run.loot, run.rare || "", net]);
           });
         });
         download(strategy.name, rows);
@@ -1497,14 +1588,61 @@
       });
 
       runsBody.addEventListener("click", event => {
-        const button = event.target.closest("button[data-remove]");
         const strategy = activeStrategy();
-        if (!button || !strategy) return;
+        if (!strategy) return;
+        const splitButton = event.target.closest("button[data-split]");
+        if (splitButton && !splitButton.disabled) {
+          splitSessionAt(splitButton.dataset.split);
+          return;
+        }
+        const button = event.target.closest("button[data-remove]");
+        if (!button) return;
         strategy.runs = strategy.runs.filter(run => run.id !== button.dataset.remove);
         renderRuns();
         refreshLive();
         saveData();
       });
+
+      runsBody.addEventListener("change", event => {
+        const select = event.target.closest("select[data-move]");
+        const strategy = activeStrategy();
+        if (!select || !strategy) return;
+        const run = strategy.runs.find(item => item.id === select.dataset.move);
+        if (!run || !strategy.sessions.some(session => session.id === select.value)) return;
+        run.sessionId = select.value;
+        renderRuns();
+        renderScope();
+        refreshLive();
+        saveData();
+        saveStatus.textContent = "Run przeniesiony do wybranej sesji.";
+      });
+
+      // Zaczyna nową sesję od wskazanego runu: ten run i wszystkie kolejne z jego sesji przechodzą do nowej
+      function splitSessionAt(runId) {
+        const strategy = activeStrategy();
+        const run = strategy?.runs.find(item => item.id === runId);
+        if (!run) return;
+        const sessionRuns = runsOfSession(strategy, run.sessionId);
+        const index = sessionRuns.findIndex(item => item.id === runId);
+        if (index <= 0) {
+          saveStatus.textContent = "Ten run jest pierwszy w sesji, więc nie ma czego dzielić. Kliknij ✂ przy runie, od którego ma zacząć się nowa sesja.";
+          return;
+        }
+        const sourceIndex = strategy.sessions.findIndex(session => session.id === run.sessionId);
+        const source = strategy.sessions[sourceIndex];
+        const created = { id: makeId(), name: nextSessionName(strategy), startedAt: null, endedAt: source.endedAt, rate: source.rate || "" };
+        strategy.sessions.splice(sourceIndex + 1, 0, created);
+        sessionRuns.slice(index).forEach(item => { item.sessionId = created.id; });
+        if (source.id === strategy.currentSessionId) {
+          strategy.currentSessionId = created.id;
+          source.endedAt = source.endedAt ?? Date.now();
+          created.endedAt = null;
+        }
+        strategy.viewSessionId = created.id;
+        renderAll();
+        saveData();
+        saveStatus.textContent = `Podzielono: „${created.name}” zaczyna się od runu ${index + 1} dotychczasowej sesji.`;
+      }
 
       function addRun() {
         const strategy = activeStrategy();
@@ -1538,6 +1676,50 @@
         saveData();
       });
 
+      sessionRateInput.addEventListener("input", () => {
+        const strategy = activeStrategy();
+        const viewed = strategy?.sessions.find(session => session.id === strategy.viewSessionId);
+        if (!viewed) return;
+        viewed.rate = sessionRateInput.value;
+        refreshLive();
+        saveData();
+      });
+      sessionRateInput.addEventListener("blur", () => {
+        const strategy = activeStrategy();
+        const viewed = strategy?.sessions.find(session => session.id === strategy.viewSessionId);
+        if (viewed) sessionRateInput.classList.toggle("invalid", Boolean((viewed.rate || "").trim()) && parseRateText(viewed.rate) === null);
+      });
+
+      $("session-rename-button").addEventListener("click", () => {
+        const strategy = activeStrategy();
+        const viewed = strategy?.sessions.find(session => session.id === strategy.viewSessionId);
+        if (!viewed) return;
+        const name = window.prompt("Nowa nazwa sesji:", viewed.name);
+        if (name === null || !name.trim()) return;
+        viewed.name = name.trim().slice(0, 60);
+        renderAll();
+        saveData();
+      });
+
+      $("session-delete-button").addEventListener("click", () => {
+        const strategy = activeStrategy();
+        if (!strategy || strategy.sessions.length < 2) return;
+        const index = strategy.sessions.findIndex(session => session.id === strategy.viewSessionId);
+        const viewed = strategy.sessions[index];
+        const target = strategy.sessions[index > 0 ? index - 1 : index + 1];
+        const count = runsOfSession(strategy, viewed.id).length;
+        const question = count
+          ? `Usunąć „${viewed.name}”? Jej ${count} ${plural(count, "run", "runy", "runów")} przeniosę do „${target.name}”.`
+          : `Usunąć pustą sesję „${viewed.name}”?`;
+        if (!window.confirm(question)) return;
+        runsOfSession(strategy, viewed.id).forEach(run => { run.sessionId = target.id; });
+        strategy.sessions = strategy.sessions.filter(session => session.id !== viewed.id);
+        if (strategy.currentSessionId === viewed.id) strategy.currentSessionId = target.id;
+        strategy.viewSessionId = target.id;
+        renderAll();
+        saveData();
+      });
+
       $("new-session-button").addEventListener("click", () => {
         const strategy = activeStrategy();
         if (!strategy || strategy.type !== "map") return;
@@ -1548,7 +1730,9 @@
         const current = strategy.sessions.find(session => session.id === strategy.currentSessionId);
         if (!window.confirm(`Zakończyć „${current ? current.name : "sesję"}” i zacząć nową? Nowe runy będą trafiać do nowej sesji, a stare zostaną w historii.`)) return;
         if (current) current.endedAt = Date.now();
-        const session = newSession(strategy.sessions.length + 1);
+        const session = newSession(1);
+        session.name = nextSessionName(strategy);
+        session.rate = current ? current.rate || "" : "";
         strategy.sessions.push(session);
         strategy.currentSessionId = session.id;
         strategy.viewSessionId = session.id;
@@ -1884,12 +2068,11 @@
               if (investments.length) result.push({ name, type: "invest", investments });
               return;
             }
-            const runs = strategy.runs.map(run => ({
-              t: parseDuration(run.time),
-              c: parseAmount(run.cost),
-              l: parseAmount(run.loot),
-              r: parseRare(run.rare)
-            })).filter(run => run.t !== null && run.c !== null && run.l !== null);
+            const read = runReader(strategy);
+            const runs = strategy.runs.map(run => {
+              const values = read(run);
+              return { t: values.time, c: values.cost, l: values.loot, r: values.rare };
+            }).filter(run => run.t !== null && run.c !== null && run.l !== null);
             if (runs.length) result.push({ name, type: "map", runs });
           });
           return result;
@@ -1897,7 +2080,7 @@
         includeRare: () => state.includeRare,
         seriesSize: () => state.seriesSize,
         successStats, chanceCells,
-        formatMoney, formatSignedMoney, formatTotalResult, formatDuration, formatPercent, escapeHtml,
+        formatMoney, formatSignedMoney, formatTotalResult, formatDuration, formatLong, formatPercent, escapeHtml,
         // do testów i rozszerzeń
         parseMoneyExpr, displayMoney, parseAmount
       };
@@ -2192,6 +2375,7 @@
       return {
         n: total.n,
         avgTime: total.t / total.n,
+        totalTime: total.t,
         avgCost: total.c / total.n,
         avgLoot: (total.l + bonus) / total.n,
         avgNet: totalNet / total.n,
@@ -2290,6 +2474,7 @@
         <td>${playersCell}</td>
         <td>${m.n}</td>
         <td>${calc.formatDuration(m.avgTime)}</td>
+        <td>${calc.formatLong(m.totalTime)}</td>
         <td>${calc.formatMoney(m.avgCost)}</td>
         <td>${calc.formatMoney(m.avgLoot)}</td>
         <td class="${sign(m.avgNet)}">${calc.formatMoney(m.avgNet)}</td>
