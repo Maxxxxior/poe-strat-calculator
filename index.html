@@ -518,7 +518,7 @@
         <div class="empty" id="empty-message">Dodaj pierwszy run i wpisz czas, koszt oraz wartość dropu.</div>
       </div>
       <div class="panel-footer">
-        <p class="hint">Czas: <strong>mm:ss</strong> lub sekundy. Kwoty możesz wpisać jako działanie, np. <strong>12c + 3 div</strong>, <strong>2+4c+5</strong> albo <strong>4+2+6div</strong>. Liczby bez jednostki to chaosy (a jeśli w działaniu jest tylko div, to divy). Po wyjściu z pola zapis się uporządkuje, a po kliknięciu w pole zobaczysz i poprawisz oryginał.<br>Net profit = drop − koszt. Liczą się tylko kompletne runy. Enter przechodzi do pola niżej.<br>Listą „Sesja” przeniesiesz pojedynczy run, a <strong>✂</strong> przy runie zaczyna od niego nową sesję (ten i kolejne runy przechodzą do niej). Czas farmienia sumuje się ze wszystkich runów z wpisanym czasem.</p>
+        <p class="hint">Czas: <strong>mm:ss</strong> lub sekundy. Kwoty możesz wpisać jako działanie (<strong>+ − * /</strong> i nawiasy), np. <strong>12c + 3 div</strong>, <strong>2+4c+5</strong>, <strong>4+2+6div</strong> albo <strong>(10+5)*2c</strong>. Liczby bez jednostki to chaosy (a jeśli w działaniu jest tylko div, to divy). Po wyjściu z pola zapis się uporządkuje, a po kliknięciu w pole zobaczysz i poprawisz oryginał.<br>Net profit = drop − koszt. Liczą się tylko kompletne runy. Enter przechodzi do pola niżej.<br>Listą „Sesja” przeniesiesz pojedynczy run, a <strong>✂</strong> przy runie zaczyna od niego nową sesję (ten i kolejne runy przechodzą do niej). Czas farmienia sumuje się ze wszystkich runów z wpisanym czasem.</p>
         <div class="add-group">
           <button class="button primary" id="add-run-button" type="button">＋ Dodaj run</button>
           <button class="button" id="add-runs-5-button" type="button">＋ 5 runów</button>
@@ -674,7 +674,7 @@
         </div>
         <div>
           <span class="field-label">Jak to działa</span>
-          <p class="hint">Wpisz chaosy, diviny, inne waluty (ile jedna sztuka jest warta) i przedmioty (ile chodzą na rynku). Wartości możesz podawać jako działania, np. <strong>12c + 3 div</strong>. Kurs jest osobny od kursu w zakładce farmienia.</p>
+          <p class="hint">Wpisz chaosy, diviny, inne waluty (ile jedna sztuka jest warta) i przedmioty (ile chodzą na rynku). Ilości i wartości możesz wpisywać jako działania (<strong>+ − * /</strong> i nawiasy), np. <strong>2+2</strong>, <strong>500+750</strong>, <strong>(10+5)*2</strong> albo <strong>12c + 3 div</strong>. Po wyjściu z pola zostaje wynik, a po kliknięciu wraca to, co wpisano. Kurs jest osobny od kursu w zakładce farmienia.</p>
         </div>
         <div class="stash-settings-actions">
           <button class="button danger" id="stash-clear" type="button">Wyczyść stash</button>
@@ -688,12 +688,12 @@
         <div class="stash-basic">
           <div>
             <label class="field-label" for="stash-chaos">Chaos Orb (ilość)</label>
-            <input id="stash-chaos" type="text" inputmode="decimal" autocomplete="off" placeholder="np. 1250">
+            <input id="stash-chaos" data-qty data-raw="" type="text" inputmode="text" autocomplete="off" spellcheck="false" placeholder="np. 1250 albo 500+750">
             <p class="hint" id="stash-chaos-value"></p>
           </div>
           <div>
             <label class="field-label" for="stash-divine">Divine Orb (ilość)</label>
-            <input id="stash-divine" type="text" inputmode="decimal" autocomplete="off" placeholder="np. 14">
+            <input id="stash-divine" data-qty data-raw="" type="text" inputmode="text" autocomplete="off" spellcheck="false" placeholder="np. 14 albo 10+4">
             <p class="hint" id="stash-divine-value"></p>
           </div>
         </div>
@@ -847,51 +847,123 @@
         return parseRateText(exchangeRateInput.value);
       }
 
-      // ===== Wpisywanie kwot jako działania: "12c + 3 div", "2+4c+5", "4+2+6div", "20*22c" =====
-      const NUMBER_RE = "(?:\\d+(?:[.,]\\d*)?|[.,]\\d+)";
-      const FACTOR_RE = new RegExp(`^(${NUMBER_RE})\\s*(chaos|divines?|divs?|c|div)?$`, "i");
+      // ===== Działania w polach: kwoty ("12c + 3 div", "2+4c+5", "(10+5)*2c", "100/4") i ilości ("2+2", "2*2") =====
+      const NUM_AT = /^(\d+(?:[.,]\d*)?|[.,]\d+)/;
+      const UNIT_AT = /^\s*(chaos|divines?|divs?|c)(?![a-wyzA-WYZ])/i;
 
-      function parseFactor(text) {
-        const match = text.trim().match(FACTOR_RE);
-        if (!match) return null;
-        const value = Number(match[1].replace(",", "."));
-        if (!Number.isFinite(value)) return null;
-        return { value, unit: match[2] ? (/^c/i.test(match[2]) ? "c" : "div") : null };
+      function tokenize(text) {
+        const tokens = [];
+        let rest = text;
+        for (;;) {
+          rest = rest.replace(/^\s+/, "");
+          if (!rest) break;
+          const number = rest.match(NUM_AT);
+          if (number) {
+            const value = Number(number[1].replace(",", "."));
+            if (!Number.isFinite(value)) return null;
+            rest = rest.slice(number[0].length);
+            const unitMatch = rest.match(UNIT_AT);
+            let unit = null;
+            if (unitMatch) {
+              unit = /^c/i.test(unitMatch[1]) ? "c" : "div";
+              rest = rest.slice(unitMatch[0].length);
+            }
+            tokens.push({ t: "num", value, unit });
+            continue;
+          }
+          const char = rest[0];
+          if ("+-*/()".includes(char)) tokens.push({ t: char });
+          else if (char === "x" || char === "X" || char === "×" || char === "÷") tokens.push({ t: char === "÷" ? "/" : "*" });
+          else return null;
+          rest = rest.slice(1);
+        }
+        return tokens;
       }
 
-      function parseTerm(text) {
-        let value = 1;
-        let unit = null;
-        for (const factorText of text.split(/[*×x]/i)) {
-          const factor = parseFactor(factorText);
-          if (!factor) return null;
-          value *= factor.value;
-          if (factor.unit) {
-            if (unit) return null;
-            unit = factor.unit;
+      // Wartość: { c, d, b, u } (chaosy, divy, liczba bez jednostki, czy w wyniku są jednostki)
+      function evalExpr(text) {
+        const tokens = tokenize(text);
+        if (!tokens || !tokens.length) return null;
+        let pos = 0;
+        const flags = { hasC: false, hasD: false };
+        const FAIL = new Error("zły zapis");
+        const scale = (v, k) => ({ c: v.c * k, d: v.d * k, b: v.b * k, u: v.u });
+        const add = (x, y, k) => ({ c: x.c + k * y.c, d: x.d + k * y.d, b: x.b + k * y.b, u: x.u || y.u });
+        const mul = (x, y) => { if (!x.u) return scale(y, x.b); if (!y.u) return scale(x, y.b); throw FAIL; };
+        const div = (x, y) => { if (y.u || Math.abs(y.b) < 1e-12) throw FAIL; return scale(x, 1 / y.b); };
+        const primary = () => {
+          const token = tokens[pos];
+          if (!token) throw FAIL;
+          if (token.t === "num") {
+            pos += 1;
+            if (token.unit === "c") { flags.hasC = true; return { c: token.value, d: 0, b: 0, u: true }; }
+            if (token.unit === "div") { flags.hasD = true; return { c: 0, d: token.value, b: 0, u: true }; }
+            return { c: 0, d: 0, b: token.value, u: false };
           }
+          if (token.t === "(") {
+            pos += 1;
+            const inner = expr();
+            if (tokens[pos]?.t !== ")") throw FAIL;
+            pos += 1;
+            return inner;
+          }
+          throw FAIL;
+        };
+        const factor = () => {
+          if (tokens[pos]?.t === "-") { pos += 1; return scale(factor(), -1); }
+          if (tokens[pos]?.t === "+") { pos += 1; return factor(); }
+          return primary();
+        };
+        const term = () => {
+          let value = factor();
+          while (tokens[pos] && (tokens[pos].t === "*" || tokens[pos].t === "/")) {
+            const op = tokens[pos].t;
+            pos += 1;
+            const right = factor();
+            value = op === "*" ? mul(value, right) : div(value, right);
+          }
+          return value;
+        };
+        const expr = () => {
+          let value = term();
+          while (tokens[pos] && (tokens[pos].t === "+" || tokens[pos].t === "-")) {
+            const sign = tokens[pos].t === "-" ? -1 : 1;
+            pos += 1;
+            value = add(value, term(), sign);
+          }
+          return value;
+        };
+        try {
+          const result = expr();
+          if (pos !== tokens.length) return null;
+          return { ...result, hasC: flags.hasC, hasD: flags.hasD };
+        } catch (error) {
+          if (error === FAIL) return null;
+          throw error;
         }
-        return { value, unit };
       }
 
       // Zwraca { c, d } (osobno chaosy i divy) albo null, gdy zapis jest nieczytelny.
       // Liczby bez jednostki dostają "c", chyba że w działaniu jest div i nie ma żadnego "c".
       function parseMoneyExpr(text) {
         if (typeof text !== "string" || !text.trim()) return null;
-        const terms = text.trim().split("+").map(parseTerm);
-        if (terms.some(item => item === null)) return null;
-        let c = 0;
-        let d = 0;
-        let bare = 0;
-        let hasC = false;
-        let hasD = false;
-        for (const item of terms) {
-          if (item.unit === "c") { c += item.value; hasC = true; }
-          else if (item.unit === "div") { d += item.value; hasD = true; }
-          else bare += item.value;
-        }
-        if (hasD && !hasC) d += bare; else c += bare;
+        const result = evalExpr(text);
+        if (!result) return null;
+        let { c, d } = result;
+        if (result.hasD && !result.hasC) d += result.b; else c += result.b;
+        c = Math.abs(c) < 1e-9 ? 0 : c;
+        d = Math.abs(d) < 1e-9 ? 0 : d;
+        if (c <= 0 && d <= 0 && (c < 0 || d < 0)) return null;
         return { c, d };
+      }
+
+      // Liczba z działania bez jednostek (do ilości), np. "2+2", "2*2", "(3+1)*5"
+      function parseNumberExpr(text) {
+        if (typeof text !== "string" || !text.trim()) return null;
+        const cleaned = text.replace(/(\d)\s+(?=\d{3}(?!\d))/g, "$1");
+        const result = evalExpr(cleaned);
+        if (!result || result.u || result.hasC || result.hasD) return null;
+        return Math.abs(result.b) < 1e-9 ? 0 : result.b;
       }
 
       const exprNumber = value => new Intl.NumberFormat("pl-PL", { maximumFractionDigits: 4, useGrouping: false }).format(value);
@@ -900,19 +972,34 @@
         const parsed = parseMoneyExpr(raw);
         if (!parsed) return raw;
         const parts = [];
-        if (parsed.c > 0 || parsed.d === 0) parts.push(`${exprNumber(parsed.c)}c`);
-        if (parsed.d > 0) parts.push(`${exprNumber(parsed.d)} div`);
-        return parts.join(" + ");
+        if (parsed.c !== 0 || parsed.d === 0) parts.push({ value: parsed.c, unit: "c" });
+        if (parsed.d !== 0) parts.push({ value: parsed.d, unit: " div" });
+        return parts.map((part, index) => {
+          const text = `${exprNumber(Math.abs(part.value))}${part.unit}`;
+          if (index === 0) return `${part.value < 0 ? "−" : ""}${text}`;
+          return `${part.value < 0 ? " − " : " + "}${text}`;
+        }).join("");
       }
 
       const isInvalidMoney = raw => typeof raw === "string" && raw.trim() !== "" && parseMoneyExpr(raw) === null;
 
-      // rate: kurs chaos/div użyty do przeliczenia (domyślnie kurs globalny z ustawień)
+      function displayQty(raw) {
+        const value = parseNumberExpr(raw);
+        return value === null ? raw : exprNumber(value);
+      }
+
+      const isInvalidQty = raw => {
+        if (typeof raw !== "string" || raw.trim() === "") return false;
+        const value = parseNumberExpr(raw);
+        return value === null || value < 0;
+      };
+
       function parseAmount(value, rate = parseRate()) {
         const parsed = parseMoneyExpr(value);
         if (!parsed) return null;
         if (rate === null || rate === undefined) return null;
-        return parsed.c + parsed.d * rate;
+        const total = parsed.c + parsed.d * rate;
+        return total < -1e-9 ? null : Math.max(total, 0);
       }
 
       function parseRare(value, rate = parseRate()) {
@@ -925,23 +1012,30 @@
         return `<input ${attrs} data-money type="text" inputmode="text" autocomplete="off" spellcheck="false" placeholder="${escapeHtml(placeholder)}" aria-label="${escapeHtml(label)}" data-raw="${escapeHtml(raw)}" value="${escapeHtml(displayMoney(raw))}"${invalid ? ' class="invalid"' : ""}>`;
       }
 
-      // Po kliknięciu pola widać to, co wpisano; po wyjściu — przeliczony zapis.
+      function qtyInput(attrs, raw, placeholder, label) {
+        const invalid = isInvalidQty(raw);
+        return `<input ${attrs} data-qty type="text" inputmode="text" autocomplete="off" spellcheck="false" placeholder="${escapeHtml(placeholder)}" aria-label="${escapeHtml(label)}" data-raw="${escapeHtml(raw)}" value="${escapeHtml(displayQty(raw))}"${invalid ? ' class="invalid"' : ""}>`;
+      }
+
+      // Po kliknięciu pola widać to, co wpisano; po wyjściu: przeliczony zapis.
+      const CALC_FIELD = "input[data-money], input[data-qty]";
       document.addEventListener("focusin", event => {
         const input = event.target;
-        if (!input.matches?.("input[data-money]")) return;
+        if (!input.matches?.(CALC_FIELD)) return;
         input.value = input.dataset.raw ?? input.value;
         input.classList.remove("invalid");
       });
       document.addEventListener("input", event => {
         const input = event.target;
-        if (input.matches?.("input[data-money]")) input.dataset.raw = input.value;
+        if (input.matches?.(CALC_FIELD)) input.dataset.raw = input.value;
       });
       document.addEventListener("focusout", event => {
         const input = event.target;
-        if (!input.matches?.("input[data-money]")) return;
+        if (!input.matches?.(CALC_FIELD)) return;
         const raw = input.dataset.raw ?? input.value;
-        input.value = displayMoney(raw);
-        input.classList.toggle("invalid", isInvalidMoney(raw));
+        const isMoney = input.matches("input[data-money]");
+        input.value = isMoney ? displayMoney(raw) : displayQty(raw);
+        input.classList.toggle("invalid", isMoney ? isInvalidMoney(raw) : isInvalidQty(raw));
       });
 
       function parseDuration(value) {
@@ -2719,7 +2813,7 @@
         successStats, chanceCells,
         formatMoney, formatSignedMoney, formatTotalResult, formatDuration, formatLong, formatPercent, escapeHtml,
         // do testów i rozszerzeń
-        parseMoneyExpr, displayMoney, parseAmount, parseRateText, parseItemText, parseFreeQuery, moneyInput
+        parseMoneyExpr, displayMoney, parseAmount, parseRateText, parseItemText, parseFreeQuery, moneyInput, qtyInput, parseNumberExpr, displayQty
       };
 
       loadData();
@@ -2730,6 +2824,7 @@
       if (parseRate() === null) $("rate-error").textContent = "Podaj kurs większy od zera, np. 155.";
       saveData();
     })();
+  </script>
   </script>
   </script>
   <script>
@@ -2777,10 +2872,12 @@
       // ----- liczenie -----
       const rate = () => calc.parseRateText(state.rate);
 
+      // Ilość może być działaniem, np. 2+2, 2*2, 500+750, (10+5)*2, 100/4
       function parseQty(text) {
-        const normalized = String(text ?? "").replace(/\s+/g, "").replace(",", ".");
-        if (!normalized) return 0;
-        return /^\d+(?:\.\d+)?$/.test(normalized) ? Number(normalized) : null;
+        const trimmed = String(text ?? "").trim();
+        if (!trimmed) return 0;
+        const value = calc.parseNumberExpr(trimmed);
+        return value === null || value < 0 ? null : value;
       }
 
       const unitChaos = row => calc.parseAmount(row.unit, rate());
@@ -2822,7 +2919,7 @@
         return `<tr data-row="${esc(row.id)}" data-kind="${kind}">
           <td class="idx">${index + 1}</td>
           <td><input data-f="name" type="text" maxlength="120" ${kind === "currencies" ? 'list="currency-names" ' : ""}placeholder="${esc(PLACEHOLDERS[kind])}" aria-label="Nazwa ${index + 1}" value="${esc(row.name)}" autocomplete="off"></td>
-          <td><input data-f="qty" type="text" inputmode="decimal" aria-label="Ilość ${index + 1}" value="${esc(row.qty)}" autocomplete="off"></td>
+          <td>${calc.qtyInput('data-f="qty"', row.qty, "np. 2+2", `Ilość ${index + 1}`)}</td>
           <td>${calc.moneyInput('data-f="unit"', row.unit, UNIT_HINTS[kind], `Wartość 1 szt. ${index + 1}`)}</td>
           <td data-sum>—</td>
           <td><button class="remove-run" type="button" data-remove aria-label="Usuń wiersz ${index + 1}" title="Usuń">×</button></td>
@@ -2871,8 +2968,11 @@
 
       function renderAll() {
         $("stash-rate").value = state.rate;
-        $("stash-chaos").value = state.chaos;
-        $("stash-divine").value = state.divine;
+        [["stash-chaos", state.chaos], ["stash-divine", state.divine]].forEach(([id, raw]) => {
+          $(id).dataset.raw = raw;
+          $(id).value = calc.displayQty(raw);
+          $(id).classList.toggle("invalid", raw.trim() !== "" && parseQty(raw) === null);
+        });
         renderKind("currencies");
         renderKind("items");
         updateTotals();
@@ -3007,7 +3107,6 @@
 
       [["stash-chaos", "chaos"], ["stash-divine", "divine"]].forEach(([id, key]) => $(id).addEventListener("input", () => {
         state[key] = $(id).value;
-        $(id).classList.toggle("invalid", parseQty($(id).value) === null);
         updateTotals();
         save();
       }));
