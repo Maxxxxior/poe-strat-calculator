@@ -232,6 +232,48 @@
     .tour-nav { display: flex; align-items: center; gap: 8px; }
     .tour-nav .grow { flex: 1; }
     .tour-close { position: absolute; top: 8px; right: 10px; border: 0; background: transparent; color: #c9bd9f; font-size: 16px; }
+    .build-sets { display: flex; justify-content: center; gap: 8px; margin: 14px 0 4px; }
+    .set-btn { width: 34px; height: 30px; border: 1px solid var(--border); border-radius: 6px; background: #151c27; color: var(--muted); font-weight: 800; }
+    .set-btn.active { border-color: #7fa1c4; background: #243448; color: #fff; }
+    .build-equipment { display: grid; grid-template-columns: repeat(9, 64px); grid-template-rows: repeat(6, 64px) 96px; gap: 6px; justify-content: center; margin: 8px auto 18px; padding: 0 12px; overflow-x: auto; }
+    .eq-slot, .eq-tile { position: relative; display: flex; align-items: center; justify-content: center; padding: 2px; border: 1px solid #4a3d33; border-radius: 4px; background: #2a2a2a; color: #7f8794; font-size: 10px; font-weight: 700; line-height: 1.2; text-align: center; overflow: hidden; cursor: pointer; }
+    .eq-slot:hover, .eq-tile:hover { border-color: var(--accent); }
+    .eq-slot.filled, .eq-tile.filled { background: #1f2a26; border-color: #55663f; }
+    .eq-slot.selected, .eq-tile.selected { outline: 2px solid #67d6ff; outline-offset: 1px; }
+    .eq-slot img, .eq-tile img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .eq-slot .eq-name { padding: 2px; word-break: break-word; }
+    .eq-price { position: absolute; left: 0; right: 0; bottom: 0; padding: 1px 2px; background: rgba(8, 10, 14, .82); color: #f5d69f; font-size: 10px; font-weight: 800; }
+    .build-lists { display: grid; gap: 14px; padding: 0 18px 18px; }
+    .build-list-title { margin: 0 0 8px; color: var(--muted); font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+    .build-list-tiles { display: flex; flex-wrap: wrap; gap: 6px; }
+    .eq-tile { width: 62px; height: 62px; }
+    .eq-tile.add { border-style: dashed; font-size: 20px; color: var(--muted); }
+    .build-table td img.thumb { display: block; width: 40px; height: 40px; object-fit: contain; border: 1px solid #3a4150; border-radius: 4px; background: #1b1f27; }
+    .build-table td .thumb-empty { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: 1px dashed #3a4150; border-radius: 4px; color: #6f788c; font-size: 16px; }
+    .build-table td:nth-child(2) { min-width: 140px; }
+    .build-table td:nth-child(3) { min-width: 240px; }
+    .build-table td:nth-child(4) { min-width: 170px; }
+    .build-table td:nth-child(5) { min-width: 90px; text-align: right; font-weight: 700; }
+    .build-table td:nth-child(5), .build-table td:nth-child(1) { width: auto; }
+    .build-table td:first-child { width: 64px; }
+    .build-table td:last-child { width: 96px; }
+    .build-table td select { padding: 8px 10px; font-size: 12px; }
+    .build-table .item-name small { display: block; margin-top: 2px; color: var(--muted); font-size: 11px; }
+    .build-table tr.no-price td:nth-child(4) input { border-color: #b48a3a; }
+    .item-tip { position: fixed; z-index: 1500; max-width: 340px; padding: 0; border: 1px solid #6b5a3d; background: #0c0a08; color: #b0b0b0; font-family: "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif; font-size: 13px; line-height: 1.5; text-align: center; box-shadow: 0 12px 36px #000b; pointer-events: none; }
+    .item-tip[hidden] { display: none; }
+    .item-tip .tip-head { padding: 7px 14px; border-bottom: 1px solid #3a2f20; font-size: 15px; font-weight: 700; }
+    .item-tip .tip-head.unique { color: #af6025; background: linear-gradient(#2a1a0c, #170e06); }
+    .item-tip .tip-head.rare { color: #ffff77; background: linear-gradient(#2a2a10, #16160a); }
+    .item-tip .tip-head.magic { color: #8888ff; background: linear-gradient(#14142e, #0c0c1c); }
+    .item-tip .tip-head.normal { color: #fff; background: linear-gradient(#222, #141414); }
+    .item-tip .tip-sec { padding: 6px 14px; border-bottom: 1px solid #2a2418; }
+    .item-tip .tip-sec:last-child { border-bottom: 0; }
+    .item-tip .tip-mod { color: #8888ff; }
+    .item-tip .tip-flavour { color: #af6025; font-style: italic; }
+    .item-tip .tip-note { color: #8a8a8a; font-size: 12px; }
+    .item-tip .tip-price { color: #f5d69f; font-weight: 700; }
+    @media (max-width: 900px) { .build-equipment { justify-content: start; } }
     .remove-run:disabled { opacity: .3; cursor: not-allowed; }
     .remove-run:disabled:hover { background: transparent; color: #81899a; }
     .session-rate { width: 210px; }
@@ -435,6 +477,7 @@
     <nav class="view-tabs" role="tablist" aria-label="Widok">
       <button class="view-tab active" id="tab-farm" type="button" role="tab" aria-selected="true" data-view="farm">Farmienie i strategie</button>
       <button class="view-tab" id="tab-stash" type="button" role="tab" aria-selected="false" data-view="stash">Stash · ile mam hajsu</button>
+      <button class="view-tab" id="tab-build" type="button" role="tab" aria-selected="false" data-view="build">Build · wycena</button>
       <span class="view-tabs-spacer"></span>
       <button class="button" id="tour-button" type="button" title="Krótki pokaz, co wyklikać">❓ Samouczek (tl;dr)</button>
       <button class="button" id="lang-button" type="button" title="Język / Language">PL · EN</button>
@@ -870,6 +913,65 @@
       </datalist>
     </div>
 
+    <div id="view-build" hidden>
+      <section class="card stash-settings" aria-label="Kurs w buildzie">
+        <div>
+          <label class="field-label" for="build-rate">Kurs chaos / divine (tylko dla buildu)</label>
+          <input id="build-rate" type="text" inputmode="decimal" autocomplete="off">
+          <p class="error-message" id="build-rate-error" role="alert"></p>
+        </div>
+        <div>
+          <span class="field-label">Jak to działa</span>
+          <p class="hint">Kliknij slot (albo „＋” przy jewelach), potem zrób Ctrl+C na przedmiocie w grze i Ctrl+V na tej zakładce. Nazwa i cena (z notatki ~b/o) wpiszą się same. Gdy ceny nie ma, wpisz w tabeli, ile przedmiot kosztował. Zrzut ekranu przedmiotu wklejony po wybraniu slotu stanie się jego ikonką, a po najechaniu zobaczysz statystyki przedmiotu.</p>
+        </div>
+        <div class="stash-settings-actions">
+          <button class="button danger" id="build-clear" type="button">Wyczyść build</button>
+        </div>
+      </section>
+
+      <section class="stash-summary" id="build-summary" aria-label="Podsumowanie buildu"></section>
+
+      <section class="card" aria-label="Ekwipunek">
+        <div class="panel-heading"><h2>Ekwipunek</h2><span class="run-count" id="build-target"></span></div>
+        <div class="stash-paste">
+          <label class="field-label" for="build-paste">Wklej przedmiot (Ctrl+V)</label>
+          <textarea id="build-paste" rows="2" placeholder="Ctrl+C na przedmiocie w grze, potem Ctrl+V tutaj albo gdziekolwiek na tej zakładce. Zrzut ekranu (obrazek) wklejony po wybraniu slotu zostaje jego ikonką."></textarea>
+          <p class="hint" id="build-note"></p>
+        </div>
+        <div class="build-sets" role="group" aria-label="Zestaw broni">
+          <button type="button" class="set-btn active" data-set="1" aria-pressed="true">I</button>
+          <button type="button" class="set-btn" data-set="2" aria-pressed="false">II</button>
+        </div>
+        <div class="build-equipment" id="build-equipment"></div>
+        <div class="build-lists" id="build-lists"></div>
+      </section>
+
+      <section class="card" aria-label="Lista kosztów">
+        <div class="panel-heading"><h2>Ile kosztował każdy przedmiot</h2><span class="run-count" id="build-count"></span></div>
+        <div class="table-wrap">
+          <table class="stash-table build-table">
+            <thead><tr><th>Ikona</th><th>Slot</th><th>Przedmiot</th><th>Cena (ile kosztował)</th><th>Udział</th><th aria-label="Akcje"></th></tr></thead>
+            <tbody id="build-body"></tbody>
+          </table>
+          <div class="empty" id="build-empty">Brak przedmiotów. Wklej pierwszy przedmiot (Ctrl+V).</div>
+        </div>
+        <div class="panel-footer">
+          <p class="hint">Cenę możesz wpisać jako działanie, np. <strong>42 div</strong>, <strong>30+12 div</strong> albo <strong>250c</strong>.</p>
+          <div class="add-group"><button class="button" type="button" id="build-sort">Sortuj od najdroższych</button></div>
+        </div>
+      </section>
+
+      <section class="card share-chart" aria-label="Wykres kosztów">
+        <div class="panel-heading"><h2>Co było najdroższe</h2></div>
+        <div class="chart-body" id="build-chart-body" hidden>
+          <div class="chart-donut" id="build-donut"></div>
+          <div class="chart-legend" id="build-legend"></div>
+        </div>
+        <div class="empty" id="build-chart-empty">Wykres pojawi się, gdy przedmioty będą miały ceny.</div>
+      </section>
+      <div class="item-tip" id="build-tip" hidden></div>
+    </div>
+
     <div id="tour-overlay" hidden aria-live="polite">
       <div class="tour-backdrop"></div>
       <div class="tour-hole" id="tour-hole"></div>
@@ -907,7 +1009,7 @@
       }
       if (lang !== "en") return;
 
-      const DATA = {"plain": {"Path of Exile · farming tracker": "Path of Exile · farming tracker", "Kalkulator farmy": "Farming calculator", "Zapisuj runy, porównuj strategie i sprawdzaj, która zarabia najwięcej na godzinę.": "Log runs, compare strategies and see which one earns the most per hour.", "Policz, ile hajsu leży w stashu: chaosy, diviny, inne waluty i przedmioty z ich cenami.": "Work out how much wealth is in your stash: chaos, divines, other currencies and items with their prices.", "Eksportuj CSV": "Export CSV", "Wyczyść wszystkie dane": "Clear all data", "Farmienie i strategie": "Farming & strategies", "Stash · ile mam hajsu": "Stash · how much I have", "❓ Samouczek (tl;dr)": "❓ Tutorial (tl;dr)", "Kurs chaos / divine": "Chaos / divine rate", "Przelicznik i format": "Converter & format", "Kwoty przeliczane są do wspólnej wartości. Od jednego divine wyświetlamy div, poniżej — c.": "Amounts are converted to a common value. From one divine up we show div, below that c.", "Wliczaj losowe dropy do profitu i średnich": "Include random drops in profit and averages", "Długość serii (liczba runów)": "Series length (number of runs)", "Do kolumny „Szansa serii” w tabelach: szansa, że tyle runów pod rząd się zwróci.": "For the “Series chance” column in the tables: the chance that this many runs in a row pay off.", "Strategie": "Strategies", "Wybierz zakładkę, aby przełączyć dane i statystyki.": "Pick a tab to switch data and statistics.", "＋ Nowa strategia": "＋ New strategy", "Zmień typ": "Change type", "Zmień nazwę": "Rename", "Usuń tę strategię": "Delete this strategy", "Zmień nazwę strategii": "Rename strategy", "Zmieni się tylko nazwa tej strategii. Jej dane i pozostałe strategie pozostaną bez zmian.": "Only the name of this strategy changes. Its data and your other strategies stay untouched.", "Nazwa strategii": "Strategy name", "Anuluj": "Cancel", "Zapisz nazwę": "Save name", "Nowa strategia": "New strategy", "Wybierz strategię, którą już farmią znajomi, albo stwórz własną.": "Pick a strategy your friends already farm, or create your own.", "＋ Stwórz nową": "＋ Create new", "Typ strategii": "Strategy type", "Mapki / bossy": "Maps / bosses", "Invitation (pakiet bossów)": "Invitation (boss bundle)", "Szansa (losowa mapa)": "Chance (random map)", "Gambling": "Gambling", "Inwestycja": "Investment", "Nazwa nowej strategii": "New strategy name", "Podobne, które już istnieją": "Similar ones that already exist", "Wróć do listy": "Back to the list", "Utwórz strategię": "Create strategy", "Zmień typ strategii": "Change strategy type", "Z typu „Inwestycja” nie da się zmienić typu, bo ma inną strukturę danych (przedmioty, ceny, statusy). Utwórz nową strategię wybranego typu.": "The “Investment” type cannot be changed because it has a different data structure (items, prices, statuses). Create a new strategy of the type you want.", "Tak, zmień typ": "Yes, change type", "Importuj runy jako bossów": "Import runs as bosses", "Wybierz strategię i runy, które mają stać się bossami tego zestawu (czas, koszt i drop zostaną skopiowane).": "Pick a strategy and the runs that should become bosses of this bundle (time, cost and drop are copied).", "Strategia": "Strategy", "Usuń zaimportowane runy z tamtej strategii (przenieś)": "Remove imported runs from the other strategy (move them)", "Importuj": "Import", "Pokaż statystyki z": "Show stats from", "Wszystkie runy": "All runs", "Ostatnie 10": "Last 10", "W tej sesji": "This session", "Per sesja": "Per session", "Kurs w tej sesji (chaos / div)": "Rate in this session (chaos / div)", "Usuń sesję": "Delete session", "Zakończ sesję · zacznij nową": "End session · start new", "Runy": "Runs", "0 kompletnych runów": "0 complete runs", "Czas runu": "Run time", "Koszt": "Cost", "Wartość dropu": "Drop value", "Losowy drop": "Random drop", "Net profit": "Net profit", "Bossy": "Bosses", "Sesja": "Session", "Dodaj pierwszy run i wpisz czas, koszt oraz wartość dropu.": "Add your first run and enter the time, cost and drop value.", "＋ Dodaj run": "＋ Add run", "＋ 5 runów": "＋ 5 runs", "＋ Dodaj wpisaną liczbę": "＋ Add typed number", "Inwestycje": "Investments", "0 inwestycji": "0 investments", "Co skupujesz": "What you are buying", "Zamrożone": "Frozen", "Status": "Status", "Brak zleceń skupu. Dodaj zlecenie, jeśli masz pieniądze zamrożone w skupowaniu na rynku.": "No buy orders. Add one if you have money frozen in a market buy order.", "＋ Dodaj zlecenie skupu": "＋ Add buy order", "Zamrożone środki nie liczą się jeszcze jako wydatek. Gdy karty się skupią, kliknij „→ Inwestycja”.": "Frozen funds do not count as spending yet. Once the cards are bought, click “→ Investment”.", "Znajdź przedmiot na liście": "Find an item in the list", "Wpisz nazwę i/lub cenę albo wklej opis przedmiotu z gry (Ctrl+C na przedmiocie w grze, potem Ctrl+V poniżej). Gdy podasz nazwę i cenę, pokażą się tylko przedmioty pasujące do obu naraz.": "Type a name and/or price, or paste an item description from the game (Ctrl+C on the item in game, then Ctrl+V below). When you give both name and price, only items matching both are shown.", "Wyczyść": "Clear", "Pokaż przedmioty": "Show items", "Wszystkie": "All", "Tylko wystawione": "Listed only", "Tylko sprzedane": "Sold only", "Dodaj pierwszą inwestycję: wpisz, ile włożyłeś, i dopisz przedmioty, które wystawiasz.": "Add your first investment: enter how much you put in and add the items you list.", "＋ Dodaj inwestycję": "＋ Add investment", "Porównanie strategii": "Strategy comparison", "Zyskowność na podstawie Twoich runów i aktualnego kursu": "Profitability based on your runs and the current rate", "Śr. czas": "Avg time", "Czas łącznie": "Total time", "Śr. koszt": "Avg cost", "Śr. drop": "Avg drop", "Net / run": "Net / run", "Łączny wynik": "Total result", "Profit / h": "Profit / h", "Szansa 1 run": "1-run chance", "Min. runów": "Min. runs", "Dodaj kompletne runy, aby porównać strategie.": "Add complete runs to compare strategies.", "Typ": "Type", "Trafienia": "Hits", "Koszt łącznie": "Total cost", "Drop łącznie": "Total drop", "Wynik": "Result", "Śr. drop / run": "Avg drop / run", "Sprzedane": "Sold", "Zainwestowano": "Invested", "Wystawione": "Listed", "Sprzedane za": "Sold for", "Zysk zreal.": "Realized profit", "Zysk potenc.": "Potential profit", "Porównanie ze znajomymi": "Comparison with friends", "Łączenie…": "Connecting…", "Twój nick": "Your nickname", "Udostępniaj moje dane znajomym": "Share my data with friends", "Wartości przeliczone na chaosy. Przełącznik losowych dropów działa też tutaj.": "Values converted to chaos. The random drops switch works here too.", "Strategia / gracz": "Strategy / player", "Gracze": "Players", "Brak danych. Włącz udostępnianie i dodaj kompletne runy.": "No data. Turn on sharing and add complete runs.", "Udział graczy w wyniku": "Players’ share of the result", "Procenty": "Percent", "Divy / chaosy": "Divines / chaos", "Brak danych do wykresu. Włącz udostępnianie i dodaj kompletne runy.": "No data for the chart. Turn on sharing and add complete runs.", "↑ Wróć do wyszukiwarki": "↑ Back to search", "Kurs chaos / divine (tylko dla stasha)": "Chaos / divine rate (stash only)", "Jak to działa": "How it works", "Wyczyść stash": "Clear stash", "Chaos i divine": "Chaos and divine", "Chaos Orb (ilość)": "Chaos Orb (amount)", "Divine Orb (ilość)": "Divine Orb (amount)", "Inne waluty": "Other currencies", "Waluta": "Currency", "Ilość": "Amount", "Wartość 1 szt.": "Value of 1 pc", "Razem": "Total", "Dodaj walutę (np. Exalted Orb) i wpisz, ile jedna sztuka jest warta w chaosach lub divinach.": "Add a currency (e.g. Exalted Orb) and enter how much one piece is worth in chaos or divines.", "＋ Dodaj walutę": "＋ Add currency", "＋ 5 walut": "＋ 5 currencies", "Przedmioty": "Items", "Dodaj przedmiot z gry": "Add an item from the game", "Przedmiot": "Item", "Cena 1 szt.": "Price of 1 pc", "Dodaj przedmiot ręcznie albo wklej opis z gry powyżej.": "Add an item manually or paste a description from the game above.", "＋ Dodaj przedmiot": "＋ Add item", "＋ 5 przedmiotów": "＋ 5 items", "Sortuj od najcenniejszych": "Sort by most valuable", "Wstecz": "Back", "Dalej": "Next", "Dane zapisują się automatycznie w tej przeglądarce.": "Data is saved automatically in this browser.", "Widok": "View", "Krótki pokaz, co wyklikać": "A short demo of what to click", "Język / Language": "Język / Language", "Kurs walut": "Exchange rate", "Wybierz strategię": "Choose a strategy", "np. Legion": "e.g. Legion", "Zakres danych i sesje": "Data scope and sessions", "Zakres statystyk": "Stats scope", "puste = kurs z ustawień": "empty = rate from settings", "Podsumowanie strategii": "Strategy summary", "Runy wybranej strategii": "Runs of the selected strategy", "Akcje": "Actions", "Ile runów dodać": "How many runs to add", "Inwestycje wybranej strategii": "Investments of the selected strategy", "Nazwa, np. Quicksilver Flask": "Name, e.g. Quicksilver Flask", "Cena, np. 18c lub 2 div": "Price, e.g. 18c or 2 div", "Wklej tutaj cały opis przedmiotu skopiowany w grze…": "Paste the whole item description copied in the game here…", "Filtr przedmiotów": "Item filter", "np. xXx_Chris_Kisser_xXx": "e.g. xXx_Chris_Kisser_xXx", "Sposób wyświetlania": "Display mode", "Kurs w stashu": "Stash rate", "Podsumowanie stasha": "Stash summary", "np. 1250 albo 500+750": "e.g. 1250 or 500+750", "np. 14 albo 10+4": "e.g. 14 or 10+4", "Usuń": "Delete", "Ile walut dodać": "How many currencies to add", "Ctrl+C na przedmiocie w grze, potem Ctrl+V tutaj. Doda się nowy wiersz z nazwą i ceną (z notatki ~b/o), a taki sam przedmiot zwiększy ilość.": "Ctrl+C an item in the game, then Ctrl+V here. A new row with name and price (from the ~b/o note) is added; an identical item increases the amount.", "Ile przedmiotów dodać": "How many items to add", "Samouczek": "Tutorial", "Zamknij": "Close", "Najlepszy profit na godzinę": "Best profit per hour", "Najlepszy": "Best", "Dodaj kompletne runy": "Add complete runs", "Wynik pojawi się po uzupełnieniu czasu, kosztu i dropu.": "The result appears once time, cost and drop are filled in.", "Dodaj runy z kosztem": "Add runs with a cost", "ROI wymaga kompletnego runu z kosztem większym od zera.": "ROI needs a complete run with a cost above zero.", "Brak kompletnych runów": "No complete runs", "Inwestycja · brak przedmiotów": "Investment · no items", "Średni czas runu": "Average run time", "Średni koszt runu": "Average run cost", "Średnia wartość dropu": "Average drop value", "Średni net profit / run": "Average net profit / run", "Profit na godzinę": "Profit per hour", "Łączny wynik strategii": "Strategy total result", "Losowe dropy (łącznie)": "Random drops (total)", "Śr. losowy drop / run": "Avg random drop / run", "Wartość wystawiona": "Listed value", "Czeka na sprzedaż": "Waiting to sell", "Zysk zrealizowany": "Realized profit", "Zysk potencjalny": "Potential profit", "Zwrot kosztów": "Cost recovery", "ROI potencjalne": "Potential ROI", "Zamrożone środki": "Frozen funds", "Śr. zarobek / sprzedaną szt.": "Avg earnings / sold pc", "Śr. zysk / inwestycję (zreal.)": "Avg profit / investment (real.)", "Śr. zysk / inwestycję (potenc.)": "Avg profit / investment (pot.)", "Runy łącznie": "Runs total", "Trafienia (coś padło)": "Hits (something dropped)", "Szansa na drop": "Drop chance", "Łączny drop": "Total drop", "Najlepszy drop": "Best drop", "Śr. drop, gdy coś padło": "Avg drop when something dropped", "Łączny wynik (drop − koszt)": "Total result (drop − cost)", "Wydane łącznie": "Spent in total", "Śr. wynik / run": "Avg result / run", "Szansa serii": "Series chance", "Czas farmienia": "Farming time", "Czas strategii łącznie": "Strategy total time", "Liczba sesji": "Number of sessions", "Czas farmienia · ": "Farming time · ", "Runy · ": "Runs · ", "Statystyka": "Statistic", "Ta sesja": "This session", "Poprzednia": "Previous", "Różnica": "Difference", "Średnia z poprzednich": "Average of previous", "Ta sesja kontra wcześniejsze": "This session vs earlier ones", "Wszystkie sesje": "All sessions", "Podsumowanie inwestycji": "Investments summary", "Czeka": "Waiting", "Średnio na inwestycję": "Average per investment", "Kurs c/div": "Rate c/div", "Śr. / sprzedaną szt.": "Avg / sold pc", "Śr. czas runu": "Avg run time", "Śr. koszt runu": "Avg run cost", "Runy w sesji": "Runs in session", "Czas walki w Invitation": "Fight time in Invitation", "Koszt walki": "Fight cost", "Drop z walki": "Fight drop", "Koszt (opcjonalnie)": "Cost (optional)", "Koszt (za co kupiłeś)": "Cost (what you paid)", "Bossy / mapy tego zestawu": "Bosses / maps of this bundle", "Wpisz tu każdego bossa odpalonego na osobnej mapie (czas, koszt mapy, drop). Walka w Invitation to wiersz wyżej.": "Enter each boss launched on a separate map here (time, map cost, drop). The Invitation fight is the row above.", "Boss / mapa": "Boss / map", "Czas": "Time", "＋ Dodaj bossa": "＋ Add boss", "＋ 4 bossy": "＋ 4 bosses", "⇩ Importuj z istniejącej strategii": "⇩ Import from an existing strategy", "dodaj bossy": "add bosses", "Przenieś run do innej sesji": "Move run to another session", "Zacznij nową sesję od tego runu (ten i kolejne runy trafią do nowej sesji)": "Start a new session from this run (this and the following runs go to the new session)", "Usuń run": "Delete run", "Usuń bossa": "Delete boss", "Usuń przedmiot": "Delete item", "Usuń inwestycję": "Delete investment", "Usuń zlecenie": "Delete order", "Usuń wiersz": "Delete row", "Nowa inwestycja": "New investment", "Dodano": "Added", "Wystawiono za": "Listed for", "Sprzedano za": "Sold for", "Wystawiony": "Listed", "Sprzedany": "Sold", "Czeka (zamrożone)": "Waiting (frozen)", "Skupione": "Bought", "Wycofane": "Withdrawn", "→ Inwestycja": "→ Investment", "Zamień w inwestycję o tym koszcie (gdy karty są już skupione)": "Turn into an investment with this cost (when the cards are bought)", "To zlecenie już zamieniono w inwestycję": "This order was already turned into an investment", "Nic nie jest teraz zamrożone": "Nothing is frozen right now", "✓ Sprzedany": "✓ Sold", "↩ Wystawiony": "↩ Listed", "Oznacz jako sprzedany (bez przenoszenia)": "Mark as sold (without jumping)", "Cofnij: oznacz jako wystawiony": "Undo: mark as listed", "Podobne": "Similar", "Wybierz nowy typ.": "Pick a new type.", "Wynik na zero": "Break-even", "Strata": "Loss", "Poza wykresem · bez zysku": "Outside the chart · no profit", "Razem w stashu": "Total in stash", "całości": "of total", "Brak dostępu do bazy (sprawdź reguły)": "No access to the database (check the rules)", "Błąd połączenia z Firebase": "Firebase connection error", "Firebase nieskonfigurowany": "Firebase not configured", "Nie udało się wysłać danych": "Could not send data", "Nie udało się usunąć danych": "Could not delete data", "Wpisz nick, aby udostępniać dane": "Enter a nickname to share data", "Wpisz nazwę strategii.": "Enter a strategy name.", "Taką strategię już masz.": "You already have that strategy.", "Taka nazwa jest już używana. Wybierz inną, żeby łatwiej odróżniać strategie.": "That name is already used. Pick another one to tell strategies apart more easily.", "Podaj kurs większy od zera, np. 155.": "Enter a rate above zero, e.g. 155.", "Nie ma jeszcze strategii od znajomych (albo masz już wszystkie). Stwórz własną.": "There are no strategies from friends yet (or you already have them all). Create your own.", "Nie ma takiej strategii — możesz utworzyć nową.": "No such strategy — you can create a new one.", "Zacznij pisać — pokażemy podobne strategie, które już istnieją.": "Start typing — we will show similar strategies that already exist.", "Nie ma na liście takiego przedmiotu.": "No such item in the list.", "Nie ma takiego przedmiotu na liście.": "No such item in the list.", "Nie rozpoznałem nazwy przedmiotu.": "I could not recognize the item name.", "Nie ma innych strategii z runami do zaimportowania.": "There are no other strategies with runs to import.", "Dodaj przynajmniej jeden run przed eksportem.": "Add at least one run before exporting.", "Dodaj przynajmniej jeden przedmiot przed eksportem.": "Add at least one item before exporting.", "Obecna sesja nie ma jeszcze żadnych runów. Dodaj je, zanim zaczniesz nową.": "The current session has no runs yet. Add some before starting a new one.", "Run przeniesiony do wybranej sesji.": "Run moved to the selected session.", "Ten run jest pierwszy w sesji, więc nie ma czego dzielić. Kliknij ✂ przy runie, od którego ma zacząć się nowa sesja.": "This run is the first in its session, so there is nothing to split. Click ✂ on the run that should start the new session.", "Zapisano automatycznie w tej przeglądarce.": "Saved automatically in this browser.", "Stash zapisany automatycznie w tej przeglądarce.": "Stash saved automatically in this browser.", "Nie udało się zapisać danych w przeglądarce.": "Could not save data in the browser.", "Nie udało się zapisać stasha w przeglądarce.": "Could not save the stash in the browser.", "Nie udało się odczytać zapisanych danych.": "Could not read the saved data.", "Nowa nazwa sesji:": "New session name:", "Usunąć wszystkie strategie, runy i ustawienia?": "Delete all strategies, runs and settings?", "Usunąć tę inwestycję wraz ze wszystkimi przedmiotami?": "Delete this investment together with all its items?", "Wyczyścić cały stash (waluty, przedmioty i kurs)?": "Clear the whole stash (currencies, items and rate)?", "Twoje runy i sesje (z kursami) zostają.": "Your runs and sessions (with their rates) stay.", "Czas runów zostanie ukryty (dane zostają i wrócą, jeśli zmienisz typ z powrotem).": "Run times will be hidden (the data stays and returns if you switch the type back).", "Każdy run zostanie zestawem bez bossów. Bossów dodasz ręcznie albo zaimportujesz z innej strategii.": "Every run becomes a bundle without bosses. You can add bosses manually or import them from another strategy.", "Pusty koszt będzie liczony jako 0c, a run liczy się, gdy wpiszesz wartość dropu (np. 0c).": "An empty cost counts as 0c, and a run counts once you enter a drop value (e.g. 0c).", "Latasz mapki lub bossy: wpisujesz czas, koszt i drop, a wynik to profit na godzinę.": "You run maps or bosses: enter time, cost and drop; the result is profit per hour.", "Kilka bossów odpalanych na osobnych mapach, a potem walka w Invitation (np. od Mavena): koszt bossów i drop z całego zestawu liczą się razem, czas też.": "Several bosses launched on separate maps, then the fight in an Invitation (e.g. from Maven): boss costs and the whole bundle’s drop count together, and so does time.", "Coś trafiło się samo na mapie: koszt zwykle 0, czas nieważny. Liczy się, jak często coś oddaje (szansa na drop).": "Something showed up on a map on its own: cost is usually 0 and time does not matter. What counts is how often it gives something back (drop chance).", "Kupujesz karty lub inne losowe rzeczy: wpisujesz koszt i wartość dropu. Czas nieważny, liczy się, czy się zwraca.": "You buy cards or other random things: enter the cost and drop value. Time does not matter; what counts is whether it pays off.", "Kupujesz, przerabiasz i sprzedajesz przedmioty: wpisujesz koszt oraz ceny i statusy przedmiotów, a wynik to zysk i ROI (bez godzin).": "You buy, craft and sell items: enter the cost plus item prices and statuses; the result is profit and ROI (no hours).", "wpisz 0c, jeśli nic nie padło": "enter 0c if nothing dropped", "puste = 0c": "empty = 0c", "np. 10c, 2+3 lub 1 div": "e.g. 10c, 2+3 or 1 div", "np. 10c + 1 div": "e.g. 10c + 1 div", "opcjonalnie, np. 2 div": "optional, e.g. 2 div", "np. 4:30": "e.g. 4:30", "np. 45c lub 2 div": "e.g. 45c or 2 div", "puste = cena wystawienia": "empty = listing price", "np. 20*22c lub 440c": "e.g. 20*22c or 440c", "np. 440c lub 20*22c": "e.g. 440c or 20*22c", "np. 2+2": "e.g. 2+2", "np. Boss z mapy Zealot's Vault": "e.g. Boss from Zealot's Vault", "koszt mapy, np. 13c": "map cost, e.g. 13c", "drop, np. 0c": "drop, e.g. 0c", "losowy (opc.)": "random (opt.)", "np. 1:00": "e.g. 1:00", "np. Exalted Orb": "e.g. Exalted Orb", "np. Constant Quicksilver Flask of the Cheetah": "e.g. Constant Quicksilver Flask of the Cheetah", "np. 12c lub 0,1 div": "e.g. 12c or 0.1 div", "np. 20× The Shortcut po 22c (zlecenie skupu)": "e.g. 20× The Shortcut at 22c (buy order)", "np. Quicksilver Flask (MS) · albo wklej opis z gry (Ctrl+V)": "e.g. Quicksilver Flask (MS) · or paste a description from the game (Ctrl+V)", "np. 20× The Shortcut → flaszki 100 lvl z movement speed": "e.g. 20× The Shortcut → lvl 100 flasks with movement speed", "Data dodania": "Date added", "Mało danych": "Little data", "Ten run": "This run", "Nowy run": "New run", "Wpisz dane runu": "Enter the run data", "Wyniki": "Results", "Zakładki strategii": "Strategy tabs", "Zmiana typu": "Change type", "Kurs divine w tej sesji": "Divine rate for this session", "Wzrost": "Growth", "Anonim": "Anonymous", "Bez nazwy": "Untitled", "bez nazwy": "untitled", "Strategia 1": "Strategy 1", "Strategie inwestycyjne (kliknij nazwę, aby zobaczyć graczy)": "Investment strategies (click a name to see the players)"}, "html": {"Wybrana strategia:<strong id=\"active-strategy-name\"></strong>": "Selected strategy:<strong id=\"active-strategy-name\"></strong>", "<span class=\"term\" data-term=\"session\">Sesja</span> pokazana w tabeli runów": "<span class=\"term\" data-term=\"session\">Session</span> shown in the runs table", "Czas: <strong>mm:ss</strong> lub sekundy. Kwoty możesz wpisać jako działanie (<strong>+ − * /</strong> i nawiasy), np. <strong>12c + 3 div</strong>, <strong>2+4c+5</strong>, <strong>4+2+6div</strong> albo <strong>(10+5)*2c</strong>. Liczby bez jednostki to chaosy (a jeśli w działaniu jest tylko div, to divy). Po wyjściu z pola zapis się uporządkuje, a po kliknięciu w pole zobaczysz i poprawisz oryginał.<br>Net profit = drop − koszt. Liczą się tylko kompletne runy. Enter przechodzi do pola niżej.<br>Listą „Sesja” przeniesiesz pojedynczy run, a <strong>✂</strong> przy runie zaczyna od niego nową sesję (ten i kolejne runy przechodzą do niej). Czas farmienia sumuje się ze wszystkich runów z wpisanym czasem.": "Time: <strong>mm:ss</strong> or seconds. You can type amounts as a calculation (<strong>+ − * /</strong> and parentheses), e.g. <strong>12c + 3 div</strong>, <strong>2+4c+5</strong>, <strong>4+2+6div</strong> or <strong>(10+5)*2c</strong>. Numbers without a unit are chaos (and if the calculation only has div, they are divines). After you leave a field the entry is tidied up; click the field to see and fix what you typed.<br>Net profit = drop − cost. Only complete runs count. Enter moves to the field below.<br>Use the “Session” list to move a single run, and <strong>✂</strong> on a run starts a new session from it (this and the following runs move there). Farming time is summed from all runs that have a time entered.", "Zlecenia skupu · <span class=\"term\" data-term=\"frozen\">zamrożone środki</span>": "Buy orders · <span class=\"term\" data-term=\"frozen\">frozen funds</span>", "W „Zainwestowano” możesz wpisać np. <strong>20*22c</strong> (20 sztuk po 22c). Ceny też mogą być działaniami, np. <strong>18c + 2 div</strong>. Cenę możesz poprawiać, gdy zmieni się rynek, a po sprzedaży ustaw status i (jeśli sprzedałeś taniej lub drożej) wpisz prawdziwą cenę. Przy inwestycjach nie liczymy profitu na godzinę, tylko zysk i ROI.": "In “Invested” you can type e.g. <strong>20*22c</strong> (20 pieces at 22c). Prices can be calculations too, e.g. <strong>18c + 2 div</strong>. You can edit a price when the market changes, and after selling set the status and (if you sold for less or more) enter the real price. For investments we do not calculate profit per hour, only profit and ROI.", "Strategie posortowane według <strong>profitu na godzinę</strong>, od najwyższego.": "Strategies sorted by <strong>profit per hour</strong>, highest first.", "<span class=\"term\" data-term=\"roi\">ROI</span> = średni net profit ÷ średni koszt runu.": "<span class=\"term\" data-term=\"roi\">ROI</span> = average net profit ÷ average run cost.", "Szansa serii: <span class=\"series-n\">10</span>": "Series chance: <span class=\"series-n\">10</span>", "Szansa i gambling <small>(czas nieważny: liczy się, czy coś oddaje i czy się zwraca)</small>": "Chance & gambling <small>(time does not matter: what counts is whether something drops and whether it pays off)</small>", "Strategie inwestycyjne <small>(bez profitu na godzinę: liczy się zysk i ROI)</small>": "Investment strategies <small>(no profit per hour: profit and ROI count)</small>", "<span class=\"term\" data-term=\"roi\">ROI</span> potenc.": "<span class=\"term\" data-term=\"roi\">ROI</span> pot.", "Strategie łączone po nazwie (bez względu na wielkość liter), posortowane według <strong>profitu na godzinę</strong>. Kliknij nazwę strategii, aby zobaczyć graczy.": "Strategies are merged by name (case-insensitive), sorted by <strong>profit per hour</strong>. Click a strategy name to see the players.", "Wpisz chaosy, diviny, inne waluty (ile jedna sztuka jest warta) i przedmioty (ile chodzą na rynku). Ilości i wartości możesz wpisywać jako działania (<strong>+ − * /</strong> i nawiasy), np. <strong>2+2</strong>, <strong>500+750</strong>, <strong>(10+5)*2</strong> albo <strong>12c + 3 div</strong>. Po wyjściu z pola zostaje wynik, a po kliknięciu wraca to, co wpisano. Kurs jest osobny od kursu w zakładce farmienia.": "Enter chaos, divines, other currencies (how much one piece is worth) and items (what they sell for on the market). Amounts and values can be calculations (<strong>+ − * /</strong> and parentheses), e.g. <strong>2+2</strong>, <strong>500+750</strong>, <strong>(10+5)*2</strong> or <strong>12c + 3 div</strong>. After you leave a field the result stays; click it and what you typed returns. The rate is separate from the farming tab’s rate.", "Wartość 1 szt. to np. <strong>12c</strong> albo <strong>0,1 div</strong>. Podpowiedzi nazw pojawiają się po wpisaniu pierwszych liter.": "Value of 1 pc is e.g. <strong>12c</strong> or <strong>0,1 div</strong>. Name suggestions appear after you type the first letters.", "Cenę wpisz taką, za jaką przedmiot chodzi na rynku albo ile jest warty (np. <strong>45c</strong>, <strong>2 div</strong>). Ctrl+V opisu przedmiotu w polu nazwy lub ceny też wypełni wiersz.": "Enter the price the item sells for on the market or what it is worth (e.g. <strong>45c</strong>, <strong>2 div</strong>). Ctrl+V of an item description in the name or price field also fills the row.", "Strategie inwestycyjne (kliknij nazwę, aby zobaczyć graczy)": "Investment strategies (click a name to see the players)"}, "rules": [["^Wartość 1 szt\\. (\\d+)$", "Value of 1 pc $1"], ["^Mało danych \\((\\d+) (?:run|runy|runów)\\) — wynik orientacyjny$", "Little data ($1 runs) — rough result"], ["^1 pozycja · (.+)$", "1 entry · $1"], ["^1 run · (.+)$", "1 run · $1"], ["^(\\d+) runów? · (.+)$", "$1 runs · $2"], ["^(\\d+) runy · (.+)$", "$1 runs · $2"], ["^Inwestycja · (\\d+) (?:przedmiot|przedmioty|przedmiotów) · (.+)$", "Investment · $1 items · $2"], ["^(\\d+) z (\\d+) (?:runu|runów) kompletnych$", "$1 of $2 runs complete"], ["^(\\d+) kompletnych runów$", "$1 complete runs"], ["^Statystyki ze wszystkich (\\d+) kompletnych runów\\.$", "Stats from all $1 complete runs."], ["^Statystyki z ostatnich (\\d+) (?:runu|runów) \\(z (\\d+) kompletnych\\)\\.$", "Stats from the last $1 runs (out of $2 complete)."], ["^Statystyki z sesji „(.*)” \\((\\d+) [^)]*\\)\\.$", "Stats from the session “$1” ($2 complete runs)."], ["^Karty u góry liczą wszystkie (\\d+) kompletnych runów\\. Porównanie sesji jest poniżej\\.$", "The cards at the top count all $1 complete runs. The session comparison is below."], ["^Runy · (.*)$", "Runs · $1"], ["^Mapki i bossy · liczone z: (.+) każdej strategii$", "Maps & bosses · calculated from: $1 of each strategy"], ["^Połączono · graczy: (\\d+)$", "Connected · players: $1"], ["^(\\d+) (?:pozycja|pozycje|pozycji) · (.+)$", "$1 entries · $2"], ["^(.+) (?:szt\\.) · (.+)% całości$", "$1 pcs · $2% of total"], ["^(.+)% całości$", "$1% of total"], ["^Zamrożone teraz: (.+) \\((\\d+) [^)]*\\)$", "Frozen now: $1 ($2 orders)"], ["^Wartość: (.+)$", "Value: $1"], ["^było: (.+)$", "was: $1"], ["^Podzielono: „(.+)” zaczyna się od runu (\\d+) dotychczasowej sesji\\.$", "Split: “$1” starts from run $2 of the previous session."], ["^Wklejono: „(.+)” za (.+)\\.$", "Pasted: “$1” for $2."], ["^Wklejono nazwę „(.+)”\\. W opisie nie było ceny \\(brak notatki ~b/o\\), więc wpisz ją ręcznie\\.$", "Pasted the name “$1”. The description had no price (no ~b/o note), so enter it manually."], ["^Wklejono nazwę „(.+)”\\. Cena w walucie „(.+)” \\(obsługuję chaos i divine\\), więc wpisz ją ręcznie\\.$", "Pasted the name “$1”. The price is in the currency “$2” (I support chaos and divine), so enter it manually."], ["^Dodano: „(.+)” za (.+)\\.(.*)$", "Added: “$1” for $2.$3"], ["^Dodano: „(.+)”\\.(.*)$", "Added: “$1”.$2"], ["^„(.+)” już był na liście, więc zwiększyłem ilość do (.+)\\.$", "“$1” was already on the list, so I increased the amount to $2."], ["^W opisie nie było ceny \\(brak notatki ~b/o\\), wpisz ją w wierszu\\.$", "The description had no price (no ~b/o note); enter it in the row."], ["^Rozpoznano: (.+)$", "Recognized: $1"], ["^„(.+)” oznaczono jako (sprzedany|wystawiony)\\.$", "“$1” marked as $2."], ["^Pasuje (\\d+) [^ ]+ \\(zielone: wystawione, niebieskie: sprzedane\\):$", "$1 matching (green: listed, blue: sold):"], ["^Pasują (\\d+) [^ ]+ \\(zielone: wystawione, niebieskie: sprzedane\\):$", "$1 matching (green: listed, blue: sold):"], ["^…i (\\d+) kolejnych \\(są podświetlone na liście\\)\\.$", "…and $1 more (highlighted in the list)."], ["^Nie ma przedmiotu o takiej nazwie i cenie\\.(?: Z samą nazwą (?:pasuje|pasują) (\\d+) [^ ]+, ale w innej cenie\\.)?$", "No item with that name and price.$1"], ["^Zaimportowano (\\d+) [^ ]+ jako bossy zestawu(.*)\\.$", "Imported $1 runs as bundle bosses$2."], ["^Zmieniono typ strategii „(.+)” na: (.+)\\.$", "Changed the type of strategy “$1” to: $2."], ["^Strategia „(.+)” ma teraz typ: (.+)\\.$", "Strategy “$1” currently has the type: $2."], ["^Co się stanie po zmianie na „(.+)”:$", "What will happen after changing to “$1”:"], ["^(\\d+) (?:run nie ma|runy nie mają|runów nie ma) wpisanego czasu, więc [^ ]+ niekompletne, dopóki go nie uzupełnisz\\.$", "$1 runs have no time entered, so they will be incomplete until you fill it in."], ["^(\\d+) (?:boss zostanie doliczony|bossy zostaną doliczone|bossów zostanie doliczonych) do swoich runów \\(czas, koszt i drop się zsumują, wartości w chaosach\\), a lista bossów zniknie\\.$", "$1 bosses will be added to their runs (time, cost and drop add up, values in chaos) and the boss list will disappear."], ["^Usunąć pustą sesję „(.+)”\\?$", "Delete the empty session “$1”?"], ["^Usunąć „(.+)”\\? Jej (\\d+) [^ ]+ przeniosę do „(.+)”\\.$", "Delete “$1”? I will move its $2 runs to “$3”."], ["^Usunąć strategię „(.+)” wraz ze wszystkimi jej danymi\\?$", "Delete the strategy “$1” together with all its data?"], ["^Zakończyć „(.+)” i zacząć nową\\? Nowe runy będą trafiać do nowej sesji, a stare zostaną w historii\\.$", "End “$1” and start a new one? New runs will go to the new session and the old ones stay in history."], ["^Ta sesja nie ma jeszcze kompletnych runów\\. Dodaj je, a pojawi się porównanie z poprzednimi sesjami\\.$", "This session has no complete runs yet. Add some and a comparison with previous sessions will appear."], ["^Nie ma jeszcze wcześniejszej sesji z kompletnymi runami\\. Kliknij „Zakończ sesję · zacznij nową”, a potem porównasz je tutaj\\.$", "There is no earlier session with complete runs yet. Click “End session · start new” and you can compare them here."], ["^Zielone = lepiej niż porównywana sesja, czerwone = gorzej(?: \\(dla czasu runu krótszy jest lepszy\\))?\\.$", "Green = better than the compared session, red = worse (a shorter run time is better)."], ["^Obwódka z lewej oznacza najlepszą sesję pod względem (.+)\\.$", "The left border marks the best session by $1."], ["^Wpisz, ile chaosów kosztuje 1 divine w tej sesji(.*)$", "Type how many chaos 1 divine costs in this session$1"], ["^Zamrożone środki$", "Frozen funds"], ["^Łączenie…$", "Connecting…"]], "phrases": [["Czas farmienia", "Farming time"], ["nigdy", "never"], ["potencjalne", "potential"], ["re:\\(1 zlec\\.\\)", "(1 order)"], ["re:(?<![\\d.,])1 szt\\.", "1 pc"], ["re:(?<![\\d.,])1 szt\\.", "1 pc"], ["Invitation (pakiet bossów)", "Invitation (boss bundle)"], ["Szansa (losowa mapa)", "Chance (random map)"], ["Mapki / bossy", "Maps / bosses"], ["Inwestycja", "Investment"], ["całości", "of total"], ["było", "was"], ["Czas runu", "Run time"], ["Koszt runu", "Run cost"], ["Wartość dropu runu", "Drop value of run"], ["Losowy drop runu", "Random drop of run"], ["Zacznij nową sesję od runu", "Start a new session from run"], ["Usuń run", "Delete run"], ["Usuń wiersz", "Delete row"], ["Wartość 1 szt.", "Value of 1 pc"], ["Ilość", "Amount"], ["Sesja runu", "Session of run"], ["Cena wystawienia przedmiotu", "Listing price of item"], ["Cena sprzedaży przedmiotu", "Sale price of item"], ["Koszt inwestycji", "Investment cost"], ["Usuń inwestycję", "Delete investment"], ["Usuń przedmiot", "Delete item"], ["Usuń zlecenie", "Delete order"], ["Zamrożone środki zlecenia", "Frozen funds of order"], ["Opis zlecenia", "Description of order"], ["Status zlecenia", "Status of order"], ["Status przedmiotu", "Status of item"], ["Nazwa przedmiotu", "Name of item"], ["Czas bossa", "Time of boss"], ["Koszt bossa", "Cost of boss"], ["Drop z bossa", "Drop from boss"], ["Losowy drop z bossa", "Random drop from boss"], ["Usuń bossa", "Delete boss"], ["Nazwa bossa", "Name of boss"], ["Ile bossów dodać", "How many bosses to add"], ["Nazwa", "Name"], ["Cena", "Price"], ["wystawienia", "listing"], ["re:(\\d+) z (\\d+)", "$1 of $2"], ["mapki / bossy", "maps / bosses"], ["invitation (pakiet bossów)", "invitation (boss bundle)"], ["szansa (losowa mapa)", "chance (random map)"], ["inwestycja", "investment"], ["gambling", "gambling"], ["profitu na godzinę", "profit per hour"], ["średniego wyniku na run", "average result per run"], ["wszystkich runów (tabela sesji niżej)", "all runs (session table below)"], ["wszystkich runów", "all runs"], ["ostatnich 10 runów", "the last 10 runs"], ["tej sesji", "this session"], ["z ustawień", "from settings"], ["kompletnych", "complete"], ["runów", "runs"], ["runy", "runs"], ["runu", "run"], ["run", "run"], ["przedmiotów", "items"], ["przedmioty", "items"], ["przedmiot", "item"], ["inwestycje", "investments"], ["inwestycji", "investments"], ["graczy", "players"], ["gracz", "player"], ["bossów", "bosses"], ["bossy", "bosses"], ["boss", "boss"], ["sesji", "sessions"], ["sesje", "sessions"], ["Sesja", "Session"], ["sesja", "session"], ["Sesja", "Session"], ["zleceń", "orders"], ["zlecenia", "orders"], ["zlecenie", "order"], ["zlec.", "orders"], ["szt.", "pcs"], ["trwa", "ongoing"], ["sprzedany", "sold"], ["wystawiony", "listed"], ["sprzedane", "sold"], ["wystawione", "listed"], ["Brak", "No"], ["brak", "no"], ["Wynik", "Result"], ["wynik", "result"], ["Koszt", "Cost"], ["koszt", "cost"], ["Drop", "Drop"], ["Czas", "Time"], ["czas", "time"], ["Kurs", "Rate"], ["kurs", "rate"], ["Razem", "Total"], ["Strategia", "Strategy"], ["strategia", "strategy"], ["Strata", "Loss"]]};
+      const DATA = {"plain": {"Path of Exile · farming tracker": "Path of Exile · farming tracker", "Kalkulator farmy": "Farming calculator", "Zapisuj runy, porównuj strategie i sprawdzaj, która zarabia najwięcej na godzinę.": "Log runs, compare strategies and see which one earns the most per hour.", "Policz, ile hajsu leży w stashu: chaosy, diviny, inne waluty i przedmioty z ich cenami.": "Work out how much wealth is in your stash: chaos, divines, other currencies and items with their prices.", "Eksportuj CSV": "Export CSV", "Wyczyść wszystkie dane": "Clear all data", "Farmienie i strategie": "Farming & strategies", "Stash · ile mam hajsu": "Stash · how much I have", "❓ Samouczek (tl;dr)": "❓ Tutorial (tl;dr)", "Kurs chaos / divine": "Chaos / divine rate", "Przelicznik i format": "Converter & format", "Kwoty przeliczane są do wspólnej wartości. Od jednego divine wyświetlamy div, poniżej — c.": "Amounts are converted to a common value. From one divine up we show div, below that c.", "Wliczaj losowe dropy do profitu i średnich": "Include random drops in profit and averages", "Długość serii (liczba runów)": "Series length (number of runs)", "Do kolumny „Szansa serii” w tabelach: szansa, że tyle runów pod rząd się zwróci.": "For the “Series chance” column in the tables: the chance that this many runs in a row pay off.", "Strategie": "Strategies", "Wybierz zakładkę, aby przełączyć dane i statystyki.": "Pick a tab to switch data and statistics.", "＋ Nowa strategia": "＋ New strategy", "Zmień typ": "Change type", "Zmień nazwę": "Rename", "Usuń tę strategię": "Delete this strategy", "Zmień nazwę strategii": "Rename strategy", "Zmieni się tylko nazwa tej strategii. Jej dane i pozostałe strategie pozostaną bez zmian.": "Only the name of this strategy changes. Its data and your other strategies stay untouched.", "Nazwa strategii": "Strategy name", "Anuluj": "Cancel", "Zapisz nazwę": "Save name", "Nowa strategia": "New strategy", "Wybierz strategię, którą już farmią znajomi, albo stwórz własną.": "Pick a strategy your friends already farm, or create your own.", "＋ Stwórz nową": "＋ Create new", "Typ strategii": "Strategy type", "Mapki / bossy": "Maps / bosses", "Invitation (pakiet bossów)": "Invitation (boss bundle)", "Szansa (losowa mapa)": "Chance (random map)", "Gambling": "Gambling", "Inwestycja": "Investment", "Nazwa nowej strategii": "New strategy name", "Podobne, które już istnieją": "Similar ones that already exist", "Wróć do listy": "Back to the list", "Utwórz strategię": "Create strategy", "Zmień typ strategii": "Change strategy type", "Z typu „Inwestycja” nie da się zmienić typu, bo ma inną strukturę danych (przedmioty, ceny, statusy). Utwórz nową strategię wybranego typu.": "The “Investment” type cannot be changed because it has a different data structure (items, prices, statuses). Create a new strategy of the type you want.", "Tak, zmień typ": "Yes, change type", "Importuj runy jako bossów": "Import runs as bosses", "Wybierz strategię i runy, które mają stać się bossami tego zestawu (czas, koszt i drop zostaną skopiowane).": "Pick a strategy and the runs that should become bosses of this bundle (time, cost and drop are copied).", "Strategia": "Strategy", "Usuń zaimportowane runy z tamtej strategii (przenieś)": "Remove imported runs from the other strategy (move them)", "Importuj": "Import", "Pokaż statystyki z": "Show stats from", "Wszystkie runy": "All runs", "Ostatnie 10": "Last 10", "W tej sesji": "This session", "Per sesja": "Per session", "Kurs w tej sesji (chaos / div)": "Rate in this session (chaos / div)", "Usuń sesję": "Delete session", "Zakończ sesję · zacznij nową": "End session · start new", "Runy": "Runs", "0 kompletnych runów": "0 complete runs", "Czas runu": "Run time", "Koszt": "Cost", "Wartość dropu": "Drop value", "Losowy drop": "Random drop", "Net profit": "Net profit", "Bossy": "Bosses", "Sesja": "Session", "Dodaj pierwszy run i wpisz czas, koszt oraz wartość dropu.": "Add your first run and enter the time, cost and drop value.", "＋ Dodaj run": "＋ Add run", "＋ 5 runów": "＋ 5 runs", "＋ Dodaj wpisaną liczbę": "＋ Add typed number", "Inwestycje": "Investments", "0 inwestycji": "0 investments", "Co skupujesz": "What you are buying", "Zamrożone": "Frozen", "Status": "Status", "Brak zleceń skupu. Dodaj zlecenie, jeśli masz pieniądze zamrożone w skupowaniu na rynku.": "No buy orders. Add one if you have money frozen in a market buy order.", "＋ Dodaj zlecenie skupu": "＋ Add buy order", "Zamrożone środki nie liczą się jeszcze jako wydatek. Gdy karty się skupią, kliknij „→ Inwestycja”.": "Frozen funds do not count as spending yet. Once the cards are bought, click “→ Investment”.", "Znajdź przedmiot na liście": "Find an item in the list", "Wpisz nazwę i/lub cenę albo wklej opis przedmiotu z gry (Ctrl+C na przedmiocie w grze, potem Ctrl+V poniżej). Gdy podasz nazwę i cenę, pokażą się tylko przedmioty pasujące do obu naraz.": "Type a name and/or price, or paste an item description from the game (Ctrl+C on the item in game, then Ctrl+V below). When you give both name and price, only items matching both are shown.", "Wyczyść": "Clear", "Pokaż przedmioty": "Show items", "Wszystkie": "All", "Tylko wystawione": "Listed only", "Tylko sprzedane": "Sold only", "Dodaj pierwszą inwestycję: wpisz, ile włożyłeś, i dopisz przedmioty, które wystawiasz.": "Add your first investment: enter how much you put in and add the items you list.", "＋ Dodaj inwestycję": "＋ Add investment", "Porównanie strategii": "Strategy comparison", "Zyskowność na podstawie Twoich runów i aktualnego kursu": "Profitability based on your runs and the current rate", "Śr. czas": "Avg time", "Czas łącznie": "Total time", "Śr. koszt": "Avg cost", "Śr. drop": "Avg drop", "Net / run": "Net / run", "Łączny wynik": "Total result", "Profit / h": "Profit / h", "Szansa 1 run": "1-run chance", "Min. runów": "Min. runs", "Dodaj kompletne runy, aby porównać strategie.": "Add complete runs to compare strategies.", "Typ": "Type", "Trafienia": "Hits", "Koszt łącznie": "Total cost", "Drop łącznie": "Total drop", "Wynik": "Result", "Śr. drop / run": "Avg drop / run", "Sprzedane": "Sold", "Zainwestowano": "Invested", "Wystawione": "Listed", "Sprzedane za": "Sold for", "Zysk zreal.": "Realized profit", "Zysk potenc.": "Potential profit", "Porównanie ze znajomymi": "Comparison with friends", "Łączenie…": "Connecting…", "Twój nick": "Your nickname", "Udostępniaj moje dane znajomym": "Share my data with friends", "Wartości przeliczone na chaosy. Przełącznik losowych dropów działa też tutaj.": "Values converted to chaos. The random drops switch works here too.", "Strategia / gracz": "Strategy / player", "Gracze": "Players", "Brak danych. Włącz udostępnianie i dodaj kompletne runy.": "No data. Turn on sharing and add complete runs.", "Udział graczy w wyniku": "Players’ share of the result", "Procenty": "Percent", "Divy / chaosy": "Divines / chaos", "Brak danych do wykresu. Włącz udostępnianie i dodaj kompletne runy.": "No data for the chart. Turn on sharing and add complete runs.", "↑ Wróć do wyszukiwarki": "↑ Back to search", "Kurs chaos / divine (tylko dla stasha)": "Chaos / divine rate (stash only)", "Jak to działa": "How it works", "Wyczyść stash": "Clear stash", "Chaos i divine": "Chaos and divine", "Chaos Orb (ilość)": "Chaos Orb (amount)", "Divine Orb (ilość)": "Divine Orb (amount)", "Inne waluty": "Other currencies", "Waluta": "Currency", "Ilość": "Amount", "Wartość 1 szt.": "Value of 1 pc", "Razem": "Total", "Dodaj walutę (np. Exalted Orb) i wpisz, ile jedna sztuka jest warta w chaosach lub divinach.": "Add a currency (e.g. Exalted Orb) and enter how much one piece is worth in chaos or divines.", "＋ Dodaj walutę": "＋ Add currency", "＋ 5 walut": "＋ 5 currencies", "Przedmioty": "Items", "Dodaj przedmiot z gry": "Add an item from the game", "Przedmiot": "Item", "Cena 1 szt.": "Price of 1 pc", "Dodaj przedmiot ręcznie albo wklej opis z gry powyżej.": "Add an item manually or paste a description from the game above.", "＋ Dodaj przedmiot": "＋ Add item", "＋ 5 przedmiotów": "＋ 5 items", "Sortuj od najcenniejszych": "Sort by most valuable", "Wstecz": "Back", "Dalej": "Next", "Dane zapisują się automatycznie w tej przeglądarce.": "Data is saved automatically in this browser.", "Widok": "View", "Krótki pokaz, co wyklikać": "A short demo of what to click", "Język / Language": "Język / Language", "Kurs walut": "Exchange rate", "Wybierz strategię": "Choose a strategy", "np. Legion": "e.g. Legion", "Zakres danych i sesje": "Data scope and sessions", "Zakres statystyk": "Stats scope", "puste = kurs z ustawień": "empty = rate from settings", "Podsumowanie strategii": "Strategy summary", "Runy wybranej strategii": "Runs of the selected strategy", "Akcje": "Actions", "Ile runów dodać": "How many runs to add", "Inwestycje wybranej strategii": "Investments of the selected strategy", "Nazwa, np. Quicksilver Flask": "Name, e.g. Quicksilver Flask", "Cena, np. 18c lub 2 div": "Price, e.g. 18c or 2 div", "Wklej tutaj cały opis przedmiotu skopiowany w grze…": "Paste the whole item description copied in the game here…", "Filtr przedmiotów": "Item filter", "np. xXx_Chris_Kisser_xXx": "e.g. xXx_Chris_Kisser_xXx", "Sposób wyświetlania": "Display mode", "Kurs w stashu": "Stash rate", "Podsumowanie stasha": "Stash summary", "np. 1250 albo 500+750": "e.g. 1250 or 500+750", "np. 14 albo 10+4": "e.g. 14 or 10+4", "Usuń": "Delete", "Ile walut dodać": "How many currencies to add", "Ctrl+C na przedmiocie w grze, potem Ctrl+V tutaj. Doda się nowy wiersz z nazwą i ceną (z notatki ~b/o), a taki sam przedmiot zwiększy ilość.": "Ctrl+C an item in the game, then Ctrl+V here. A new row with name and price (from the ~b/o note) is added; an identical item increases the amount.", "Ile przedmiotów dodać": "How many items to add", "Samouczek": "Tutorial", "Zamknij": "Close", "Najlepszy profit na godzinę": "Best profit per hour", "Najlepszy": "Best", "Dodaj kompletne runy": "Add complete runs", "Wynik pojawi się po uzupełnieniu czasu, kosztu i dropu.": "The result appears once time, cost and drop are filled in.", "Dodaj runy z kosztem": "Add runs with a cost", "ROI wymaga kompletnego runu z kosztem większym od zera.": "ROI needs a complete run with a cost above zero.", "Brak kompletnych runów": "No complete runs", "Inwestycja · brak przedmiotów": "Investment · no items", "Średni czas runu": "Average run time", "Średni koszt runu": "Average run cost", "Średnia wartość dropu": "Average drop value", "Średni net profit / run": "Average net profit / run", "Profit na godzinę": "Profit per hour", "Łączny wynik strategii": "Strategy total result", "Losowe dropy (łącznie)": "Random drops (total)", "Śr. losowy drop / run": "Avg random drop / run", "Wartość wystawiona": "Listed value", "Czeka na sprzedaż": "Waiting to sell", "Zysk zrealizowany": "Realized profit", "Zysk potencjalny": "Potential profit", "Zwrot kosztów": "Cost recovery", "ROI potencjalne": "Potential ROI", "Zamrożone środki": "Frozen funds", "Śr. zarobek / sprzedaną szt.": "Avg earnings / sold pc", "Śr. zysk / inwestycję (zreal.)": "Avg profit / investment (real.)", "Śr. zysk / inwestycję (potenc.)": "Avg profit / investment (pot.)", "Runy łącznie": "Runs total", "Trafienia (coś padło)": "Hits (something dropped)", "Szansa na drop": "Drop chance", "Łączny drop": "Total drop", "Najlepszy drop": "Best drop", "Śr. drop, gdy coś padło": "Avg drop when something dropped", "Łączny wynik (drop − koszt)": "Total result (drop − cost)", "Wydane łącznie": "Spent in total", "Śr. wynik / run": "Avg result / run", "Szansa serii": "Series chance", "Czas farmienia": "Farming time", "Czas strategii łącznie": "Strategy total time", "Liczba sesji": "Number of sessions", "Czas farmienia · ": "Farming time · ", "Runy · ": "Runs · ", "Statystyka": "Statistic", "Ta sesja": "This session", "Poprzednia": "Previous", "Różnica": "Difference", "Średnia z poprzednich": "Average of previous", "Ta sesja kontra wcześniejsze": "This session vs earlier ones", "Wszystkie sesje": "All sessions", "Podsumowanie inwestycji": "Investments summary", "Czeka": "Waiting", "Średnio na inwestycję": "Average per investment", "Kurs c/div": "Rate c/div", "Śr. / sprzedaną szt.": "Avg / sold pc", "Śr. czas runu": "Avg run time", "Śr. koszt runu": "Avg run cost", "Runy w sesji": "Runs in session", "Czas walki w Invitation": "Fight time in Invitation", "Koszt walki": "Fight cost", "Drop z walki": "Fight drop", "Koszt (opcjonalnie)": "Cost (optional)", "Koszt (za co kupiłeś)": "Cost (what you paid)", "Bossy / mapy tego zestawu": "Bosses / maps of this bundle", "Wpisz tu każdego bossa odpalonego na osobnej mapie (czas, koszt mapy, drop). Walka w Invitation to wiersz wyżej.": "Enter each boss launched on a separate map here (time, map cost, drop). The Invitation fight is the row above.", "Boss / mapa": "Boss / map", "Czas": "Time", "＋ Dodaj bossa": "＋ Add boss", "＋ 4 bossy": "＋ 4 bosses", "⇩ Importuj z istniejącej strategii": "⇩ Import from an existing strategy", "dodaj bossy": "add bosses", "Przenieś run do innej sesji": "Move run to another session", "Zacznij nową sesję od tego runu (ten i kolejne runy trafią do nowej sesji)": "Start a new session from this run (this and the following runs go to the new session)", "Usuń run": "Delete run", "Usuń bossa": "Delete boss", "Usuń przedmiot": "Delete item", "Usuń inwestycję": "Delete investment", "Usuń zlecenie": "Delete order", "Usuń wiersz": "Delete row", "Nowa inwestycja": "New investment", "Dodano": "Added", "Wystawiono za": "Listed for", "Sprzedano za": "Sold for", "Wystawiony": "Listed", "Sprzedany": "Sold", "Czeka (zamrożone)": "Waiting (frozen)", "Skupione": "Bought", "Wycofane": "Withdrawn", "→ Inwestycja": "→ Investment", "Zamień w inwestycję o tym koszcie (gdy karty są już skupione)": "Turn into an investment with this cost (when the cards are bought)", "To zlecenie już zamieniono w inwestycję": "This order was already turned into an investment", "Nic nie jest teraz zamrożone": "Nothing is frozen right now", "✓ Sprzedany": "✓ Sold", "↩ Wystawiony": "↩ Listed", "Oznacz jako sprzedany (bez przenoszenia)": "Mark as sold (without jumping)", "Cofnij: oznacz jako wystawiony": "Undo: mark as listed", "Podobne": "Similar", "Wybierz nowy typ.": "Pick a new type.", "Wynik na zero": "Break-even", "Strata": "Loss", "Poza wykresem · bez zysku": "Outside the chart · no profit", "Razem w stashu": "Total in stash", "całości": "of total", "Brak dostępu do bazy (sprawdź reguły)": "No access to the database (check the rules)", "Błąd połączenia z Firebase": "Firebase connection error", "Firebase nieskonfigurowany": "Firebase not configured", "Nie udało się wysłać danych": "Could not send data", "Nie udało się usunąć danych": "Could not delete data", "Wpisz nick, aby udostępniać dane": "Enter a nickname to share data", "Wpisz nazwę strategii.": "Enter a strategy name.", "Taką strategię już masz.": "You already have that strategy.", "Taka nazwa jest już używana. Wybierz inną, żeby łatwiej odróżniać strategie.": "That name is already used. Pick another one to tell strategies apart more easily.", "Podaj kurs większy od zera, np. 155.": "Enter a rate above zero, e.g. 155.", "Nie ma jeszcze strategii od znajomych (albo masz już wszystkie). Stwórz własną.": "There are no strategies from friends yet (or you already have them all). Create your own.", "Nie ma takiej strategii — możesz utworzyć nową.": "No such strategy — you can create a new one.", "Zacznij pisać — pokażemy podobne strategie, które już istnieją.": "Start typing — we will show similar strategies that already exist.", "Nie ma na liście takiego przedmiotu.": "No such item in the list.", "Nie ma takiego przedmiotu na liście.": "No such item in the list.", "Nie rozpoznałem nazwy przedmiotu.": "I could not recognize the item name.", "Nie ma innych strategii z runami do zaimportowania.": "There are no other strategies with runs to import.", "Dodaj przynajmniej jeden run przed eksportem.": "Add at least one run before exporting.", "Dodaj przynajmniej jeden przedmiot przed eksportem.": "Add at least one item before exporting.", "Obecna sesja nie ma jeszcze żadnych runów. Dodaj je, zanim zaczniesz nową.": "The current session has no runs yet. Add some before starting a new one.", "Run przeniesiony do wybranej sesji.": "Run moved to the selected session.", "Ten run jest pierwszy w sesji, więc nie ma czego dzielić. Kliknij ✂ przy runie, od którego ma zacząć się nowa sesja.": "This run is the first in its session, so there is nothing to split. Click ✂ on the run that should start the new session.", "Zapisano automatycznie w tej przeglądarce.": "Saved automatically in this browser.", "Stash zapisany automatycznie w tej przeglądarce.": "Stash saved automatically in this browser.", "Nie udało się zapisać danych w przeglądarce.": "Could not save data in the browser.", "Nie udało się zapisać stasha w przeglądarce.": "Could not save the stash in the browser.", "Nie udało się odczytać zapisanych danych.": "Could not read the saved data.", "Nowa nazwa sesji:": "New session name:", "Usunąć wszystkie strategie, runy i ustawienia?": "Delete all strategies, runs and settings?", "Usunąć tę inwestycję wraz ze wszystkimi przedmiotami?": "Delete this investment together with all its items?", "Wyczyścić cały stash (waluty, przedmioty i kurs)?": "Clear the whole stash (currencies, items and rate)?", "Twoje runy i sesje (z kursami) zostają.": "Your runs and sessions (with their rates) stay.", "Czas runów zostanie ukryty (dane zostają i wrócą, jeśli zmienisz typ z powrotem).": "Run times will be hidden (the data stays and returns if you switch the type back).", "Każdy run zostanie zestawem bez bossów. Bossów dodasz ręcznie albo zaimportujesz z innej strategii.": "Every run becomes a bundle without bosses. You can add bosses manually or import them from another strategy.", "Pusty koszt będzie liczony jako 0c, a run liczy się, gdy wpiszesz wartość dropu (np. 0c).": "An empty cost counts as 0c, and a run counts once you enter a drop value (e.g. 0c).", "Latasz mapki lub bossy: wpisujesz czas, koszt i drop, a wynik to profit na godzinę.": "You run maps or bosses: enter time, cost and drop; the result is profit per hour.", "Kilka bossów odpalanych na osobnych mapach, a potem walka w Invitation (np. od Mavena): koszt bossów i drop z całego zestawu liczą się razem, czas też.": "Several bosses launched on separate maps, then the fight in an Invitation (e.g. from Maven): boss costs and the whole bundle’s drop count together, and so does time.", "Coś trafiło się samo na mapie: koszt zwykle 0, czas nieważny. Liczy się, jak często coś oddaje (szansa na drop).": "Something showed up on a map on its own: cost is usually 0 and time does not matter. What counts is how often it gives something back (drop chance).", "Kupujesz karty lub inne losowe rzeczy: wpisujesz koszt i wartość dropu. Czas nieważny, liczy się, czy się zwraca.": "You buy cards or other random things: enter the cost and drop value. Time does not matter; what counts is whether it pays off.", "Kupujesz, przerabiasz i sprzedajesz przedmioty: wpisujesz koszt oraz ceny i statusy przedmiotów, a wynik to zysk i ROI (bez godzin).": "You buy, craft and sell items: enter the cost plus item prices and statuses; the result is profit and ROI (no hours).", "wpisz 0c, jeśli nic nie padło": "enter 0c if nothing dropped", "puste = 0c": "empty = 0c", "np. 10c, 2+3 lub 1 div": "e.g. 10c, 2+3 or 1 div", "np. 10c + 1 div": "e.g. 10c + 1 div", "opcjonalnie, np. 2 div": "optional, e.g. 2 div", "np. 4:30": "e.g. 4:30", "np. 45c lub 2 div": "e.g. 45c or 2 div", "puste = cena wystawienia": "empty = listing price", "np. 20*22c lub 440c": "e.g. 20*22c or 440c", "np. 440c lub 20*22c": "e.g. 440c or 20*22c", "np. 2+2": "e.g. 2+2", "np. Boss z mapy Zealot's Vault": "e.g. Boss from Zealot's Vault", "koszt mapy, np. 13c": "map cost, e.g. 13c", "drop, np. 0c": "drop, e.g. 0c", "losowy (opc.)": "random (opt.)", "np. 1:00": "e.g. 1:00", "np. Exalted Orb": "e.g. Exalted Orb", "np. Constant Quicksilver Flask of the Cheetah": "e.g. Constant Quicksilver Flask of the Cheetah", "np. 12c lub 0,1 div": "e.g. 12c or 0.1 div", "np. 20× The Shortcut po 22c (zlecenie skupu)": "e.g. 20× The Shortcut at 22c (buy order)", "np. Quicksilver Flask (MS) · albo wklej opis z gry (Ctrl+V)": "e.g. Quicksilver Flask (MS) · or paste a description from the game (Ctrl+V)", "np. 20× The Shortcut → flaszki 100 lvl z movement speed": "e.g. 20× The Shortcut → lvl 100 flasks with movement speed", "Data dodania": "Date added", "Mało danych": "Little data", "Ten run": "This run", "Nowy run": "New run", "Wpisz dane runu": "Enter the run data", "Wyniki": "Results", "Zakładki strategii": "Strategy tabs", "Zmiana typu": "Change type", "Kurs divine w tej sesji": "Divine rate for this session", "Wzrost": "Growth", "Anonim": "Anonymous", "Bez nazwy": "Untitled", "bez nazwy": "untitled", "Strategia 1": "Strategy 1", "Strategie inwestycyjne (kliknij nazwę, aby zobaczyć graczy)": "Investment strategies (click a name to see the players)", "Build · wycena": "Build · valuation", "Wklej przedmioty z gry, przypisz je do slotów i zobacz, ile kosztował cały build i co było najdroższe.": "Paste items from the game, assign them to slots and see what the whole build cost and what was the most expensive.", "Kurs chaos / divine (tylko dla buildu)": "Chaos / divine rate (build only)", "Kliknij slot (albo „＋” przy jewelach), potem zrób Ctrl+C na przedmiocie w grze i Ctrl+V na tej zakładce. Nazwa i cena (z notatki ~b/o) wpiszą się same. Gdy ceny nie ma, wpisz w tabeli, ile przedmiot kosztował. Zrzut ekranu przedmiotu wklejony po wybraniu slotu stanie się jego ikonką, a po najechaniu zobaczysz statystyki przedmiotu.": "Click a slot (or “＋” next to jewels), then Ctrl+C an item in the game and Ctrl+V on this tab. The name and price (from the ~b/o note) fill in automatically. If there is no price, enter in the table what the item cost. A screenshot of the item pasted after selecting a slot becomes its icon, and on hover you see the item’s stats.", "Wyczyść build": "Clear build", "Kurs w buildzie": "Build rate", "Podsumowanie buildu": "Build summary", "Ekwipunek": "Equipment", "Wklej przedmiot (Ctrl+V)": "Paste item (Ctrl+V)", "Ctrl+C na przedmiocie w grze, potem Ctrl+V tutaj albo gdziekolwiek na tej zakładce. Zrzut ekranu (obrazek) wklejony po wybraniu slotu zostaje jego ikonką.": "Ctrl+C an item in the game, then Ctrl+V here or anywhere on this tab. A screenshot (image) pasted after selecting a slot becomes its icon.", "Zestaw broni": "Weapon set", "Lista kosztów": "Cost list", "Ile kosztował każdy przedmiot": "What each item cost", "Ikona": "Icon", "Slot": "Slot", "Cena (ile kosztował)": "Price (what it cost)", "Udział": "Share", "Brak przedmiotów. Wklej pierwszy przedmiot (Ctrl+V).": "No items. Paste your first item (Ctrl+V).", "Sortuj od najdroższych": "Sort by most expensive", "Wykres kosztów": "Cost chart", "Co było najdroższe": "What was the most expensive", "Wykres pojawi się, gdy przedmioty będą miały ceny.": "The chart appears once items have prices.", "Broń (lewa ręka)": "Weapon (left hand)", "Broń (prawa ręka)": "Weapon (right hand)", "Hełm": "Helmet", "Zbroja": "Body armour", "Pierścień 1": "Ring 1", "Pierścień 2": "Ring 2", "Rękawice": "Gloves", "Pas": "Belt", "Buty": "Boots", "Flaszka 1": "Flask 1", "Flaszka 2": "Flask 2", "Flaszka 3": "Flask 3", "Flaszka 4": "Flask 4", "Flaszka 5": "Flask 5", "Inne": "Other", "Broń I (lewa ręka)": "Weapon I (left hand)", "Broń I (prawa ręka)": "Weapon I (right hand)", "Broń II (lewa ręka)": "Weapon II (left hand)", "Broń II (prawa ręka)": "Weapon II (right hand)", "Nie wybrano slotu: slot dobierze się z typu przedmiotu": "No slot selected: the slot is picked from the item type", "Łączny koszt buildu": "Total build cost", "Bez ceny": "No price", "uzupełnij w tabeli": "fill in the table", "Najdroższy": "Most expensive", "Średnio na przedmiot": "Average per item", "z przedmiotów z ceną": "from items with a price", "Nie rozpoznałem przedmiotu. Skopiuj go w grze (Ctrl+C na przedmiocie) i wklej cały opis.": "I did not recognize an item. Copy it in the game (Ctrl+C on the item) and paste the whole description.", "Najpierw kliknij slot (albo przedmiot), dla którego jest ten obrazek, i dopiero wklej zrzut ekranu.": "First click the slot (or item) this image is for, then paste the screenshot.", "Nie udało się wczytać obrazka.": "Could not load the image.", "Build zapisany automatycznie w tej przeglądarce.": "Build saved automatically in this browser.", "Nie udało się zapisać buildu w przeglądarce (za dużo obrazków?).": "Could not save the build in the browser (too many images?).", "Wyczyścić cały build (przedmioty, ikonki i kurs)?": "Clear the whole build (items, icons and rate)?", "(bez nazwy)": "(untitled)", "ile kosztował, np. 42 div": "what it cost, e.g. 42 div", "Usuń ikonkę": "Remove icon", "Cena przedmiotu": "Item price"}, "html": {"Wybrana strategia:<strong id=\"active-strategy-name\"></strong>": "Selected strategy:<strong id=\"active-strategy-name\"></strong>", "<span class=\"term\" data-term=\"session\">Sesja</span> pokazana w tabeli runów": "<span class=\"term\" data-term=\"session\">Session</span> shown in the runs table", "Czas: <strong>mm:ss</strong> lub sekundy. Kwoty możesz wpisać jako działanie (<strong>+ − * /</strong> i nawiasy), np. <strong>12c + 3 div</strong>, <strong>2+4c+5</strong>, <strong>4+2+6div</strong> albo <strong>(10+5)*2c</strong>. Liczby bez jednostki to chaosy (a jeśli w działaniu jest tylko div, to divy). Po wyjściu z pola zapis się uporządkuje, a po kliknięciu w pole zobaczysz i poprawisz oryginał.<br>Net profit = drop − koszt. Liczą się tylko kompletne runy. Enter przechodzi do pola niżej.<br>Listą „Sesja” przeniesiesz pojedynczy run, a <strong>✂</strong> przy runie zaczyna od niego nową sesję (ten i kolejne runy przechodzą do niej). Czas farmienia sumuje się ze wszystkich runów z wpisanym czasem.": "Time: <strong>mm:ss</strong> or seconds. You can type amounts as a calculation (<strong>+ − * /</strong> and parentheses), e.g. <strong>12c + 3 div</strong>, <strong>2+4c+5</strong>, <strong>4+2+6div</strong> or <strong>(10+5)*2c</strong>. Numbers without a unit are chaos (and if the calculation only has div, they are divines). After you leave a field the entry is tidied up; click the field to see and fix what you typed.<br>Net profit = drop − cost. Only complete runs count. Enter moves to the field below.<br>Use the “Session” list to move a single run, and <strong>✂</strong> on a run starts a new session from it (this and the following runs move there). Farming time is summed from all runs that have a time entered.", "Zlecenia skupu · <span class=\"term\" data-term=\"frozen\">zamrożone środki</span>": "Buy orders · <span class=\"term\" data-term=\"frozen\">frozen funds</span>", "W „Zainwestowano” możesz wpisać np. <strong>20*22c</strong> (20 sztuk po 22c). Ceny też mogą być działaniami, np. <strong>18c + 2 div</strong>. Cenę możesz poprawiać, gdy zmieni się rynek, a po sprzedaży ustaw status i (jeśli sprzedałeś taniej lub drożej) wpisz prawdziwą cenę. Przy inwestycjach nie liczymy profitu na godzinę, tylko zysk i ROI.": "In “Invested” you can type e.g. <strong>20*22c</strong> (20 pieces at 22c). Prices can be calculations too, e.g. <strong>18c + 2 div</strong>. You can edit a price when the market changes, and after selling set the status and (if you sold for less or more) enter the real price. For investments we do not calculate profit per hour, only profit and ROI.", "Strategie posortowane według <strong>profitu na godzinę</strong>, od najwyższego.": "Strategies sorted by <strong>profit per hour</strong>, highest first.", "<span class=\"term\" data-term=\"roi\">ROI</span> = średni net profit ÷ średni koszt runu.": "<span class=\"term\" data-term=\"roi\">ROI</span> = average net profit ÷ average run cost.", "Szansa serii: <span class=\"series-n\">10</span>": "Series chance: <span class=\"series-n\">10</span>", "Szansa i gambling <small>(czas nieważny: liczy się, czy coś oddaje i czy się zwraca)</small>": "Chance & gambling <small>(time does not matter: what counts is whether something drops and whether it pays off)</small>", "Strategie inwestycyjne <small>(bez profitu na godzinę: liczy się zysk i ROI)</small>": "Investment strategies <small>(no profit per hour: profit and ROI count)</small>", "<span class=\"term\" data-term=\"roi\">ROI</span> potenc.": "<span class=\"term\" data-term=\"roi\">ROI</span> pot.", "Strategie łączone po nazwie (bez względu na wielkość liter), posortowane według <strong>profitu na godzinę</strong>. Kliknij nazwę strategii, aby zobaczyć graczy.": "Strategies are merged by name (case-insensitive), sorted by <strong>profit per hour</strong>. Click a strategy name to see the players.", "Wpisz chaosy, diviny, inne waluty (ile jedna sztuka jest warta) i przedmioty (ile chodzą na rynku). Ilości i wartości możesz wpisywać jako działania (<strong>+ − * /</strong> i nawiasy), np. <strong>2+2</strong>, <strong>500+750</strong>, <strong>(10+5)*2</strong> albo <strong>12c + 3 div</strong>. Po wyjściu z pola zostaje wynik, a po kliknięciu wraca to, co wpisano. Kurs jest osobny od kursu w zakładce farmienia.": "Enter chaos, divines, other currencies (how much one piece is worth) and items (what they sell for on the market). Amounts and values can be calculations (<strong>+ − * /</strong> and parentheses), e.g. <strong>2+2</strong>, <strong>500+750</strong>, <strong>(10+5)*2</strong> or <strong>12c + 3 div</strong>. After you leave a field the result stays; click it and what you typed returns. The rate is separate from the farming tab’s rate.", "Wartość 1 szt. to np. <strong>12c</strong> albo <strong>0,1 div</strong>. Podpowiedzi nazw pojawiają się po wpisaniu pierwszych liter.": "Value of 1 pc is e.g. <strong>12c</strong> or <strong>0,1 div</strong>. Name suggestions appear after you type the first letters.", "Cenę wpisz taką, za jaką przedmiot chodzi na rynku albo ile jest warty (np. <strong>45c</strong>, <strong>2 div</strong>). Ctrl+V opisu przedmiotu w polu nazwy lub ceny też wypełni wiersz.": "Enter the price the item sells for on the market or what it is worth (e.g. <strong>45c</strong>, <strong>2 div</strong>). Ctrl+V of an item description in the name or price field also fills the row.", "Strategie inwestycyjne (kliknij nazwę, aby zobaczyć graczy)": "Investment strategies (click a name to see the players)", "Cenę możesz wpisać jako działanie, np. <strong>42 div</strong>, <strong>30+12 div</strong> albo <strong>250c</strong>.": "You can enter the price as a calculation, e.g. <strong>42 div</strong>, <strong>30+12 div</strong> or <strong>250c</strong>."}, "rules": [["^Wybrany slot: (.+)$", "Selected slot: $1"], ["^Wybrany: (.+)$", "Selected: $1"], ["^(\\d+) z ceną$", "$1 with a price"], ["^(\\d+) (?:przedmiot|przedmioty|przedmiotów)$", "$1 items"], ["^Wklejono „(.+)” do slotu: (.+?)\\. Cena z notatki: (.+)\\.$", "Pasted “$1” into slot: $2. Price from the note: $3."], ["^Wklejono „(.+)” do slotu: (.+?)\\. Cena w walucie „(.+)” \\(obsługuję chaos i divine\\), wpisz ją w tabeli\\.$", "Pasted “$1” into slot: $2. The price is in the currency “$3” (I support chaos and divine); enter it in the table."], ["^Wklejono „(.+)” do slotu: (.+?)\\. W opisie nie było ceny \\(brak notatki ~b/o\\), wpisz w tabeli, ile kosztował\\.$", "Pasted “$1” into slot: $2. The description had no price (no ~b/o note); enter in the table what it cost."], ["^Ikonka ustawiona \\((.+)\\)\\.$", "Icon set ($1)."], ["^Cena: (.+)$", "Price: $1"], ["^Pozostałe \\((\\d+)\\)$", "Others ($1)"], ["^Wartość 1 szt\\. (\\d+)$", "Value of 1 pc $1"], ["^Mało danych \\((\\d+) (?:run|runy|runów)\\) — wynik orientacyjny$", "Little data ($1 runs) — rough result"], ["^1 pozycja · (.+)$", "1 entry · $1"], ["^1 run · (.+)$", "1 run · $1"], ["^(\\d+) runów? · (.+)$", "$1 runs · $2"], ["^(\\d+) runy · (.+)$", "$1 runs · $2"], ["^Inwestycja · (\\d+) (?:przedmiot|przedmioty|przedmiotów) · (.+)$", "Investment · $1 items · $2"], ["^(\\d+) z (\\d+) (?:runu|runów) kompletnych$", "$1 of $2 runs complete"], ["^(\\d+) kompletnych runów$", "$1 complete runs"], ["^Statystyki ze wszystkich (\\d+) kompletnych runów\\.$", "Stats from all $1 complete runs."], ["^Statystyki z ostatnich (\\d+) (?:runu|runów) \\(z (\\d+) kompletnych\\)\\.$", "Stats from the last $1 runs (out of $2 complete)."], ["^Statystyki z sesji „(.*)” \\((\\d+) [^)]*\\)\\.$", "Stats from the session “$1” ($2 complete runs)."], ["^Karty u góry liczą wszystkie (\\d+) kompletnych runów\\. Porównanie sesji jest poniżej\\.$", "The cards at the top count all $1 complete runs. The session comparison is below."], ["^Runy · (.*)$", "Runs · $1"], ["^Mapki i bossy · liczone z: (.+) każdej strategii$", "Maps & bosses · calculated from: $1 of each strategy"], ["^Połączono · graczy: (\\d+)$", "Connected · players: $1"], ["^(\\d+) (?:pozycja|pozycje|pozycji) · (.+)$", "$1 entries · $2"], ["^(.+) (?:szt\\.) · (.+)% całości$", "$1 pcs · $2% of total"], ["^(.+)% całości$", "$1% of total"], ["^Zamrożone teraz: (.+) \\((\\d+) [^)]*\\)$", "Frozen now: $1 ($2 orders)"], ["^Wartość: (.+)$", "Value: $1"], ["^było: (.+)$", "was: $1"], ["^Podzielono: „(.+)” zaczyna się od runu (\\d+) dotychczasowej sesji\\.$", "Split: “$1” starts from run $2 of the previous session."], ["^Wklejono: „(.+)” za (.+)\\.$", "Pasted: “$1” for $2."], ["^Wklejono nazwę „(.+)”\\. W opisie nie było ceny \\(brak notatki ~b/o\\), więc wpisz ją ręcznie\\.$", "Pasted the name “$1”. The description had no price (no ~b/o note), so enter it manually."], ["^Wklejono nazwę „(.+)”\\. Cena w walucie „(.+)” \\(obsługuję chaos i divine\\), więc wpisz ją ręcznie\\.$", "Pasted the name “$1”. The price is in the currency “$2” (I support chaos and divine), so enter it manually."], ["^Dodano: „(.+)” za (.+)\\.(.*)$", "Added: “$1” for $2.$3"], ["^Dodano: „(.+)”\\.(.*)$", "Added: “$1”.$2"], ["^„(.+)” już był na liście, więc zwiększyłem ilość do (.+)\\.$", "“$1” was already on the list, so I increased the amount to $2."], ["^W opisie nie było ceny \\(brak notatki ~b/o\\), wpisz ją w wierszu\\.$", "The description had no price (no ~b/o note); enter it in the row."], ["^Rozpoznano: (.+)$", "Recognized: $1"], ["^„(.+)” oznaczono jako (sprzedany|wystawiony)\\.$", "“$1” marked as $2."], ["^Pasuje (\\d+) [^ ]+ \\(zielone: wystawione, niebieskie: sprzedane\\):$", "$1 matching (green: listed, blue: sold):"], ["^Pasują (\\d+) [^ ]+ \\(zielone: wystawione, niebieskie: sprzedane\\):$", "$1 matching (green: listed, blue: sold):"], ["^…i (\\d+) kolejnych \\(są podświetlone na liście\\)\\.$", "…and $1 more (highlighted in the list)."], ["^Nie ma przedmiotu o takiej nazwie i cenie\\.(?: Z samą nazwą (?:pasuje|pasują) (\\d+) [^ ]+, ale w innej cenie\\.)?$", "No item with that name and price.$1"], ["^Zaimportowano (\\d+) [^ ]+ jako bossy zestawu(.*)\\.$", "Imported $1 runs as bundle bosses$2."], ["^Zmieniono typ strategii „(.+)” na: (.+)\\.$", "Changed the type of strategy “$1” to: $2."], ["^Strategia „(.+)” ma teraz typ: (.+)\\.$", "Strategy “$1” currently has the type: $2."], ["^Co się stanie po zmianie na „(.+)”:$", "What will happen after changing to “$1”:"], ["^(\\d+) (?:run nie ma|runy nie mają|runów nie ma) wpisanego czasu, więc [^ ]+ niekompletne, dopóki go nie uzupełnisz\\.$", "$1 runs have no time entered, so they will be incomplete until you fill it in."], ["^(\\d+) (?:boss zostanie doliczony|bossy zostaną doliczone|bossów zostanie doliczonych) do swoich runów \\(czas, koszt i drop się zsumują, wartości w chaosach\\), a lista bossów zniknie\\.$", "$1 bosses will be added to their runs (time, cost and drop add up, values in chaos) and the boss list will disappear."], ["^Usunąć pustą sesję „(.+)”\\?$", "Delete the empty session “$1”?"], ["^Usunąć „(.+)”\\? Jej (\\d+) [^ ]+ przeniosę do „(.+)”\\.$", "Delete “$1”? I will move its $2 runs to “$3”."], ["^Usunąć strategię „(.+)” wraz ze wszystkimi jej danymi\\?$", "Delete the strategy “$1” together with all its data?"], ["^Zakończyć „(.+)” i zacząć nową\\? Nowe runy będą trafiać do nowej sesji, a stare zostaną w historii\\.$", "End “$1” and start a new one? New runs will go to the new session and the old ones stay in history."], ["^Ta sesja nie ma jeszcze kompletnych runów\\. Dodaj je, a pojawi się porównanie z poprzednimi sesjami\\.$", "This session has no complete runs yet. Add some and a comparison with previous sessions will appear."], ["^Nie ma jeszcze wcześniejszej sesji z kompletnymi runami\\. Kliknij „Zakończ sesję · zacznij nową”, a potem porównasz je tutaj\\.$", "There is no earlier session with complete runs yet. Click “End session · start new” and you can compare them here."], ["^Zielone = lepiej niż porównywana sesja, czerwone = gorzej(?: \\(dla czasu runu krótszy jest lepszy\\))?\\.$", "Green = better than the compared session, red = worse (a shorter run time is better)."], ["^Obwódka z lewej oznacza najlepszą sesję pod względem (.+)\\.$", "The left border marks the best session by $1."], ["^Wpisz, ile chaosów kosztuje 1 divine w tej sesji(.*)$", "Type how many chaos 1 divine costs in this session$1"], ["^Zamrożone środki$", "Frozen funds"], ["^Łączenie…$", "Connecting…"]], "phrases": [["najdroższy", "most expensive"], ["Broń I (lewa ręka)", "Weapon I (left hand)"], ["Broń I (prawa ręka)", "Weapon I (right hand)"], ["Broń II (lewa ręka)", "Weapon II (left hand)"], ["Broń II (prawa ręka)", "Weapon II (right hand)"], ["Hełm", "Helmet"], ["Pierścień 1", "Ring 1"], ["Flaszka 1", "Flask 1"], ["Cluster jewels", "Cluster jewels"], ["Czas farmienia", "Farming time"], ["nigdy", "never"], ["potencjalne", "potential"], ["re:\\(1 zlec\\.\\)", "(1 order)"], ["re:(?<![\\d.,])1 szt\\.", "1 pc"], ["re:(?<![\\d.,])1 szt\\.", "1 pc"], ["Invitation (pakiet bossów)", "Invitation (boss bundle)"], ["Szansa (losowa mapa)", "Chance (random map)"], ["Mapki / bossy", "Maps / bosses"], ["Inwestycja", "Investment"], ["całości", "of total"], ["było", "was"], ["Czas runu", "Run time"], ["Koszt runu", "Run cost"], ["Wartość dropu runu", "Drop value of run"], ["Losowy drop runu", "Random drop of run"], ["Zacznij nową sesję od runu", "Start a new session from run"], ["Usuń run", "Delete run"], ["Usuń wiersz", "Delete row"], ["Wartość 1 szt.", "Value of 1 pc"], ["Ilość", "Amount"], ["Sesja runu", "Session of run"], ["Cena wystawienia przedmiotu", "Listing price of item"], ["Cena sprzedaży przedmiotu", "Sale price of item"], ["Koszt inwestycji", "Investment cost"], ["Usuń inwestycję", "Delete investment"], ["Usuń przedmiot", "Delete item"], ["Usuń zlecenie", "Delete order"], ["Zamrożone środki zlecenia", "Frozen funds of order"], ["Opis zlecenia", "Description of order"], ["Status zlecenia", "Status of order"], ["Status przedmiotu", "Status of item"], ["Nazwa przedmiotu", "Name of item"], ["Czas bossa", "Time of boss"], ["Koszt bossa", "Cost of boss"], ["Drop z bossa", "Drop from boss"], ["Losowy drop z bossa", "Random drop from boss"], ["Usuń bossa", "Delete boss"], ["Nazwa bossa", "Name of boss"], ["Ile bossów dodać", "How many bosses to add"], ["Nazwa", "Name"], ["Cena", "Price"], ["wystawienia", "listing"], ["re:(\\d+) z (\\d+)", "$1 of $2"], ["mapki / bossy", "maps / bosses"], ["invitation (pakiet bossów)", "invitation (boss bundle)"], ["szansa (losowa mapa)", "chance (random map)"], ["inwestycja", "investment"], ["gambling", "gambling"], ["profitu na godzinę", "profit per hour"], ["średniego wyniku na run", "average result per run"], ["wszystkich runów (tabela sesji niżej)", "all runs (session table below)"], ["wszystkich runów", "all runs"], ["ostatnich 10 runów", "the last 10 runs"], ["tej sesji", "this session"], ["z ustawień", "from settings"], ["kompletnych", "complete"], ["runów", "runs"], ["runy", "runs"], ["runu", "run"], ["run", "run"], ["przedmiotów", "items"], ["przedmioty", "items"], ["przedmiot", "item"], ["inwestycje", "investments"], ["inwestycji", "investments"], ["graczy", "players"], ["gracz", "player"], ["bossów", "bosses"], ["bossy", "bosses"], ["boss", "boss"], ["sesji", "sessions"], ["sesje", "sessions"], ["Sesja", "Session"], ["sesja", "session"], ["Sesja", "Session"], ["zleceń", "orders"], ["zlecenia", "orders"], ["zlecenie", "order"], ["zlec.", "orders"], ["szt.", "pcs"], ["trwa", "ongoing"], ["sprzedany", "sold"], ["wystawiony", "listed"], ["sprzedane", "sold"], ["wystawione", "listed"], ["Brak", "No"], ["brak", "no"], ["Wynik", "Result"], ["wynik", "result"], ["Koszt", "Cost"], ["koszt", "cost"], ["Drop", "Drop"], ["Czas", "Time"], ["czas", "time"], ["Kurs", "Rate"], ["kurs", "rate"], ["Razem", "Total"], ["Strategia", "Strategy"], ["strategia", "strategy"], ["Strata", "Loss"]]};
       const PLAIN = DATA.plain;
       const HTML_KEYS = Object.keys(DATA.html);
       const RULES = DATA.rules.map(([pattern, replacement]) => [new RegExp(pattern, "u"), replacement]);
@@ -2378,9 +2480,12 @@
       function parseItemText(text) {
         const lines = text.replace(/\r/g, "").split("\n").map(line => line.trim());
         const rarityIndex = lines.findIndex(line => /^(Rarity|Rzadkość)\s*:/i.test(line));
+        const classLine = lines.find(line => /^Item Class\s*:/i.test(line));
+        let rarityName = "";
         let name = "";
         if (rarityIndex >= 0) {
           const rarity = lines[rarityIndex].replace(/^[^:]*:\s*/, "").toLowerCase();
+          rarityName = rarity;
           const first = lines[rarityIndex + 1] || "";
           const second = lines[rarityIndex + 2] || "";
           const twoLines = (rarity === "rare" || rarity === "unique" || rarity === "rzadki" || rarity === "unikatowy") && second && !/^-+$/.test(second);
@@ -2395,7 +2500,7 @@
           if (unit) priceText = `${noteMatch[1].replace(",", ".")}${unit === "c" ? "c" : " div"}`;
           else unknownCurrency = noteMatch[2];
         }
-        return { isItem: rarityIndex >= 0 || Boolean(noteMatch), name: name.trim(), priceText, unknownCurrency, hasNote: Boolean(noteLine) };
+        return { isItem: rarityIndex >= 0 || Boolean(noteMatch), name: name.trim(), priceText, unknownCurrency, hasNote: Boolean(noteLine), rarity: rarityName, itemClass: classLine ? classLine.replace(/^[^:]*:\s*/, "") : "" };
       }
 
       function parseFreeQuery(text) {
@@ -3793,12 +3898,14 @@
       // ----- zakładki widoków -----
       const SUBTITLES = {
         farm: "Zapisuj runy, porównuj strategie i sprawdzaj, która zarabia najwięcej na godzinę.",
-        stash: "Policz, ile hajsu leży w stashu: chaosy, diviny, inne waluty i przedmioty z ich cenami."
+        stash: "Policz, ile hajsu leży w stashu: chaosy, diviny, inne waluty i przedmioty z ich cenami.",
+        build: "Wklej przedmioty z gry, przypisz je do slotów i zobacz, ile kosztował cały build i co było najdroższe."
       };
       function setView(view) {
-        const target = view === "stash" ? "stash" : "farm";
+        const target = view === "stash" || view === "build" ? view : "farm";
         $("view-farm").hidden = target !== "farm";
         $("view-stash").hidden = target !== "stash";
+        $("view-build").hidden = target !== "build";
         document.querySelectorAll(".view-tab").forEach(tab => {
           const active = tab.dataset.view === target;
           tab.classList.toggle("active", active);
@@ -3876,6 +3983,9 @@
           { target: "#stats", title: ["Wyniki", "Results"],
             text: ["Tu na bieżąco widzisz statystyki. Przyciski „Wszystkie runy / Ostatnie 10 / W tej sesji / Per sesja” zmieniają, z czego są liczone.",
                    "Your stats update live here. The “All runs / Last 10 / This session / Per session” buttons change what they are calculated from."] },
+          { target: "#tab-build", title: ["Build · wycena", "Build · valuation"],
+            text: ["W zakładce „Build” wklejasz (Ctrl+V) przedmioty z gry do slotów, a program liczy, ile kosztował cały build i co było najdroższe.",
+                   "In the “Build” tab you paste (Ctrl+V) items from the game into slots, and the app works out what the whole build cost and what was the most expensive."] },
           { target: "#tab-stash", title: ["Stash", "Stash"],
             text: ["Zakładka „Stash” liczy, ile masz hajsu: chaosy, diviny, waluty i przedmioty, z osobnym kursem.",
                    "The “Stash” tab calculates how much wealth you have: chaos, divines, currencies and items, with its own rate."] }
@@ -3995,6 +4105,511 @@
         if (event.key === "ArrowLeft") $("tour-back").click();
       });
       document.addEventListener("poe:lang", () => { if (!$("tour-overlay").hidden) show(); });
+    })();
+  </script>
+  <script>
+    // ===== Build: wycena przedmiotów =====
+    (() => {
+      const calc = window.poeCalc;
+      const $ = id => document.getElementById(id);
+      const esc = calc.escapeHtml;
+      const KEY = "poe-build-v1";
+      const nf = new Intl.NumberFormat(window.poeLocale, { maximumFractionDigits: 2 });
+      const PALETTE = ["#d6a85b", "#67d6a1", "#6fa8ff", "#c58bff", "#ff8585", "#5fd0d6", "#f2c14e", "#9bd45a", "#ff9f6b", "#8fa0ff"];
+      const makeId = () => globalThis.crypto?.randomUUID?.() || `b-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+      // [kolumna, szerokość, wiersz, wysokość]
+      const GEOMETRY = {
+        wl: [1, 2, 1, 4], wr: [8, 2, 1, 4], head: [4, 2, 1, 2], body: [4, 2, 3, 3], amulet: [6, 1, 3, 1],
+        ring1: [3, 1, 4, 1], ring2: [6, 1, 4, 1], gloves: [2, 2, 5, 2], belt: [4, 2, 6, 1], boots: [6, 2, 5, 2],
+        flask1: [3, 1, 7, 1], flask2: [4, 1, 7, 1], flask3: [5, 1, 7, 1], flask4: [6, 1, 7, 1], flask5: [7, 1, 7, 1]
+      };
+      const SLOT_LABELS = {
+        wl: "Broń (lewa ręka)", wr: "Broń (prawa ręka)", head: "Hełm", body: "Zbroja", amulet: "Amulet", ring1: "Pierścień 1", ring2: "Pierścień 2",
+        gloves: "Rękawice", belt: "Pas", boots: "Buty", flask1: "Flaszka 1", flask2: "Flaszka 2", flask3: "Flaszka 3", flask4: "Flaszka 4", flask5: "Flaszka 5",
+        cluster: "Cluster jewels", base: "Base jewels", other: "Inne"
+      };
+      const LISTS = ["cluster", "base", "other"];
+
+      let state = { rate: "155", set: 1, items: [] };
+      let selectedSlot = null;
+      let selectedItem = null;
+
+      function load() {
+        try {
+          const stored = JSON.parse(localStorage.getItem(KEY) || "null");
+          if (stored && Array.isArray(stored.items)) {
+            state.rate = typeof stored.rate === "string" ? stored.rate : "155";
+            state.set = stored.set === 2 ? 2 : 1;
+            state.items = stored.items.filter(item => item && typeof item.slot === "string").map(item => ({
+              id: typeof item.id === "string" ? item.id : makeId(), slot: item.slot, name: String(item.name || ""), base: String(item.base || ""),
+              rarity: String(item.rarity || ""), itemClass: String(item.itemClass || ""), price: String(item.price || ""), text: String(item.text || ""),
+              icon: typeof item.icon === "string" && item.icon.startsWith("data:image/") ? item.icon : ""
+            }));
+          } else {
+            const stash = JSON.parse(localStorage.getItem("poe-stash-v1") || "null");
+            if (stash && typeof stash.rate === "string") state.rate = stash.rate;
+          }
+        } catch (error) { console.error("Nie udało się odczytać buildu:", error); }
+      }
+
+      function save() {
+        try {
+          localStorage.setItem(KEY, JSON.stringify({ version: 1, ...state }));
+          $("save-status").textContent = "Build zapisany automatycznie w tej przeglądarce.";
+        } catch (error) {
+          $("save-status").textContent = "Nie udało się zapisać buildu w przeglądarce (za dużo obrazków?).";
+          console.error(error);
+        }
+      }
+
+      const rate = () => calc.parseRateText(state.rate);
+      const chaosOf = item => calc.parseAmount(item.price, rate());
+
+      function fmt(chaos) {
+        const r = rate();
+        if (r === null) return "—";
+        return Math.abs(chaos) >= r ? `${nf.format(chaos / r)} div` : `${nf.format(chaos)}c`;
+      }
+
+      const slotName = slot => {
+        const weapon = /^w([12])([lr])$/.exec(slot);
+        if (weapon) return `Broń ${weapon[1] === "1" ? "I" : "II"} (${weapon[2] === "l" ? "lewa" : "prawa"} ręka)`;
+        return SLOT_LABELS[slot] || slot;
+      };
+      const fixedSlot = slot => Boolean(GEOMETRY[slot]) || /^w[12][lr]$/.test(slot);
+      const weaponSlot = (side) => `w${state.set}${side}`;
+      const itemIn = slot => state.items.find(item => item.slot === slot);
+      const byId = id => state.items.find(item => item.id === id);
+
+      // ----- parsowanie przedmiotu -----
+      function parseBuildItem(text) {
+        const parsed = calc.parseItemText(text);
+        const lines = text.replace(/\r/g, "").split("\n").map(line => line.trim());
+        const rarityIndex = lines.findIndex(line => /^(Rarity|Rzadkość)\s*:/i.test(line));
+        let name = "";
+        let base = "";
+        if (rarityIndex >= 0) {
+          const first = lines[rarityIndex + 1] || "";
+          const second = lines[rarityIndex + 2] || "";
+          const twoLines = (parsed.rarity === "rare" || parsed.rarity === "unique") && second && !/^-+$/.test(second);
+          name = first;
+          base = twoLines ? second : "";
+        }
+        return { ...parsed, name: name.trim(), base: base.trim() };
+      }
+
+      function autoSlot(parsed) {
+        const klass = (parsed.itemClass || "").toLowerCase();
+        const free = list => list.find(slot => !itemIn(slot));
+        const flasks = ["flask1", "flask2", "flask3", "flask4", "flask5"];
+        if (/helmet/.test(klass)) return "head";
+        if (/body armour/.test(klass)) return "body";
+        if (/gloves/.test(klass)) return "gloves";
+        if (/boots/.test(klass)) return "boots";
+        if (/belt/.test(klass)) return "belt";
+        if (/amulet/.test(klass)) return "amulet";
+        if (/ring/.test(klass)) return free(["ring1", "ring2"]) || "ring1";
+        if (/flask/.test(klass)) return free(flasks) || "flask5";
+        if (/jewel/.test(klass)) return /cluster/i.test(`${parsed.name} ${parsed.base}`) ? "cluster" : "base";
+        if (/shield|quiver/.test(klass)) return weaponSlot("r");
+        if (/claw|dagger|sword|axe|mace|sceptre|wand|bow|staff|staves|rod|spear/.test(klass)) {
+          const twoHanded = /two hand|bow|staff|staves/.test(klass);
+          return twoHanded || !itemIn(weaponSlot("l")) ? weaponSlot("l") : (itemIn(weaponSlot("r")) ? weaponSlot("l") : weaponSlot("r"));
+        }
+        return "other";
+      }
+
+      // ----- obsługa wklejania -----
+      function note(text) { $("build-note").textContent = text; }
+
+      function handleText(text) {
+        const parsed = parseBuildItem(text);
+        if (!parsed.isItem || !parsed.name) { note("Nie rozpoznałem przedmiotu. Skopiuj go w grze (Ctrl+C na przedmiocie) i wklej cały opis."); return; }
+        const slot = selectedSlot || autoSlot(parsed);
+        const existing = fixedSlot(slot) ? itemIn(slot) : null;
+        const entry = {
+          id: existing ? existing.id : makeId(), slot, name: parsed.name, base: parsed.base, rarity: parsed.rarity, itemClass: parsed.itemClass,
+          price: parsed.priceText || "", text, icon: existing && !existing.text ? existing.icon : ""
+        };
+        if (existing) state.items[state.items.indexOf(existing)] = entry; else state.items.push(entry);
+        selectedSlot = null;
+        selectedItem = entry.id;
+        let message = `Wklejono „${entry.name}” do slotu: ${slotName(slot)}.`;
+        if (parsed.priceText) message += ` Cena z notatki: ${calc.displayMoney(parsed.priceText)}.`;
+        else if (parsed.unknownCurrency) message += ` Cena w walucie „${parsed.unknownCurrency}” (obsługuję chaos i divine), wpisz ją w tabeli.`;
+        else message += " W opisie nie było ceny (brak notatki ~b/o), wpisz w tabeli, ile kosztował.";
+        note(message);
+        renderAll();
+        save();
+        const input = $("build-body").querySelector(`tr[data-item="${CSS.escape(entry.id)}"] [data-f="price"]`);
+        if (input && !entry.price) input.focus({ preventScroll: true });
+      }
+
+      function shrinkImage(file) {
+        return new Promise(resolve => {
+          const reader = new FileReader();
+          reader.onerror = () => resolve("");
+          reader.onload = () => {
+            const dataUrl = String(reader.result);
+            const image = new Image();
+            setTimeout(() => resolve(dataUrl.length < 150000 ? dataUrl : ""), 2500);
+            image.onerror = () => resolve(dataUrl.length < 150000 ? dataUrl : "");
+            image.onload = () => {
+              try {
+                const max = 84;
+                const scale = Math.min(1, max / Math.max(image.width, image.height));
+                const canvas = document.createElement("canvas");
+                canvas.width = Math.max(1, Math.round(image.width * scale));
+                canvas.height = Math.max(1, Math.round(image.height * scale));
+                canvas.getContext("2d").drawImage(image, 0, 0, canvas.width, canvas.height);
+                resolve(canvas.toDataURL("image/png"));
+              } catch (error) { resolve(dataUrl.length < 150000 ? dataUrl : ""); }
+            };
+            image.src = dataUrl;
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+
+      async function handleImage(file) {
+        let target = selectedItem ? byId(selectedItem) : null;
+        if (!target && selectedSlot && fixedSlot(selectedSlot)) target = itemIn(selectedSlot);
+        if (!target && !selectedSlot) { note("Najpierw kliknij slot (albo przedmiot), dla którego jest ten obrazek, i dopiero wklej zrzut ekranu."); return; }
+        const icon = await shrinkImage(file);
+        if (!icon) { note("Nie udało się wczytać obrazka."); return; }
+        if (!target) {
+          target = { id: makeId(), slot: selectedSlot, name: "", base: "", rarity: "", itemClass: "", price: "", text: "", icon: "" };
+          state.items.push(target);
+        }
+        target.icon = icon;
+        note(`Ikonka ustawiona (${slotName(target.slot)}).`);
+        renderAll();
+        save();
+      }
+
+      document.addEventListener("paste", event => {
+        if ($("view-build").hidden) return;
+        const target = event.target;
+        const editable = target.matches?.("input, textarea") && target.id !== "build-paste";
+        if (editable) return;
+        const data = event.clipboardData;
+        if (!data) return;
+        const imageItem = [...(data.items || [])].find(item => item.kind === "file" && /^image\//.test(item.type));
+        const text = data.getData("text");
+        if (imageItem && !text.trim()) {
+          event.preventDefault();
+          handleImage(imageItem.getAsFile());
+          return;
+        }
+        if (text.trim()) {
+          event.preventDefault();
+          if (target.id === "build-paste") target.value = "";
+          handleText(text);
+        }
+      });
+
+      // ----- podpowiedź ze statystykami -----
+      const tip = $("build-tip");
+      function tipHtml(item) {
+        const rarity = ["unique", "rare", "magic"].includes(item.rarity) ? item.rarity : "normal";
+        const head = `<div class="tip-head ${rarity}">${esc(item.name || slotName(item.slot))}${item.base ? `<br>${esc(item.base)}` : ""}</div>`;
+        const sections = (item.text || "").replace(/\r/g, "").split(/\n-{4,}\n?/).map(section => section.split("\n").map(line => line.trim()).filter(Boolean));
+        const body = [];
+        const nameLines = item.base ? 2 : 1;
+        sections.forEach((lines, index) => {
+          let rows = lines;
+          if (index === 0) rows = lines.filter(line => !/^(Item Class|Rarity|Rzadkość)\s*:/i.test(line)).slice(nameLines);
+          if (!rows.length) return;
+          const isNote = rows.length === 1 && /^(Note|Notatka)\s*:/i.test(rows[0]);
+          const isReq = /^(Requirements|Sockets|Item Level|Level|Wymagania)/i.test(rows[0]);
+          const isFlavour = item.rarity === "unique" && index === sections.length - 2 && !rows.some(line => /\d/.test(line)) && sections[sections.length - 1]?.some(line => /^Note/i.test(line));
+          const cls = isNote ? "tip-note" : isFlavour ? "tip-flavour" : isReq ? "" : (index >= 1 && !/^(Claw|Quality|Physical|Critical|Attacks|Weapon|Lasts|Consumes|Currently)/i.test(rows[0]) ? "tip-mod" : "");
+          body.push(`<div class="tip-sec ${cls}">${rows.map(row => esc(row)).join("<br>")}</div>`);
+        });
+        const chaos = chaosOf(item);
+        if (chaos !== null && item.price.trim()) body.push(`<div class="tip-sec tip-price">Cena: ${esc(fmt(chaos))}</div>`);
+        return head + body.join("");
+      }
+
+      function showTip(itemId, event) {
+        const item = byId(itemId);
+        if (!item || (!item.text && !item.name)) { tip.hidden = true; return; }
+        tip.innerHTML = tipHtml(item);
+        tip.hidden = false;
+        moveTip(event);
+      }
+      function moveTip(event) {
+        const vw = document.documentElement.clientWidth;
+        const vh = document.documentElement.clientHeight;
+        const w = tip.offsetWidth || 300;
+        const h = tip.offsetHeight || 200;
+        let left = event.clientX + 18;
+        let top = event.clientY + 14;
+        if (left + w > vw - 8) left = event.clientX - w - 18;
+        if (top + h > vh - 8) top = vh - h - 8;
+        tip.style.left = `${Math.max(8, left)}px`;
+        tip.style.top = `${Math.max(8, top)}px`;
+      }
+      document.addEventListener("mouseover", event => {
+        const holder = event.target.closest?.("[data-tip-item]");
+        if (holder && !$("view-build").hidden) showTip(holder.dataset.tipItem, event);
+      });
+      document.addEventListener("mousemove", event => { if (!tip.hidden) moveTip(event); });
+      document.addEventListener("mouseout", event => {
+        const holder = event.target.closest?.("[data-tip-item]");
+        if (holder && !holder.contains(event.relatedTarget)) tip.hidden = true;
+      });
+
+      // ----- renderowanie -----
+      function slotButton(slot) {
+        const [col, colSpan, row, rowSpan] = GEOMETRY[slot];
+        const item = itemIn(slot);
+        const chaos = item ? chaosOf(item) : null;
+        const classes = ["eq-slot", item ? "filled" : "", selectedSlot === slot || (item && selectedItem === item.id) ? "selected" : ""].filter(Boolean).join(" ");
+        const inner = item && item.icon ? `<img src="${esc(item.icon)}" alt="${esc(item.name)}">` : `<span class="eq-name">${esc(item && item.name ? item.name : slotName(slot))}</span>`;
+        const price = item && item.price.trim() && chaos !== null ? `<span class="eq-price">${esc(fmt(chaos))}</span>` : "";
+        return `<button type="button" class="${classes}" data-slot="${slot}" ${item ? `data-tip-item="${esc(item.id)}"` : ""} style="grid-column:${col} / span ${colSpan};grid-row:${row} / span ${rowSpan}" aria-label="${esc(slotName(slot))}">${inner}${price}</button>`;
+      }
+
+      function renderEquipment() {
+        const slots = [`w${state.set}l`, `w${state.set}r`];
+        const map = { [slots[0]]: "wl", [slots[1]]: "wr" };
+        const html = Object.keys(GEOMETRY).map(key => {
+          if (key === "wl" || key === "wr") {
+            const real = key === "wl" ? slots[0] : slots[1];
+            const [col, colSpan, row, rowSpan] = GEOMETRY[key];
+            const item = itemIn(real);
+            const chaos = item ? chaosOf(item) : null;
+            const classes = ["eq-slot", item ? "filled" : "", selectedSlot === real || (item && selectedItem === item.id) ? "selected" : ""].filter(Boolean).join(" ");
+            const inner = item && item.icon ? `<img src="${esc(item.icon)}" alt="${esc(item.name)}">` : `<span class="eq-name">${esc(item && item.name ? item.name : slotName(key))}</span>`;
+            const price = item && item.price.trim() && chaos !== null ? `<span class="eq-price">${esc(fmt(chaos))}</span>` : "";
+            return `<button type="button" class="${classes}" data-slot="${real}" ${item ? `data-tip-item="${esc(item.id)}"` : ""} style="grid-column:${col} / span ${colSpan};grid-row:${row} / span ${rowSpan}" aria-label="${esc(slotName(key))}">${inner}${price}</button>`;
+          }
+          return slotButton(key);
+        });
+        $("build-equipment").innerHTML = html.join("");
+        document.querySelectorAll(".set-btn").forEach(button => {
+          const active = Number(button.dataset.set) === state.set;
+          button.classList.toggle("active", active);
+          button.setAttribute("aria-pressed", String(active));
+        });
+        void map;
+      }
+
+      function renderLists() {
+        $("build-lists").innerHTML = LISTS.map(list => {
+          const items = state.items.filter(item => item.slot === list);
+          const tiles = items.map(item => {
+            const chaos = chaosOf(item);
+            const classes = ["eq-tile", "filled", selectedItem === item.id ? "selected" : ""].filter(Boolean).join(" ");
+            const inner = item.icon ? `<img src="${esc(item.icon)}" alt="${esc(item.name)}">` : `<span class="eq-name">${esc(item.name || "?")}</span>`;
+            const price = item.price.trim() && chaos !== null ? `<span class="eq-price">${esc(fmt(chaos))}</span>` : "";
+            return `<button type="button" class="${classes}" data-tile="${esc(item.id)}" data-tip-item="${esc(item.id)}" aria-label="${esc(item.name)}">${inner}${price}</button>`;
+          }).join("");
+          const add = `<button type="button" class="eq-tile add${selectedSlot === list ? " selected" : ""}" data-slot="${list}" aria-label="${esc(slotName(list))}">＋</button>`;
+          return `<div><div class="build-list-title">${esc(slotName(list))}</div><div class="build-list-tiles">${tiles}${add}</div></div>`;
+        }).join("");
+      }
+
+      function slotOptions(current) {
+        const fixed = [`w${state.set}l`, `w${state.set}r`];
+        const all = ["wl", "wr", "head", "body", "amulet", "ring1", "ring2", "gloves", "belt", "boots", "flask1", "flask2", "flask3", "flask4", "flask5", ...LISTS];
+        const slots = [...all.map(key => key === "wl" ? "w1l" : key === "wr" ? "w1r" : key), "w2l", "w2r"];
+        const labels = { w1l: "Broń I (lewa ręka)", w1r: "Broń I (prawa ręka)", w2l: "Broń II (lewa ręka)", w2r: "Broń II (prawa ręka)" };
+        void fixed;
+        return slots.map(slot => `<option value="${slot}"${slot === current ? " selected" : ""}>${esc(labels[slot] || slotName(slot))}</option>`).join("");
+      }
+
+      function renderTable() {
+        const total = state.items.reduce((sum, item) => sum + (chaosOf(item) ?? 0), 0);
+        $("build-body").innerHTML = state.items.map(item => {
+          const chaos = chaosOf(item);
+          const share = total > 0 && chaos !== null ? `${nf.format(chaos / total * 100)}%` : "—";
+          const missing = !item.price.trim();
+          return `<tr data-item="${esc(item.id)}"${missing ? ' class="no-price"' : ""}>
+            <td>${item.icon ? `<img class="thumb" src="${esc(item.icon)}" alt="">` : '<div class="thumb-empty">▫</div>'}</td>
+            <td><select data-f="slot" aria-label="Slot">${slotOptions(item.slot)}</select></td>
+            <td class="item-name" data-tip-item="${esc(item.id)}"><strong>${esc(item.name || "(bez nazwy)")}</strong>${item.base ? `<small>${esc(item.base)}</small>` : ""}</td>
+            <td>${calc.moneyInput('data-f="price"', item.price, "ile kosztował, np. 42 div", "Cena przedmiotu")}</td>
+            <td data-share>${share}</td>
+            <td><div class="row-actions">
+              <button class="remove-run" type="button" data-icon-clear title="Usuń ikonkę" aria-label="Usuń ikonkę"${item.icon ? "" : " disabled"}>🖼</button>
+              <button class="remove-run" type="button" data-remove title="Usuń przedmiot" aria-label="Usuń przedmiot">×</button>
+            </div></td>
+          </tr>`;
+        }).join("");
+        $("build-empty").hidden = state.items.length > 0;
+      }
+
+      function updateTotals() {
+        const r = rate();
+        $("build-rate-error").textContent = r === null ? "Podaj kurs większy od zera, np. 155." : "";
+        $("build-rate").classList.toggle("invalid", r === null);
+        const priced = state.items.map(item => ({ item, chaos: item.price.trim() ? chaosOf(item) : null })).filter(entry => entry.chaos !== null && entry.chaos > 0);
+        const total = priced.reduce((sum, entry) => sum + entry.chaos, 0);
+        const missing = state.items.filter(item => !item.price.trim()).length;
+        const top = [...priced].sort((a, b) => b.chaos - a.chaos)[0];
+        $("build-summary").innerHTML = `
+          <div class="stash-total"><div class="stash-total-label">Łączny koszt buildu</div><div class="stash-total-value">${r === null ? "—" : `${nf.format(total / r)} div`}</div><div class="stash-total-sub">${nf.format(total)}c</div></div>
+          <div class="stash-part"><div class="stash-part-label">Przedmioty</div><div class="stash-part-value">${state.items.length}</div><div class="stash-part-sub">${priced.length} z ceną</div></div>
+          <div class="stash-part"><div class="stash-part-label">Bez ceny</div><div class="stash-part-value">${missing}</div><div class="stash-part-sub">uzupełnij w tabeli</div></div>
+          <div class="stash-part"><div class="stash-part-label">Najdroższy</div><div class="stash-part-value">${top ? esc(fmt(top.chaos)) : "—"}</div><div class="stash-part-sub">${top ? esc(top.item.name || slotName(top.item.slot)) : "—"}</div></div>
+          <div class="stash-part"><div class="stash-part-label">Średnio na przedmiot</div><div class="stash-part-value">${priced.length ? esc(fmt(total / priced.length)) : "—"}</div><div class="stash-part-sub">z przedmiotów z ceną</div></div>`;
+        $("build-count").textContent = `${state.items.length} ${state.items.length === 1 ? "przedmiot" : "przedmiotów"}`;
+        $("build-target").textContent = selectedSlot ? `Wybrany slot: ${slotName(selectedSlot)}` : (selectedItem && byId(selectedItem) ? `Wybrany: ${byId(selectedItem).name || slotName(byId(selectedItem).slot)}` : "Nie wybrano slotu: slot dobierze się z typu przedmiotu");
+        document.querySelectorAll("#build-body tr[data-item]").forEach(tr => {
+          const item = byId(tr.dataset.item);
+          const chaos = item ? chaosOf(item) : null;
+          tr.querySelector("[data-share]").textContent = total > 0 && chaos !== null && item.price.trim() ? `${nf.format(chaos / total * 100)}%` : "—";
+          tr.classList.toggle("no-price", !item.price.trim());
+        });
+        renderChart(priced, total);
+      }
+
+      function renderChart(priced, total) {
+        $("build-chart-body").hidden = priced.length === 0;
+        $("build-chart-empty").hidden = priced.length > 0;
+        if (!priced.length) return;
+        const sorted = [...priced].sort((a, b) => b.chaos - a.chaos);
+        const slices = sorted.slice(0, 8).map((entry, index) => ({ label: entry.item.name || slotName(entry.item.slot), slot: slotName(entry.item.slot), chaos: entry.chaos, color: PALETTE[index % PALETTE.length] }));
+        const rest = sorted.slice(8);
+        if (rest.length) slices.push({ label: `Pozostałe (${rest.length})`, slot: "", chaos: rest.reduce((sum, entry) => sum + entry.chaos, 0), color: "#4b5365" });
+        const c = 130, r = 92, sw = 54, C = 2 * Math.PI * r;
+        const gap = slices.length > 1 ? 2 : 0;
+        let acc = 0;
+        const arcs = slices.map(slice => {
+          const length = slice.chaos / total * C;
+          const dash = Math.max(length - gap, 0.5);
+          const arc = `<circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="${slice.color}" stroke-width="${sw}" stroke-dasharray="${dash.toFixed(3)} ${(C - dash).toFixed(3)}" stroke-dashoffset="${(-(acc + gap / 2)).toFixed(3)}" transform="rotate(-90 ${c} ${c})"><title>${esc(slice.label)}: ${nf.format(slice.chaos / total * 100)}% · ${esc(fmt(slice.chaos))}</title></circle>`;
+          acc += length;
+          return arc;
+        }).join("");
+        const labels = (() => {
+          let pos = 0;
+          return slices.map(slice => {
+            const length = slice.chaos / total * C;
+            const angle = (pos + length / 2) / C * 2 * Math.PI - Math.PI / 2;
+            pos += length;
+            return slice.chaos / total >= 0.07 ? `<text x="${(c + r * Math.cos(angle)).toFixed(1)}" y="${(c + r * Math.sin(angle)).toFixed(1)}" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="700" fill="#10131b">${nf.format(slice.chaos / total * 100)}%</text>` : "";
+          }).join("");
+        })();
+        $("build-donut").innerHTML = `<svg viewBox="0 0 260 260" role="img" aria-label="Wykres kosztów">${arcs}${labels}<text x="${c}" y="${c - 9}" text-anchor="middle" font-size="11" fill="#9ba3b5">Razem</text><text x="${c}" y="${c + 14}" text-anchor="middle" font-size="17" font-weight="700" fill="#f5d69f">${esc(fmt(total))}</text></svg>`;
+        $("build-legend").innerHTML = slices.map((slice, index) => `<div class="legend-row${index === 0 ? " leader" : ""}"><span class="dot" style="background:${slice.color}"></span><div class="legend-main"><strong>${esc(slice.label)}</strong><span class="legend-sub">${esc(slice.slot)}${index === 0 && slice.slot ? " · najdroższy" : ""}</span></div><div class="legend-values"><strong>${esc(fmt(slice.chaos))}</strong><span>${nf.format(slice.chaos / total * 100)}%</span></div></div>`).join("");
+      }
+
+      function renderAll() {
+        $("build-rate").value = state.rate;
+        renderEquipment();
+        renderLists();
+        renderTable();
+        updateTotals();
+      }
+
+      // ----- zdarzenia -----
+      $("build-equipment").addEventListener("click", event => {
+        const button = event.target.closest("[data-slot]");
+        if (!button) return;
+        const slot = button.dataset.slot;
+        const item = itemIn(slot);
+        if (selectedSlot === slot) { selectedSlot = null; selectedItem = null; }
+        else { selectedSlot = slot; selectedItem = item ? item.id : null; }
+        renderEquipment();
+        renderLists();
+        updateTotals();
+        $("build-paste").focus({ preventScroll: true });
+      });
+      $("build-lists").addEventListener("click", event => {
+        const tile = event.target.closest("[data-tile]");
+        const add = event.target.closest("[data-slot]");
+        if (tile) {
+          const same = selectedItem === tile.dataset.tile;
+          selectedItem = same ? null : tile.dataset.tile;
+          selectedSlot = null;
+        } else if (add) {
+          selectedSlot = selectedSlot === add.dataset.slot ? null : add.dataset.slot;
+          selectedItem = null;
+        } else return;
+        renderEquipment();
+        renderLists();
+        updateTotals();
+        $("build-paste").focus({ preventScroll: true });
+      });
+      document.querySelectorAll(".set-btn").forEach(button => button.addEventListener("click", () => {
+        state.set = Number(button.dataset.set) === 2 ? 2 : 1;
+        selectedSlot = null;
+        selectedItem = null;
+        renderAll();
+        save();
+      }));
+
+      const body = $("build-body");
+      body.addEventListener("input", event => {
+        const input = event.target;
+        if (input.dataset.f !== "price") return;
+        const item = byId(input.closest("tr[data-item]")?.dataset.item);
+        if (!item) return;
+        item.price = input.value;
+        updateTotals();
+        renderEquipment();
+        renderLists();
+        save();
+      });
+      body.addEventListener("change", event => {
+        const select = event.target.closest("select[data-f='slot']");
+        const item = select && byId(select.closest("tr[data-item]").dataset.item);
+        if (!item) return;
+        const slot = select.value;
+        if (fixedSlot(slot)) {
+          const other = itemIn(slot);
+          if (other && other.id !== item.id) other.slot = "other";
+        }
+        item.slot = slot;
+        if (slot === "w1l" || slot === "w1r") state.set = 1;
+        if (slot === "w2l" || slot === "w2r") state.set = 2;
+        renderAll();
+        save();
+      });
+      body.addEventListener("click", event => {
+        const row = event.target.closest("tr[data-item]");
+        const item = row && byId(row.dataset.item);
+        if (!item) return;
+        if (event.target.closest("[data-remove]")) {
+          state.items = state.items.filter(entry => entry.id !== item.id);
+          if (selectedItem === item.id) selectedItem = null;
+          renderAll();
+          save();
+        } else if (event.target.closest("[data-icon-clear]")) {
+          item.icon = "";
+          renderAll();
+          save();
+        }
+      });
+
+      $("build-sort").addEventListener("click", () => {
+        state.items.sort((a, b) => (chaosOf(b) ?? -1) - (chaosOf(a) ?? -1));
+        renderAll();
+        save();
+      });
+      $("build-rate").addEventListener("input", () => {
+        state.rate = $("build-rate").value;
+        updateTotals();
+        renderEquipment();
+        renderLists();
+        save();
+      });
+      $("build-clear").addEventListener("click", () => {
+        if (!window.confirm("Wyczyścić cały build (przedmioty, ikonki i kurs)?")) return;
+        state = { rate: "155", set: 1, items: [] };
+        selectedSlot = null;
+        selectedItem = null;
+        note("");
+        renderAll();
+        save();
+      });
+
+      load();
+      renderAll();
     })();
   </script>
   <script>
