@@ -4603,9 +4603,13 @@
       }
       document.addEventListener("mouseover", event => {
         const holder = event.target.closest?.("[data-tip-item]");
-        if (holder && !$("view-build").hidden) showTip(holder.dataset.tipItem, event);
+        if (holder && !$("view-build").hidden) { setAlt(event.altKey); showTip(holder.dataset.tipItem, event); }
       });
-      document.addEventListener("mousemove", event => { if (!tip.hidden) moveTip(event); });
+      // Zdarzenia myszy niosą prawdziwy stan Alt, więc naprawiają sytuację, gdy przeglądarka "zgubiła" keydown/keyup
+      document.addEventListener("mousemove", event => {
+        if (!$("view-build").hidden && event.altKey !== altDown) setAlt(event.altKey);
+        if (!tip.hidden) moveTip(event);
+      });
       document.addEventListener("mouseout", event => {
         const holder = event.target.closest?.("[data-tip-item]");
         if (holder && !holder.contains(event.relatedTarget)) { tip.hidden = true; tipItemId = null; }
@@ -4615,9 +4619,20 @@
         altDown = value;
         if (!tip.hidden && tipItemId && byId(tipItemId)) tip.innerHTML = tipHtml(byId(tipItemId), altDown);
       };
-      document.addEventListener("keydown", event => { if (event.key === "Alt") setAlt(true); });
-      document.addEventListener("keyup", event => { if (event.key === "Alt") setAlt(false); });
+      // preventDefault na samym Alt: bez tego przeglądarka (Windows) po puszczeniu Alt przenosi fokus na swoje menu
+      // i strona przestaje dostawać klawisze, przez co drugie wciśnięcie Alt nic nie robiło
+      document.addEventListener("keydown", event => {
+        if (event.key !== "Alt" || $("view-build").hidden) return;
+        event.preventDefault();
+        setAlt(true);
+      }, true);
+      document.addEventListener("keyup", event => {
+        if (event.key !== "Alt" || $("view-build").hidden) return;
+        event.preventDefault();
+        setAlt(false);
+      }, true);
       window.addEventListener("blur", () => setAlt(false));
+      document.addEventListener("visibilitychange", () => { if (document.hidden) setAlt(false); });
 
       // przypinane okienka (Alt + klik)
       const pinnedTips = new Map();
